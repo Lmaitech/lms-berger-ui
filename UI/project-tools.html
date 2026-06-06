@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Tools - Berger LMS</title>
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --purple-main: #4a154b;
+            --purple-light: #6b266d;
+            --purple-dark: #300c31;
+            --purple-gradient: linear-gradient(135deg, #6b266d 0%, #300c31 100%);
+            --yellow-accent: #ffcc00;
+            --yellow-hover: #e6b800;
+            --text-dark: #1f1f1f;
+            --text-muted: #757575;
+            --bg-light: #f7f5fa;
+            --card-bg: #ffffff;
+            --border-radius: 20px;
+            --shadow-lg: 0 20px 25px -5px rgba(74, 21, 75, 0.12), 0 10px 10px -5px rgba(74, 21, 75, 0.04);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 16px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            border: 1px solid rgba(74, 21, 75, 0.08);
+            margin-bottom: 30px;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .app-header {
+            background: var(--purple-gradient);
+            padding: 24px 20px;
+            color: #ffffff;
+            border-bottom: 4px solid var(--yellow-accent);
+        }
+
+        .brand-logo {
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--yellow-accent);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .brand-logo svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--yellow-accent);
+        }
+
+        .header-title {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .content {
+            padding: 24px 20px;
+        }
+
+        .welcome-card {
+            background: #faf8fc;
+            border: 1.5px solid #f0eaf5;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+
+        .welcome-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--purple-dark);
+            margin-bottom: 4px;
+        }
+
+        .welcome-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .section-title {
+            font-size: 14px;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: var(--purple-light);
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+            border-bottom: 1.5px solid #f0eaf5;
+            padding-bottom: 6px;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .tool-card {
+            background: #ffffff;
+            border: 1.5px solid #e2d9e8;
+            border-radius: 16px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .tool-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--purple-light);
+            box-shadow: 0 10px 15px -3px rgba(74, 21, 75, 0.05);
+        }
+
+        .tool-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: rgba(74, 21, 75, 0.05);
+            color: var(--purple-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px auto;
+            transition: var(--transition);
+        }
+
+        .tool-card:hover .tool-icon {
+            background: var(--purple-main);
+            color: #ffffff;
+        }
+
+        .tool-icon svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+        }
+
+        .tool-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: #2d2d2d;
+            margin-bottom: 4px;
+        }
+
+        .tool-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1.3;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 24px;
+            padding: 12px 20px;
+            background: transparent;
+            border: 2px solid var(--purple-light);
+            color: var(--purple-light);
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .btn-back:hover {
+            background: var(--purple-light);
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <header class="app-header">
+            <div class="brand-logo">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3zm1 11h-2v-2h2v2zm0-4h-2V7h2v3z"/>
+                </svg>
+                Berger Paints CRM
+            </div>
+            <h1 class="header-title">Project Tools</h1>
+        </header>
+
+        <div class="content">
+            <div class="welcome-card">
+                <h3 class="welcome-title" id="welcomeTitle">Site Visit Active</h3>
+                <p class="welcome-desc" id="welcomeDesc">Your coordinates have been successfully verified. Select a tool below to record your site measurements or estimate materials.</p>
+            </div>
+
+            <h3 class="section-title">Renovation Tools</h3>
+
+            <div class="tools-grid">
+                <!-- Tool 1 -->
+                <div class="tool-card" onclick="goToSiteWon()">
+                    <div class="tool-icon" style="color: #2e7d32; background: rgba(46, 125, 50, 0.1);">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                    </div>
+                    <div class="tool-name">Site is won</div>
+                    <div class="tool-desc">Mark project as successfully won and closed</div>
+                </div>
+                <!-- Tool 2 -->
+                <div class="tool-card" onclick="goToSiteLost()">
+                    <div class="tool-icon" style="color: #c62828; background: rgba(198, 40, 40, 0.1);">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11H7v-2h10v2z"/></svg>
+                    </div>
+                    <div class="tool-name">Site is lost</div>
+                    <div class="tool-desc">Record site closure with lost reason details</div>
+                </div>
+
+                <!-- Tool 3 -->
+                <div class="tool-card" onclick="goToScheduleFollowup()">
+                    <div class="tool-icon" style="color: #b7791f; background: rgba(183, 121, 31, 0.1);">
+                        <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm-5-7h-4v4h4v-4z"/></svg>
+                    </div>
+                    <div class="tool-name">Schedule follow up</div>
+                    <div class="tool-desc">Set next site meeting date and reminders</div>
+                </div>
+
+                <!-- Tool 4 -->
+                <div class="tool-card" onclick="goToSubmitEstimate()">
+                    <div class="tool-icon" style="color: #1565c0; background: rgba(21, 101, 192, 0.1);">
+                        <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                    </div>
+                    <div class="tool-name">Estimate submission</div>
+                    <div class="tool-desc">Generate material and labor cost quotes</div>
+                </div>
+
+                <!-- Tool 5 -->
+                <div class="tool-card" style="grid-column: span 2;" onclick="alert('Knowledge Bank is coming in the next updates!')">
+                    <div class="tool-icon" style="color: var(--purple-main); background: rgba(74, 21, 75, 0.08);">
+                        <svg viewBox="0 0 24 24"><path d="M12 11.55C9.64 9.35 6.48 8 3 8v11c3.48 0 6.64 1.35 9 3.55 2.36-2.2 5.52-3.55 9-3.55V8c-3.48 0-6.64 1.35-9 3.55zM12 2c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3z"/></svg>
+                    </div>
+                    <div class="tool-name">Knowledge Bank</div>
+                    <div class="tool-desc">Access paint catalog, application guides, and product catalog training</div>
+                </div>
+            </div>
+
+            <a href="#" class="btn-back" id="btnBackToDashboard">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                Back to Pipeline
+            </a>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const leadId = urlParams.get('lead_id');
+        const painterId = urlParams.get('painter_id') || urlParams.get('id');
+
+        // Set back button link
+        const backBtn = document.getElementById('btnBackToDashboard');
+        if (painterId) {
+            backBtn.href = `open-leads-by-user-type.html?id=${painterId}`;
+        } else {
+            backBtn.href = `open-leads-by-user-type.html`;
+        }
+
+        // Custom details if available
+        if (leadId) {
+            document.getElementById('welcomeTitle').textContent = `Active Visit - Lead #${leadId.substring(0, 8)}`;
+        }
+
+        function goToScheduleFollowup() {
+            const visitNumber = urlParams.get('visit_number') || '1';
+            const ownerName = urlParams.get('owner_name') || '';
+            const ownerMobile = urlParams.get('owner_mobile') || '';
+            const address = urlParams.get('address') || '';
+            window.location.href = `schedule-followup.html?lead_id=${leadId}&id=${painterId}&visit_number=${visitNumber}&owner_name=${encodeURIComponent(ownerName)}&owner_mobile=${ownerMobile}&address=${encodeURIComponent(address)}`;
+        }
+
+        function goToSubmitEstimate() {
+            const visitNumber = urlParams.get('visit_number') || '1';
+            const ownerName = urlParams.get('owner_name') || '';
+            const ownerMobile = urlParams.get('owner_mobile') || '';
+            const address = urlParams.get('address') || '';
+            const painterName = urlParams.get('painter_name') || '';
+            const retailerName = urlParams.get('retailer_name') || '';
+            window.location.href = `submit-estimate.html?lead_id=${leadId}&id=${painterId}&visit_number=${visitNumber}&owner_name=${encodeURIComponent(ownerName)}&owner_mobile=${ownerMobile}&address=${encodeURIComponent(address)}&painter_name=${encodeURIComponent(painterName)}&retailer_name=${encodeURIComponent(retailerName)}`;
+        }
+
+        function goToSiteWon() {
+            const visitNumber = urlParams.get('visit_number') || '1';
+            const ownerName = urlParams.get('owner_name') || '';
+            const ownerMobile = urlParams.get('owner_mobile') || '';
+            const address = urlParams.get('address') || '';
+            const painterName = urlParams.get('painter_name') || '';
+            const retailerName = urlParams.get('retailer_name') || '';
+            window.location.href = `site-won.html?lead_id=${leadId}&id=${painterId}&visit_number=${visitNumber}&owner_name=${encodeURIComponent(ownerName)}&owner_mobile=${ownerMobile}&address=${encodeURIComponent(address)}&painter_name=${encodeURIComponent(painterName)}&retailer_name=${encodeURIComponent(retailerName)}`;
+        }
+
+        function goToSiteLost() {
+            const visitNumber = urlParams.get('visit_number') || '1';
+            const ownerName = urlParams.get('owner_name') || '';
+            const ownerMobile = urlParams.get('owner_mobile') || '';
+            const address = urlParams.get('address') || '';
+            const painterName = urlParams.get('painter_name') || '';
+            const retailerName = urlParams.get('retailer_name') || '';
+            window.location.href = `site-lost.html?lead_id=${leadId}&id=${painterId}&visit_number=${visitNumber}&owner_name=${encodeURIComponent(ownerName)}&owner_mobile=${ownerMobile}&address=${encodeURIComponent(address)}&painter_name=${encodeURIComponent(painterName)}&retailer_name=${encodeURIComponent(retailerName)}`;
+        }
+    </script>
+</body>
+</html>

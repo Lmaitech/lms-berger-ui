@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirm Site Won - Berger LMS</title>
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --purple-main: #4a154b;
+            --purple-light: #6b266d;
+            --purple-dark: #300c31;
+            --purple-gradient: linear-gradient(135deg, #6b266d 0%, #300c31 100%);
+            --yellow-accent: #ffcc00;
+            --yellow-hover: #e6b800;
+            --text-dark: #1f1f1f;
+            --text-muted: #757575;
+            --bg-light: #f7f5fa;
+            --card-bg: #ffffff;
+            --border-radius: 20px;
+            --input-border: #e2d9e8;
+            --shadow-lg: 0 20px 25px -5px rgba(74, 21, 75, 0.12), 0 10px 10px -5px rgba(74, 21, 75, 0.04);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --success-color: #2e7d32;
+            --error-color: #c62828;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 16px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            border: 1px solid rgba(74, 21, 75, 0.08);
+            margin-bottom: 30px;
+            animation: slideUp 0.4s ease-out;
+            position: relative;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .app-header {
+            background: var(--purple-gradient);
+            padding: 24px 20px;
+            color: #ffffff;
+            border-bottom: 4px solid var(--yellow-accent);
+        }
+
+        .brand-logo {
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--yellow-accent);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .brand-logo svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--yellow-accent);
+        }
+
+        .header-title {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        /* Summary Card */
+        .summary-card {
+            background: #faf8fc;
+            border: 1.5px solid #f0eaf5;
+            border-radius: 16px;
+            padding: 14px;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .summary-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .summary-label {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .summary-val {
+            color: var(--text-dark);
+            font-weight: 600;
+            text-align: right;
+            max-width: 65%;
+        }
+
+        .section-title {
+            font-size: 14px;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: var(--purple-light);
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            border-bottom: 1.5px solid #f0eaf5;
+            padding-bottom: 6px;
+        }
+
+        /* Estimate Preview Box */
+        .estimate-box {
+            background: #ffffff;
+            border: 2px solid var(--purple-light);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 12px rgba(107, 38, 109, 0.05);
+        }
+
+        .est-title-bar {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 800;
+            font-size: 14px;
+            color: var(--purple-main);
+            border-bottom: 1px dashed var(--input-border);
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+        }
+
+        .est-item-row {
+            font-size: 13px;
+            padding: 4px 0;
+            border-bottom: 1px dotted #faf8fc;
+        }
+
+        .est-footer {
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1.5px solid #f0eaf5;
+        }
+
+        .est-cost-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        .est-cost-row.grand-total {
+            font-weight: 800;
+            font-size: 16px;
+            color: var(--purple-main);
+            margin-top: 6px;
+            padding-top: 4px;
+            border-top: 1px dashed var(--purple-light);
+        }
+
+        /* Action Buttons */
+        .action-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-confirm {
+            background: var(--purple-main);
+            color: #ffffff;
+        }
+
+        .btn-confirm:hover {
+            background: var(--purple-light);
+            box-shadow: 0 8px 16px rgba(74, 21, 75, 0.2);
+        }
+
+        .btn-change {
+            background: #ffffff;
+            color: var(--purple-main);
+            border: 2px solid var(--purple-light);
+        }
+
+        .btn-change:hover {
+            background: #faf8fc;
+        }
+
+        .btn-back {
+            background: transparent;
+            color: var(--text-muted);
+            border: none;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+
+        .btn-back:hover {
+            color: var(--purple-main);
+            text-decoration: underline;
+        }
+
+        /* Status Panels */
+        .loading-panel, .error-panel {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 4px solid rgba(74, 21, 75, 0.1);
+            border-top: 4px solid var(--purple-light);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 14px;
+            margin-bottom: 16px;
+            font-weight: 500;
+        }
+
+        /* Success Overlay */
+        .success-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.98);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            z-index: 100;
+            text-align: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .success-icon {
+            width: 72px;
+            height: 72px;
+            background: #e8f5e9;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .success-icon svg {
+            width: 36px;
+            height: 36px;
+            fill: #2e7d32;
+        }
+
+        .success-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: #2e7d32;
+            margin-bottom: 8px;
+        }
+
+        .success-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Success Screen Overlay -->
+        <div class="success-overlay" id="successScreen">
+            <div class="success-icon">
+                <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+            </div>
+            <h3 class="success-title">Site Won Registered!</h3>
+            <p class="success-desc" id="successDesc">The site was successfully registered as WON and closed. Returning you to pipeline...</p>
+        </div>
+
+        <header class="app-header">
+            <div class="brand-logo">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3zm1 11h-2v-2h2v2zm0-4h-2V7h2v3z"/>
+                </svg>
+                Berger Paints CRM
+            </div>
+            <h1 class="header-title">Mark Site as Won</h1>
+        </header>
+
+        <div class="content">
+            <!-- Project / Client Summary -->
+            <div class="summary-card">
+                <div class="summary-row">
+                    <span class="summary-label">Client Name</span>
+                    <span class="summary-val" id="summaryName">-</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Address</span>
+                    <span class="summary-val" id="summaryAddress">-</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Visit Count</span>
+                    <span class="summary-val" id="summaryVisitNumber">-</span>
+                </div>
+            </div>
+
+            <h3 class="section-title">Latest Estimate Confirmation</h3>
+
+            <!-- Dynamic Loader Panel -->
+            <div id="loaderPanel" class="loading-panel">
+                <div class="spinner"></div>
+                <p style="color: var(--text-muted); font-size: 13px;">Checking latest project estimate...</p>
+            </div>
+
+            <!-- Error/Empty State Panel -->
+            <div id="errorPanel" class="error-panel" style="display: none;">
+                <div class="error-message" id="errorMsg">No estimate has been submitted for this site yet.</div>
+                <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">You must submit an estimate before marking this site as won.</p>
+                <a href="#" class="btn btn-confirm" id="btnGoToEstimate">
+                    Submit Material Estimate
+                </a>
+            </div>
+
+            <!-- Estimate Confirmation Details -->
+            <div id="estimateConfirmationPanel" style="display: none;">
+                <div class="estimate-box">
+                    <div class="est-title-bar">
+                        <span id="estVersionTitle">Estimate Version #1</span>
+                        <span id="estMetaTitle" style="font-weight: 500; font-size: 12px; color: var(--text-muted);">SUPPLY - VOLUME</span>
+                    </div>
+                    <div id="estItemsList" style="margin-bottom: 12px;">
+                        <!-- Items rendered here -->
+                    </div>
+                    <div class="est-footer">
+                        <div class="est-cost-row">
+                            <span>Material Total:</span>
+                            <span id="estMaterialVal" style="font-weight: 600;">-</span>
+                        </div>
+                        <div class="est-cost-row" id="estLabourRow" style="display: none;">
+                            <span>Manpower Charges:</span>
+                            <span id="estLabourVal" style="font-weight: 600;">-</span>
+                        </div>
+                        <div class="est-cost-row grand-total">
+                            <span>Grand Total:</span>
+                            <span id="estGrandTotalVal">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-container">
+                    <button type="button" class="btn btn-confirm" id="btnConfirmWon">
+                        Confirm & Mark Won
+                    </button>
+                    <a href="#" class="btn btn-change" id="btnReviseEstimate">
+                        Change / Revise Estimate
+                    </a>
+                </div>
+            </div>
+
+            <div style="text-align: center;">
+                <button type="button" class="btn btn-back" id="btnCancel">Cancel & Return</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Configuration parameters -->
+    <script src="config.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const leadId = urlParams.get('lead_id');
+        const painterId = urlParams.get('id');
+        const visitNumber = urlParams.get('visit_number') || '1';
+        const ownerName = urlParams.get('owner_name') || '';
+        const ownerMobile = urlParams.get('owner_mobile') || '';
+        const address = urlParams.get('address') || '';
+        const painterName = urlParams.get('painter_name') || '';
+        const retailerName = urlParams.get('retailer_name') || '';
+
+        // Populate summary
+        document.getElementById('summaryName').textContent = ownerName || '-';
+        document.getElementById('summaryAddress').textContent = address || '-';
+        document.getElementById('summaryVisitNumber').textContent = `${visitNumber} Visits`;
+
+        const returnUrl = `project-tools.html?lead_id=${leadId}&id=${painterId}&visit_number=${visitNumber}&owner_name=${encodeURIComponent(ownerName)}&owner_mobile=${ownerMobile}&address=${encodeURIComponent(address)}&painter_name=${encodeURIComponent(painterName)}&retailer_name=${encodeURIComponent(retailerName)}`;
+        
+        document.getElementById('btnCancel').addEventListener('click', () => {
+            window.location.href = returnUrl;
+        });
+
+        // Set links for redirects
+        const estUrl = `submit-estimate.html?lead_id=${leadId}&id=${painterId}&visit_number=${visitNumber}&owner_name=${encodeURIComponent(ownerName)}&owner_mobile=${ownerMobile}&address=${encodeURIComponent(address)}&painter_name=${encodeURIComponent(painterName)}&retailer_name=${encodeURIComponent(retailerName)}`;
+        document.getElementById('btnGoToEstimate').href = estUrl;
+        document.getElementById('btnReviseEstimate').href = estUrl;
+
+        let latestEstimateId = null;
+        let latestVersion = 0;
+
+        // Fetch Estimates on Load
+        window.addEventListener('load', async () => {
+            const loader = document.getElementById('loaderPanel');
+            const errorPanel = document.getElementById('errorPanel');
+            const confirmPanel = document.getElementById('estimateConfirmationPanel');
+
+            try {
+                const baseUrl = CONFIG.N8N_WEBHOOK_URL.endsWith('/') ? CONFIG.N8N_WEBHOOK_URL : CONFIG.N8N_WEBHOOK_URL + '/';
+                const response = await fetch(`${baseUrl}previous-estimates?lead_id=${leadId}`);
+                
+                if (response.ok) {
+                    let data = await response.json();
+                    data = data.filter(item => item && item.estimate_id);
+
+                    if (data.length === 0) {
+                        loader.style.display = 'none';
+                        errorPanel.style.display = 'block';
+                        return;
+                    }
+
+                    // Group by version and find max version
+                    const grouped = {};
+                    data.forEach(item => {
+                        if (!grouped[item.estimate_version]) {
+                            grouped[item.estimate_version] = {
+                                estimate_id: item.estimate_id,
+                                version: item.estimate_version,
+                                grand_total: item.grand_total,
+                                material_total: item.material_total,
+                                labour_cost: item.labour_cost,
+                                mode: item.estimate_mode,
+                                type: item.estimate_type,
+                                items: []
+                            };
+                        }
+                        grouped[item.estimate_version].items.push(item);
+                    });
+
+                    // Find latest version
+                    const versions = Object.keys(grouped).map(Number).sort((a,b) => b-a);
+                    latestVersion = versions[0];
+                    const est = grouped[latestVersion];
+                    latestEstimateId = est.estimate_id;
+
+                    // Render latest estimate
+                    document.getElementById('estVersionTitle').textContent = `Estimate Version #${latestVersion}`;
+                    const modeLbl = est.mode === 'SUPPLY_APPLY' ? 'Supply & Apply' : 'Supply Only';
+                    const typeLbl = est.type === 'VALUE' ? 'Value-based' : 'Volume-based';
+                    document.getElementById('estMetaTitle').textContent = `${modeLbl} - ${typeLbl}`;
+
+                    // Items list
+                    const itemsContainer = document.getElementById('estItemsList');
+                    itemsContainer.innerHTML = '';
+                    const isValue = est.type === 'VALUE';
+
+                    est.items.forEach(item => {
+                        const row = document.createElement('div');
+                        row.className = 'est-item-row';
+                        row.style.display = 'flex';
+                        row.style.justifyContent = 'space-between';
+                        
+                        const unitStr = item.unit || 'L';
+                        const qtyStr = `${parseFloat(item.quantity)} ${unitStr}`;
+                        const rateStr = isValue ? ` @ Rs ${parseFloat(item.rate).toFixed(2)}` : '';
+                        
+                        row.innerHTML = `
+                            <span>&bull; ${item.product_name}</span>
+                            <span style="font-weight:600;">${qtyStr}${rateStr}</span>
+                        `;
+                        itemsContainer.appendChild(row);
+                    });
+
+                    // Totals
+                    const isSupplyApply = est.mode === 'SUPPLY_APPLY';
+                    if (isValue) {
+                        document.getElementById('estMaterialVal').textContent = `Rs ${parseFloat(est.material_total).toFixed(2)}`;
+                        if (isSupplyApply) {
+                            document.getElementById('estLabourRow').style.display = 'flex';
+                            document.getElementById('estLabourVal').textContent = `Rs ${parseFloat(est.labour_cost).toFixed(2)}`;
+                        }
+                        document.getElementById('estGrandTotalVal').textContent = `Rs ${parseFloat(est.grand_total).toFixed(2)}`;
+                    } else {
+                        // Volume mode
+                        // Calculate volume sums dynamically
+                        const volSums = {};
+                        est.items.forEach(item => {
+                            let u = item.unit || 'L';
+                            const upperUnit = u.toUpperCase().trim();
+                            if (['L', 'LTR', 'LITRE', 'LITRES'].includes(upperUnit)) u = 'L';
+                            else if (['KG', 'KGS', 'KILOGRAM'].includes(upperUnit)) u = 'Kg';
+                            volSums[u] = (volSums[u] || 0) + parseFloat(item.quantity);
+                        });
+
+                        const volParts = [];
+                        Object.keys(volSums).forEach(u => {
+                            if (volSums[u] > 0) volParts.push(`${volSums[u].toFixed(2)} ${u}`);
+                        });
+                        const volStr = volParts.join(' + ') || '0.00 L/Kg';
+
+                        document.getElementById('estMaterialVal').textContent = volStr;
+                        if (isSupplyApply) {
+                            document.getElementById('estLabourRow').style.display = 'flex';
+                            document.getElementById('estLabourVal').textContent = `Rs ${parseFloat(est.labour_cost).toFixed(2)}`;
+                            document.getElementById('estGrandTotalVal').innerHTML = `<span style="font-size:12px; font-weight:normal; color:var(--text-muted);">Rs ${parseFloat(est.labour_cost).toFixed(2)} (Manpower) +</span><br/>${volStr}`;
+                        } else {
+                            document.getElementById('estGrandTotalVal').textContent = volStr;
+                        }
+                    }
+
+                    loader.style.display = 'none';
+                    confirmPanel.style.display = 'block';
+                } else {
+                    loader.style.display = 'none';
+                    errorPanel.style.display = 'block';
+                    document.getElementById('errorMsg').textContent = 'Failed to load project estimates. Please reload the page.';
+                }
+            } catch (err) {
+                console.error("Site won initialization error:", err);
+                loader.style.display = 'none';
+                errorPanel.style.display = 'block';
+                document.getElementById('errorMsg').textContent = 'Network error loading estimate details.';
+            }
+        });
+
+        // Confirm Site Won POST Trigger
+        document.getElementById('btnConfirmWon').addEventListener('click', async () => {
+            const btn = document.getElementById('btnConfirmWon');
+            btn.disabled = true;
+            btn.innerHTML = `<div class="spinner" style="width:14px; height:14px; margin:0 6px 0 0; display:inline-block; border-width:2.5px;"></div> Confirming...`;
+
+            try {
+                const baseUrl = CONFIG.N8N_WEBHOOK_URL.endsWith('/') ? CONFIG.N8N_WEBHOOK_URL : CONFIG.N8N_WEBHOOK_URL + '/';
+                const response = await fetch(`${baseUrl}mark-site-won`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        lead_id: leadId,
+                        painter_id: painterId,
+                        estimate_id: latestEstimateId,
+                        version: latestVersion
+                    })
+                });
+
+                if (response.ok) {
+                    document.getElementById('successScreen').style.display = 'flex';
+                    setTimeout(() => {
+                        // Redirect back to painter dashboard / open leads pipeline
+                        window.location.href = `open-leads-by-user-type.html?id=${painterId}`;
+                    }, 1800);
+                } else {
+                    alert('Failed to register site as Won. Please try again.');
+                    btn.disabled = false;
+                    btn.textContent = 'Confirm & Mark Won';
+                }
+            } catch (err) {
+                console.error("Confirm won error:", err);
+                alert('Network error confirming site status. Check internet connection.');
+                btn.disabled = false;
+                btn.textContent = 'Confirm & Mark Won';
+            }
+        });
+    </script>
+</body>
+</html>

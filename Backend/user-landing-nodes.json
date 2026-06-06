@@ -1,0 +1,1364 @@
+{
+  "name": "LMS - User Open Leads Landing",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "user-open-leads",
+        "responseMode": "responseNode",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET, OPTIONS"
+              }
+            ]
+          }
+        }
+      },
+      "name": "Webhook - GET Open Leads",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        100,
+        150
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=SELECT * FROM user_open_leads_view\nWHERE user_id = '{{$node[\"Webhook - GET Open Leads\"].json[\"query\"][\"userid\"] || $node[\"Webhook - GET Open Leads\"].json[\"query\"][\"id\"]}}'\nORDER BY lead_created_at DESC;"
+      },
+      "name": "Postgres - Fetch Open Leads",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        300,
+        150
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $('Postgres - Fetch Open Leads').all().map(item => item.json) }}"
+      },
+      "name": "Respond OK - Open Leads",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        500,
+        150
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "lead-history",
+        "responseMode": "responseNode",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET, OPTIONS"
+              }
+            ]
+          }
+        }
+      },
+      "name": "Webhook - GET History",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        100,
+        350
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=SELECT \n  (\n    SELECT COALESCE(json_agg(status_row), '[]'::json)\n    FROM (\n      SELECT status_history_id, old_status, new_status, remarks, changed_at\n      FROM lead_status_history\n      WHERE lead_id = '{{$node[\"Webhook - GET History\"].json[\"query\"][\"lead_id\"]}}'\n      ORDER BY changed_at ASC\n    ) status_row\n  ) AS status_history,\n  (\n    SELECT COALESCE(json_agg(assign_row), '[]'::json)\n    FROM (\n      SELECT *\n      FROM lead_assignment_history_view\n      WHERE lead_id = '{{$node[\"Webhook - GET History\"].json[\"query\"][\"lead_id\"]}}'\n      ORDER BY assigned_at ASC\n    ) assign_row\n  ) AS assignment_history;"
+      },
+      "name": "Postgres - Fetch Lead History",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        300,
+        350
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($node[\"Postgres - Fetch Lead History\"].json) }}"
+      },
+      "name": "Respond OK - Lead History",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        500,
+        350
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "start-visit",
+        "responseMode": "responseNode",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "POST, OPTIONS"
+              }
+            ]
+          }
+        }
+      },
+      "name": "Webhook - POST Start Visit",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        100,
+        550
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$node[\"Webhook - POST Start Visit\"].json[\"body\"][\"is_first_visit\"] === true || $node[\"Webhook - POST Start Visit\"].json[\"body\"][\"is_first_visit\"] === 'true'}}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "name": "Is First Visit?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        300,
+        550
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=INSERT INTO site_visits (visit_id, lead_id, painter_id, visit_number, latitude, longitude, visit_time)\nVALUES (gen_random_uuid(), '{{$node[\"Webhook - POST Start Visit\"].json[\"body\"][\"lead_id\"]}}', '{{$node[\"Webhook - POST Start Visit\"].json[\"body\"][\"painter_id\"]}}', 1, {{$node[\"Webhook - POST Start Visit\"].json[\"body\"][\"latitude\"]}}, {{$node[\"Webhook - POST Start Visit\"].json[\"body\"][\"longitude\"]}}, NOW())\nRETURNING visit_id;"
+      },
+      "name": "Postgres - Log Visit 1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        500,
+        480
+      ],
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=UPDATE leads \nSET registered_latitude = {{$node[\"Webhook - POST Start Visit\"].json[\"body\"][\"latitude\"]}},\n    registered_longitude = {{$node[\"Webhook - POST Start Visit\"].json[\"body\"][\"longitude\"]}},\n    current_status = 'VISITED',\n    updated_at = NOW()\nWHERE lead_id = '{{$node[\"Webhook - POST Start Visit\"].json[\"body\"][\"lead_id\"]}}'\nRETURNING lead_id;"
+      },
+      "name": "Postgres - Update Lead Visited",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        700,
+        480
+      ],
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=INSERT INTO lead_status_history (\n    lead_id,\n    old_status,\n    new_status,\n    remarks\n) VALUES (\n    '{{$node[\"Webhook - POST Start Visit\"].json[\"body\"][\"lead_id\"]}}',\n    'ACCEPTED',\n    'VISITED',\n    'First site visit started (coordinates registered)'\n) RETURNING status_history_id;"
+      },
+      "name": "Postgres - Visit 1 Status History",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        900,
+        480
+      ],
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"success\",\n  \"visit_number\": 1,\n  \"first_visit\": true\n}"
+      },
+      "name": "Respond OK - Visit 1",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=SELECT COALESCE(MAX(visit_number), 0) as max_visit FROM site_visits WHERE lead_id = '{{$node[\"Webhook - POST Start Visit\"].json[\"body\"][\"lead_id\"]}}';"
+      },
+      "name": "Postgres - Query Max Visit Num",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        500,
+        640
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=INSERT INTO site_visits (visit_id, lead_id, painter_id, visit_number, latitude, longitude, visit_time)\nVALUES (gen_random_uuid(), '{{$node[\"Webhook - POST Start Visit\"].json[\"body\"][\"lead_id\"]}}', '{{$node[\"Webhook - POST Start Visit\"].json[\"body\"][\"painter_id\"]}}', {{$node[\"Postgres - Query Max Visit Num\"].json[\"max_visit\"]}} + 1, {{$node[\"Webhook - POST Start Visit\"].json[\"body\"][\"latitude\"]}}, {{$node[\"Webhook - POST Start Visit\"].json[\"body\"][\"longitude\"]}}, NOW())\nRETURNING visit_id;"
+      },
+      "name": "Postgres - Log Subsequent Visit",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        700,
+        640
+      ],
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"success\",\n  \"visit_number\": {{$node[\"Postgres - Query Max Visit Num\"].json[\"max_visit\"] + 1}},\n  \"first_visit\": false\n}"
+      },
+      "name": "Respond OK - Subsequent Visit",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        900,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "schedule-followup",
+        "responseMode": "responseNode",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "POST, OPTIONS"
+              }
+            ]
+          }
+        }
+      },
+      "name": "Webhook - POST Schedule Followup",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        100,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=INSERT INTO followups (followup_id, lead_id, visit_number, followup_date, followup_time, remarks, created_at)\nVALUES (gen_random_uuid(), '{{$node[\"Webhook - POST Schedule Followup\"].json[\"body\"][\"lead_id\"]}}', {{$node[\"Webhook - POST Schedule Followup\"].json[\"body\"][\"visit_number\"]}}, '{{$node[\"Webhook - POST Schedule Followup\"].json[\"body\"][\"followup_date\"]}}', '{{$node[\"Webhook - POST Schedule Followup\"].json[\"body\"][\"followup_time\"]}}', '{{$node[\"Webhook - POST Schedule Followup\"].json[\"body\"][\"remarks\"]}}', NOW())\nRETURNING followup_id;"
+      },
+      "name": "Postgres - Log Followup",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        300,
+        800
+      ],
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=UPDATE leads \nSET next_followup_date = '{{$node[\"Webhook - POST Schedule Followup\"].json[\"body\"][\"followup_date\"]}}',\n    current_status = 'FOLLOWUP',\n    updated_at = NOW()\nWHERE lead_id = '{{$node[\"Webhook - POST Schedule Followup\"].json[\"body\"][\"lead_id\"]}}'\nRETURNING lead_id;"
+      },
+      "name": "Postgres - Update Lead Followup Date",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        500,
+        800
+      ],
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=INSERT INTO lead_status_history (\n    lead_id,\n    old_status,\n    new_status,\n    remarks\n) VALUES (\n    '{{$node[\"Webhook - POST Schedule Followup\"].json[\"body\"][\"lead_id\"]}}',\n    'VISITED',\n    'FOLLOWUP',\n    'Scheduled follow-up: {{$node[\"Webhook - POST Schedule Followup\"].json[\"body\"][\"remarks\"]}}'\n) RETURNING status_history_id;"
+      },
+      "name": "Postgres - Followup Status History",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        700,
+        800
+      ],
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"success\",\n  \"message\": \"Follow-up scheduled successfully\"\n}"
+      },
+      "name": "Respond OK - Followup Scheduled",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        900,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "products",
+        "responseMode": "responseNode",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET, OPTIONS"
+              }
+            ]
+          }
+        }
+      },
+      "name": "Webhook - GET Products",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        100,
+        1000
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=SELECT product_id, sku_code, product_name, category, unit FROM products WHERE active = true ORDER BY category, product_name;"
+      },
+      "name": "Postgres - Fetch Products",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        300,
+        1000
+      ],
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $('Postgres - Fetch Products').all().map(item => item.json) }}"
+      },
+      "name": "Respond OK - Products",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        500,
+        1000
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "previous-estimates",
+        "responseMode": "responseNode",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET, OPTIONS"
+              }
+            ]
+          }
+        }
+      },
+      "name": "Webhook - GET Previous Estimates",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        100,
+        1200
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=SELECT * FROM estimate_details_view WHERE lead_id = '{{$node[\"Webhook - GET Previous Estimates\"].json[\"query\"][\"lead_id\"]}}' ORDER BY estimate_version DESC, category, product_name;"
+      },
+      "name": "Postgres - Fetch Previous Estimates",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        300,
+        1200
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $('Postgres - Fetch Previous Estimates').all().map(item => item.json) }}"
+      },
+      "name": "Respond OK - Previous Estimates",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        500,
+        1200
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "submit-estimate",
+        "responseMode": "responseNode",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "POST, OPTIONS"
+              }
+            ]
+          }
+        }
+      },
+      "name": "Webhook - POST Submit Estimate",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        100,
+        1400
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=SELECT COALESCE(MAX(estimate_version), 0) + 1 AS new_version FROM estimates WHERE lead_id = '{{$node[\"Webhook - POST Submit Estimate\"].json[\"body\"][\"lead_id\"]}}';"
+      },
+      "name": "Postgres - Calculate New Version",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        250,
+        1400
+      ],
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=INSERT INTO estimates (estimate_id, lead_id, painter_id, estimate_version, estimate_json, estimate_mode, estimate_type, material_total, labour_cost, discount, grand_total, submitted_at)\nVALUES (gen_random_uuid(), '{{$node[\"Webhook - POST Submit Estimate\"].json[\"body\"][\"lead_id\"]}}', '{{$node[\"Webhook - POST Submit Estimate\"].json[\"body\"][\"painter_id\"]}}', {{$node[\"Postgres - Calculate New Version\"].json[\"new_version\"]}}, '{{JSON.stringify($node[\"Webhook - POST Submit Estimate\"].json[\"body\"][\"estimate_items\"])}}'::jsonb, '{{$node[\"Webhook - POST Submit Estimate\"].json[\"body\"][\"mode\"]}}', '{{$node[\"Webhook - POST Submit Estimate\"].json[\"body\"][\"estimate_type\"]}}', {{$node[\"Webhook - POST Submit Estimate\"].json[\"body\"][\"material_total\"]}}, {{$node[\"Webhook - POST Submit Estimate\"].json[\"body\"][\"labour_cost\"]}}, {{$node[\"Webhook - POST Submit Estimate\"].json[\"body\"][\"discount\"] || 0}}, {{$node[\"Webhook - POST Submit Estimate\"].json[\"body\"][\"grand_total\"]}}, NOW())\nRETURNING estimate_id;"
+      },
+      "name": "Postgres - Insert Estimate",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        400,
+        1400
+      ],
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $node[\"Webhook - POST Submit Estimate\"].json[\"body\"][\"estimate_items\"] || [];\nconst estimateId = $node[\"Postgres - Insert Estimate\"].json[\"estimate_id\"];\n\nif (items.length === 0) {\n  return { query: \"SELECT 1;\" };\n}\n\nlet query = \"INSERT INTO estimate_items (estimate_item_id, estimate_id, product_id, quantity, rate, line_total) VALUES \";\nconst values = items.map(item => {\n  const qty = parseFloat(item.quantity) || 0;\n  const rate = parseFloat(item.rate) || 0;\n  const total = qty * rate;\n  return `(gen_random_uuid(), '${estimateId}', '${item.product_id}', ${qty}, ${rate}, ${total})`;\n});\nquery += values.join(\", \") + \" RETURNING estimate_item_id;\";\n\nreturn { query: query };"
+      },
+      "name": "Code - Build Items Query",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        550,
+        1400
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "={{$node[\"Code - Build Items Query\"].json[\"query\"]}}"
+      },
+      "name": "Postgres - Insert Estimate Items",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        700,
+        1400
+      ],
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=UPDATE leads\nSET latest_estimate_id = '{{$item(0).$node[\"Postgres - Insert Estimate\"].json[\"estimate_id\"]}}',\n    current_status = 'FOLLOWUP',\n    updated_at = NOW()\nWHERE lead_id = '{{$item(0).$node[\"Webhook - POST Submit Estimate\"].json[\"body\"][\"lead_id\"]}}'\nRETURNING lead_id;"
+      },
+      "name": "Postgres - Update Lead Estimate",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        850,
+        1400
+      ],
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=INSERT INTO lead_status_history (lead_id, old_status, new_status, remarks, changed_at)\nVALUES ('{{$item(0).$node[\"Webhook - POST Submit Estimate\"].json[\"body\"][\"lead_id\"]}}', 'VISITED', 'FOLLOWUP', 'New estimate submitted (Version ' || {{$item(0).$node[\"Postgres - Calculate New Version\"].json[\"new_version\"]}} || ')', NOW())\nRETURNING status_history_id;"
+      },
+      "name": "Postgres - Log Status Transition",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        1400
+      ],
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"success\",\n  \"estimate_id\": \"{{$item(0).$node[\"Postgres - Insert Estimate\"].json[\"estimate_id\"]}}\",\n  \"version\": {{$item(0).$node[\"Postgres - Calculate New Version\"].json[\"new_version\"]}}\n}"
+      },
+      "name": "Respond OK - Estimate Submitted",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1150,
+        1400
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "mark-site-won",
+        "responseMode": "responseNode",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "POST, OPTIONS"
+              }
+            ]
+          }
+        }
+      },
+      "name": "Webhook - POST Mark Site Won",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        100,
+        1600
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=UPDATE leads SET current_status = 'WON', latest_estimate_id = '{{$node[\"Webhook - POST Mark Site Won\"].json[\"body\"][\"estimate_id\"]}}', closed_at = NOW(), updated_at = NOW() WHERE lead_id = '{{$node[\"Webhook - POST Mark Site Won\"].json[\"body\"][\"lead_id\"]}}' RETURNING lead_id;"
+      },
+      "name": "Postgres - Update Lead Won",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        300,
+        1600
+      ],
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=INSERT INTO lead_status_history (lead_id, old_status, new_status, remarks, changed_at) VALUES ('{{$node[\"Webhook - POST Mark Site Won\"].json[\"body\"][\"lead_id\"]}}', (SELECT current_status FROM leads WHERE lead_id = '{{$node[\"Webhook - POST Mark Site Won\"].json[\"body\"][\"lead_id\"]}}'), 'WON', 'Site marked as WON. Estimate Version #' || '{{$node[\"Webhook - POST Mark Site Won\"].json[\"body\"][\"version\"]}}' || ' confirmed.', NOW()) RETURNING status_history_id;"
+      },
+      "name": "Postgres - Log Status Transition Won",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        500,
+        1600
+      ],
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=UPDATE painter_performance SET won_sites = won_sites + 1, open_leads = open_leads - 1, updated_at = NOW() WHERE painter_id = '{{$node[\"Webhook - POST Mark Site Won\"].json[\"body\"][\"painter_id\"]}}' RETURNING painter_id;"
+      },
+      "name": "Postgres - Update Painter Stats Won",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        700,
+        1600
+      ],
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"success\",\n  \"message\": \"Site registered as WON successfully\"\n}"
+      },
+      "name": "Respond OK - Site Won",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        900,
+        1600
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "lost-reasons",
+        "responseMode": "responseNode",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET, OPTIONS"
+              }
+            ]
+          }
+        }
+      },
+      "name": "Webhook - GET Lost Reasons",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        100,
+        1800
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=SELECT lost_reason_id, reason_name FROM lost_reasons WHERE active = true ORDER BY reason_name;"
+      },
+      "name": "Postgres - Fetch Lost Reasons",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        300,
+        1800
+      ],
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $('Postgres - Fetch Lost Reasons').all().map(item => item.json) }}"
+      },
+      "name": "Respond OK - Lost Reasons",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        500,
+        1800
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "mark-site-lost",
+        "responseMode": "responseNode",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "POST, OPTIONS"
+              }
+            ]
+          }
+        }
+      },
+      "name": "Webhook - POST Mark Site Lost",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        100,
+        2000
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=UPDATE leads SET current_status = 'LOST', lost_reason_id = '{{$node[\"Webhook - POST Mark Site Lost\"].json[\"body\"][\"lost_reason_id\"]}}', closed_at = NOW(), updated_at = NOW() WHERE lead_id = '{{$node[\"Webhook - POST Mark Site Lost\"].json[\"body\"][\"lead_id\"]}}' RETURNING lead_id;"
+      },
+      "name": "Postgres - Update Lead Lost",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        300,
+        2000
+      ],
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=INSERT INTO lead_status_history (lead_id, old_status, new_status, remarks, changed_at) VALUES ('{{$node[\"Webhook - POST Mark Site Lost\"].json[\"body\"][\"lead_id\"]}}', (SELECT current_status FROM leads WHERE lead_id = '{{$node[\"Webhook - POST Mark Site Lost\"].json[\"body\"][\"lead_id\"]}}'), 'LOST', 'Site marked as LOST. Reason: ' || (SELECT reason_name FROM lost_reasons WHERE lost_reason_id = '{{$node[\"Webhook - POST Mark Site Lost\"].json[\"body\"][\"lost_reason_id\"]}}'), NOW()) RETURNING status_history_id;"
+      },
+      "name": "Postgres - Log Status Transition Lost",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        500,
+        2000
+      ],
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=UPDATE painter_performance SET lost_sites = lost_sites + 1, open_leads = open_leads - 1, updated_at = NOW() WHERE painter_id = '{{$node[\"Webhook - POST Mark Site Lost\"].json[\"body\"][\"painter_id\"]}}' RETURNING painter_id;"
+      },
+      "name": "Postgres - Update Painter Stats Lost",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        700,
+        2000
+      ],
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"success\",\n  \"message\": \"Site registered as LOST successfully\"\n}"
+      },
+      "name": "Respond OK - Site Lost",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        900,
+        2000
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook - GET Open Leads": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Fetch Open Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Fetch Open Leads": {
+      "main": [
+        [
+          {
+            "node": "Respond OK - Open Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - GET History": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Fetch Lead History",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Fetch Lead History": {
+      "main": [
+        [
+          {
+            "node": "Respond OK - Lead History",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - POST Start Visit": {
+      "main": [
+        [
+          {
+            "node": "Is First Visit?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is First Visit?": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Log Visit 1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Postgres - Query Max Visit Num",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Log Visit 1": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Update Lead Visited",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Update Lead Visited": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Visit 1 Status History",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Visit 1 Status History": {
+      "main": [
+        [
+          {
+            "node": "Respond OK - Visit 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Query Max Visit Num": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Log Subsequent Visit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Log Subsequent Visit": {
+      "main": [
+        [
+          {
+            "node": "Respond OK - Subsequent Visit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - POST Schedule Followup": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Log Followup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Log Followup": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Update Lead Followup Date",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Update Lead Followup Date": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Followup Status History",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Followup Status History": {
+      "main": [
+        [
+          {
+            "node": "Respond OK - Followup Scheduled",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - GET Products": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Fetch Products",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Fetch Products": {
+      "main": [
+        [
+          {
+            "node": "Respond OK - Products",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - GET Previous Estimates": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Fetch Previous Estimates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Fetch Previous Estimates": {
+      "main": [
+        [
+          {
+            "node": "Respond OK - Previous Estimates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - POST Submit Estimate": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Calculate New Version",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Calculate New Version": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Insert Estimate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Insert Estimate": {
+      "main": [
+        [
+          {
+            "node": "Code - Build Items Query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Build Items Query": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Insert Estimate Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Insert Estimate Items": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Update Lead Estimate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Update Lead Estimate": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Log Status Transition",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Log Status Transition": {
+      "main": [
+        [
+          {
+            "node": "Respond OK - Estimate Submitted",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - POST Mark Site Won": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Update Lead Won",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Update Lead Won": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Log Status Transition Won",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Log Status Transition Won": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Update Painter Stats Won",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Update Painter Stats Won": {
+      "main": [
+        [
+          {
+            "node": "Respond OK - Site Won",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - GET Lost Reasons": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Fetch Lost Reasons",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Fetch Lost Reasons": {
+      "main": [
+        [
+          {
+            "node": "Respond OK - Lost Reasons",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - POST Mark Site Lost": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Update Lead Lost",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Update Lead Lost": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Log Status Transition Lost",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Log Status Transition Lost": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Update Painter Stats Lost",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Update Painter Stats Lost": {
+      "main": [
+        [
+          {
+            "node": "Respond OK - Site Lost",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

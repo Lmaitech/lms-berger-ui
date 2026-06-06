@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirm Site Lost - Berger LMS</title>
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --purple-main: #4a154b;
+            --purple-light: #6b266d;
+            --purple-dark: #300c31;
+            --purple-gradient: linear-gradient(135deg, #6b266d 0%, #300c31 100%);
+            --yellow-accent: #ffcc00;
+            --yellow-hover: #e6b800;
+            --text-dark: #1f1f1f;
+            --text-muted: #757575;
+            --bg-light: #f7f5fa;
+            --card-bg: #ffffff;
+            --border-radius: 20px;
+            --input-border: #e2d9e8;
+            --shadow-lg: 0 20px 25px -5px rgba(74, 21, 75, 0.12), 0 10px 10px -5px rgba(74, 21, 75, 0.04);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --success-color: #2e7d32;
+            --error-color: #c62828;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 16px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            border: 1px solid rgba(74, 21, 75, 0.08);
+            margin-bottom: 30px;
+            animation: slideUp 0.4s ease-out;
+            position: relative;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .app-header {
+            background: var(--purple-gradient);
+            padding: 24px 20px;
+            color: #ffffff;
+            border-bottom: 4px solid var(--yellow-accent);
+        }
+
+        .brand-logo {
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--yellow-accent);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .brand-logo svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--yellow-accent);
+        }
+
+        .header-title {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        /* Summary Card */
+        .summary-card {
+            background: #faf8fc;
+            border: 1.5px solid #f0eaf5;
+            border-radius: 16px;
+            padding: 14px;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .summary-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .summary-label {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .summary-val {
+            color: var(--text-dark);
+            font-weight: 600;
+            text-align: right;
+            max-width: 65%;
+        }
+
+        .section-title {
+            font-size: 14px;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: var(--purple-light);
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            border-bottom: 1.5px solid #f0eaf5;
+            padding-bottom: 6px;
+        }
+
+        /* Form fields */
+        .form-group {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--purple-light);
+            margin-bottom: 8px;
+        }
+
+        .form-select, .form-input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid var(--input-border);
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: inherit;
+            color: var(--text-dark);
+            background-color: #faf9fc;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .form-select:focus, .form-input:focus {
+            border-color: var(--purple-light);
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(107, 38, 109, 0.15);
+        }
+
+        /* Action Buttons */
+        .action-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-confirm {
+            background: var(--error-color);
+            color: #ffffff;
+        }
+
+        .btn-confirm:hover {
+            background: #b71c1c;
+            box-shadow: 0 8px 16px rgba(198, 40, 40, 0.2);
+        }
+
+        .btn-back {
+            background: transparent;
+            color: var(--text-muted);
+            border: none;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+
+        .btn-back:hover {
+            color: var(--purple-main);
+            text-decoration: underline;
+        }
+
+        /* Status Panels */
+        .loading-panel {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 4px solid rgba(74, 21, 75, 0.1);
+            border-top: 4px solid var(--purple-light);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Success Overlay */
+        .success-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.98);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            z-index: 100;
+            text-align: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .success-icon {
+            width: 72px;
+            height: 72px;
+            background: #ffebee;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .success-icon svg {
+            width: 36px;
+            height: 36px;
+            fill: var(--error-color);
+        }
+
+        .success-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--error-color);
+            margin-bottom: 8px;
+        }
+
+        .success-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Success Screen Overlay -->
+        <div class="success-overlay" id="successScreen">
+            <div class="success-icon">
+                <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+            </div>
+            <h3 class="success-title">Site Lost Registered</h3>
+            <p class="success-desc" id="successDesc">The site has been registered as LOST and closed. Returning you to pipeline...</p>
+        </div>
+
+        <header class="app-header">
+            <div class="brand-logo">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3zm1 11h-2v-2h2v2zm0-4h-2V7h2v3z"/>
+                </svg>
+                Berger Paints CRM
+            </div>
+            <h1 class="header-title">Mark Site as Lost</h1>
+        </header>
+
+        <div class="content">
+            <!-- Project / Client Summary -->
+            <div class="summary-card">
+                <div class="summary-row">
+                    <span class="summary-label">Client Name</span>
+                    <span class="summary-val" id="summaryName">-</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Address</span>
+                    <span class="summary-val" id="summaryAddress">-</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Visit Count</span>
+                    <span class="summary-val" id="summaryVisitNumber">-</span>
+                </div>
+            </div>
+
+            <h3 class="section-title">Closure Information</h3>
+
+            <form id="lostForm">
+                <div class="form-group">
+                    <label class="form-label" for="lostReason">Reason for Closure</label>
+                    <select id="lostReason" class="form-select" required>
+                        <option value="">-- Choose Lost Reason --</option>
+                    </select>
+                </div>
+
+                <div class="action-container">
+                    <button type="submit" class="btn btn-confirm" id="btnSubmitLost">
+                        Confirm & Mark Lost
+                    </button>
+                </div>
+            </form>
+
+            <div style="text-align: center;">
+                <button type="button" class="btn btn-back" id="btnCancel">Cancel & Return</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Configuration parameters -->
+    <script src="config.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const leadId = urlParams.get('lead_id');
+        const painterId = urlParams.get('id');
+        const visitNumber = urlParams.get('visit_number') || '1';
+        const ownerName = urlParams.get('owner_name') || '';
+        const ownerMobile = urlParams.get('owner_mobile') || '';
+        const address = urlParams.get('address') || '';
+        const painterName = urlParams.get('painter_name') || '';
+        const retailerName = urlParams.get('retailer_name') || '';
+
+        // Populate summary
+        document.getElementById('summaryName').textContent = ownerName || '-';
+        document.getElementById('summaryAddress').textContent = address || '-';
+        document.getElementById('summaryVisitNumber').textContent = `${visitNumber} Visits`;
+
+        const returnUrl = `project-tools.html?lead_id=${leadId}&id=${painterId}&visit_number=${visitNumber}&owner_name=${encodeURIComponent(ownerName)}&owner_mobile=${ownerMobile}&address=${encodeURIComponent(address)}&painter_name=${encodeURIComponent(painterName)}&retailer_name=${encodeURIComponent(retailerName)}`;
+        
+        document.getElementById('btnCancel').addEventListener('click', () => {
+            window.location.href = returnUrl;
+        });
+
+        // Load lost reasons dropdown on page load
+        window.addEventListener('load', async () => {
+            const dropdown = document.getElementById('lostReason');
+            try {
+                const baseUrl = CONFIG.N8N_WEBHOOK_URL.endsWith('/') ? CONFIG.N8N_WEBHOOK_URL : CONFIG.N8N_WEBHOOK_URL + '/';
+                const response = await fetch(`${baseUrl}lost-reasons`);
+                if (response.ok) {
+                    const data = await response.json();
+                    data.forEach(r => {
+                        const opt = document.createElement('option');
+                        opt.value = r.lost_reason_id;
+                        opt.textContent = r.reason_name;
+                        dropdown.appendChild(opt);
+                    });
+                } else {
+                    console.error("Failed to load lost reasons.");
+                }
+            } catch (err) {
+                console.error("Error fetching lost reasons:", err);
+            }
+        });
+
+        // Form Submit
+        document.getElementById('lostForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmitLost');
+            const reasonSelect = document.getElementById('lostReason');
+            const reasonId = reasonSelect.value;
+
+            btn.disabled = true;
+            btn.innerHTML = `<div class="spinner" style="width:14px; height:14px; margin:0 6px 0 0; display:inline-block; border-width:2.5px;"></div> Registering...`;
+
+            try {
+                const baseUrl = CONFIG.N8N_WEBHOOK_URL.endsWith('/') ? CONFIG.N8N_WEBHOOK_URL : CONFIG.N8N_WEBHOOK_URL + '/';
+                const response = await fetch(`${baseUrl}mark-site-lost`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        lead_id: leadId,
+                        painter_id: painterId,
+                        lost_reason_id: reasonId
+                    })
+                });
+
+                if (response.ok) {
+                    document.getElementById('successScreen').style.display = 'flex';
+                    setTimeout(() => {
+                        window.location.href = `open-leads-by-user-type.html?id=${painterId}`;
+                    }, 1800);
+                } else {
+                    alert('Failed to register site as Lost. Please try again.');
+                    btn.disabled = false;
+                    btn.textContent = 'Confirm & Mark Lost';
+                }
+            } catch (err) {
+                console.error("Confirm lost error:", err);
+                alert('Network error registering site status. Check internet connection.');
+                btn.disabled = false;
+                btn.textContent = 'Confirm & Mark Lost';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule Follow-up - Berger LMS</title>
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --purple-main: #4a154b;
+            --purple-light: #6b266d;
+            --purple-dark: #300c31;
+            --purple-gradient: linear-gradient(135deg, #6b266d 0%, #300c31 100%);
+            --yellow-accent: #ffcc00;
+            --yellow-hover: #e6b800;
+            --text-dark: #1f1f1f;
+            --text-muted: #757575;
+            --bg-light: #f7f5fa;
+            --card-bg: #ffffff;
+            --border-radius: 20px;
+            --input-border: #e2d9e8;
+            --shadow-lg: 0 20px 25px -5px rgba(74, 21, 75, 0.12), 0 10px 10px -5px rgba(74, 21, 75, 0.04);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 16px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            border: 1px solid rgba(74, 21, 75, 0.08);
+            margin-bottom: 30px;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .app-header {
+            background: var(--purple-gradient);
+            padding: 24px 20px;
+            color: #ffffff;
+            border-bottom: 4px solid var(--yellow-accent);
+        }
+
+        .brand-logo {
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--yellow-accent);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .brand-logo svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--yellow-accent);
+        }
+
+        .header-title {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .content {
+            padding: 24px 20px;
+        }
+
+        /* Summary Info Card */
+        .summary-card {
+            background: #faf8fc;
+            border: 1.5px solid #f0eaf5;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .summary-row:last-child {
+            margin-bottom: 0;
+            border-top: 1px dashed #e2d9e8;
+            padding-top: 8px;
+            margin-top: 8px;
+        }
+
+        .summary-label {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .summary-val {
+            color: var(--text-dark);
+            font-weight: 600;
+            text-align: right;
+            max-width: 60%;
+        }
+
+        .section-title {
+            font-size: 14px;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: var(--purple-light);
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+            border-bottom: 1.5px solid #f0eaf5;
+            padding-bottom: 6px;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--purple-dark);
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px;
+            border: 1.5px solid var(--input-border);
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: inherit;
+            color: var(--text-dark);
+            background-color: #faf9fc;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .form-input:focus {
+            border-color: var(--purple-light);
+            background-color: #ffffff;
+            box-shadow: 0 0 0 4px rgba(107, 38, 109, 0.08);
+        }
+
+        textarea.form-input {
+            resize: none;
+            min-height: 100px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--purple-gradient);
+            border: none;
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 6px rgba(74, 21, 75, 0.15);
+            transition: var(--transition);
+            margin-top: 24px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 12px rgba(74, 21, 75, 0.2);
+        }
+
+        .submit-btn:disabled {
+            background: #cbd5e1;
+            color: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-cancel {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 16px;
+            padding: 12px;
+            background: transparent;
+            border: 2px solid var(--purple-light);
+            color: var(--purple-light);
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            width: 100%;
+            text-align: center;
+        }
+
+        .btn-cancel:hover {
+            background: var(--purple-light);
+            color: #ffffff;
+        }
+
+        /* Spinner */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2.5px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 0.8s infinite linear;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Success Message Overlay */
+        .success-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 24px;
+            z-index: 10;
+        }
+
+        .success-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: #e8f5e9;
+            color: #2e7d32;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .success-icon svg {
+            width: 36px;
+            height: 36px;
+            fill: currentColor;
+        }
+
+        .success-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--purple-dark);
+            margin-bottom: 8px;
+        }
+
+        .success-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .error-message {
+            display: none;
+            background: #ffebee;
+            color: #c62828;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 16px;
+            font-weight: 500;
+            border-left: 4px solid #c62828;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container" style="position: relative;">
+        <!-- Success Screen Overlay -->
+        <div class="success-overlay" id="successScreen">
+            <div class="success-icon">
+                <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+            </div>
+            <h3 class="success-title">Follow-up Scheduled</h3>
+            <p class="success-desc" id="successDesc">The next meeting has been registered successfully. Returning you to tools...</p>
+        </div>
+
+        <header class="app-header">
+            <div class="brand-logo">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3zm1 11h-2v-2h2v2zm0-4h-2V7h2v3z"/>
+                </svg>
+                Berger Paints CRM
+            </div>
+            <h1 class="header-title">Schedule Follow-up</h1>
+        </header>
+
+        <div class="content">
+            <div class="summary-card">
+                <div class="summary-row">
+                    <span class="summary-label">Client Name</span>
+                    <span class="summary-val" id="summaryName">-</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Client Mobile</span>
+                    <span class="summary-val" id="summaryMobile">-</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Site Address</span>
+                    <span class="summary-val" id="summaryAddress">-</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Active Visit Count</span>
+                    <span class="summary-val" id="summaryVisitCount">-</span>
+                </div>
+            </div>
+
+            <h3 class="section-title">Follow-up Schedule</h3>
+
+            <div class="error-message" id="errorMessageBox"></div>
+
+            <form id="followupForm">
+                <div class="form-group">
+                    <label class="form-label" for="followupDate">Date</label>
+                    <input class="form-input" type="date" id="followupDate" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="followupTime">Time</label>
+                    <input class="form-input" type="time" id="followupTime" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="remarks">Remarks / Notes</label>
+                    <textarea class="form-input" id="remarks" placeholder="Enter visit summary or follow-up details..." required></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    Schedule Follow-up
+                </button>
+            </form>
+
+            <a href="#" class="btn-cancel" id="btnCancel">
+                Back to Tools
+            </a>
+        </div>
+    </div>
+
+    <!-- Configuration Settings -->
+    <script src="config.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const leadId = urlParams.get('lead_id');
+        const painterId = urlParams.get('id');
+        const visitNumber = urlParams.get('visit_number') || '1';
+        const ownerName = urlParams.get('owner_name') || '';
+        const ownerMobile = urlParams.get('owner_mobile') || '';
+        const address = urlParams.get('address') || '';
+
+        // Populate details
+        document.getElementById('summaryName').textContent = ownerName || '-';
+        document.getElementById('summaryMobile').textContent = ownerMobile || '-';
+        document.getElementById('summaryAddress').textContent = address || '-';
+        document.getElementById('summaryVisitCount').textContent = `Visit #${visitNumber}`;
+
+        // Set default date to tomorrow
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const yyyy = tomorrow.getFullYear();
+        let mm = tomorrow.getMonth() + 1;
+        let dd = tomorrow.getDate();
+        if (dd < 10) dd = '0' + dd;
+        if (mm < 10) mm = '0' + mm;
+        document.getElementById('followupDate').value = `${yyyy}-${mm}-${dd}`;
+        document.getElementById('followupTime').value = "11:00";
+
+        // Set cancel button redirection
+        const cancelBtn = document.getElementById('btnCancel');
+        const returnUrl = `project-tools.html?lead_id=${leadId}&id=${painterId}&visit_number=${visitNumber}&owner_name=${encodeURIComponent(ownerName)}&owner_mobile=${ownerMobile}&address=${encodeURIComponent(address)}`;
+        cancelBtn.href = returnUrl;
+
+        // Form Submission
+        document.getElementById('followupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const errorMessageBox = document.getElementById('errorMessageBox');
+            const successScreen = document.getElementById('successScreen');
+            
+            errorMessageBox.style.display = 'none';
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<div class="spinner"></div> Scheduling...`;
+
+            const followupDate = document.getElementById('followupDate').value;
+            const followupTime = document.getElementById('followupTime').value;
+            const remarks = document.getElementById('remarks').value;
+
+            try {
+                const baseUrl = CONFIG.N8N_WEBHOOK_URL.endsWith('/') ? CONFIG.N8N_WEBHOOK_URL : CONFIG.N8N_WEBHOOK_URL + '/';
+                const response = await fetch(`${baseUrl}schedule-followup`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        lead_id: leadId,
+                        painter_id: painterId,
+                        visit_number: parseInt(visitNumber),
+                        followup_date: followupDate,
+                        followup_time: followupTime,
+                        remarks: remarks
+                    })
+                });
+
+                if (response.ok) {
+                    successScreen.style.display = 'flex';
+                    setTimeout(() => {
+                        window.location.href = returnUrl;
+                    }, 1500);
+                } else {
+                    showError('Failed to schedule follow-up. Please try again.');
+                }
+            } catch (error) {
+                console.error('Submission error:', error);
+                showError('Network error occurred. Please check your connection.');
+            }
+        });
+
+        function showError(msg) {
+            const errorMessageBox = document.getElementById('errorMessageBox');
+            const submitBtn = document.getElementById('submitBtn');
+            errorMessageBox.textContent = msg;
+            errorMessageBox.style.display = 'block';
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Schedule Follow-up';
+        }
+    </script>
+</body>
+</html>

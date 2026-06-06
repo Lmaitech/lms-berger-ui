@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lead Assignment Response - Berger LMS</title>
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --purple-main: #4a154b;
+            --purple-light: #6b266d;
+            --purple-dark: #300c31;
+            --purple-gradient: linear-gradient(135deg, #6b266d 0%, #300c31 100%);
+            --yellow-accent: #ffcc00;
+            --yellow-hover: #e6b800;
+            --text-dark: #1f1f1f;
+            --text-muted: #757575;
+            --bg-light: #f7f5fa;
+            --card-bg: #ffffff;
+            --border-radius: 16px;
+            --input-border: #e0dbe5;
+            --success-color: #2e7d32;
+            --error-color: #c62828;
+            --shadow-lg: 0 20px 25px -5px rgba(74, 21, 75, 0.12), 0 10px 10px -5px rgba(74, 21, 75, 0.04);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 16px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            border: 1px solid rgba(74, 21, 75, 0.08);
+            margin-bottom: 30px;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Header Style */
+        .app-header {
+            background: var(--purple-gradient);
+            padding: 24px 20px;
+            color: #ffffff;
+            position: relative;
+            border-bottom: 4px solid var(--yellow-accent);
+        }
+
+        .brand-logo {
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--yellow-accent);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .brand-logo svg {
+            width: 18px;
+            height: 18px;
+            fill: var(--yellow-accent);
+        }
+
+        .header-title {
+            font-size: 22px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        /* Screen States */
+        .screen-state {
+            display: none;
+            padding: 24px 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .screen-state.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Info Layout styling */
+        .info-card {
+            background: #faf9fc;
+            border: 1.5px solid var(--input-border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .info-row {
+            margin-bottom: 12px;
+        }
+
+        .info-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--purple-light);
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+
+        .info-value {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+
+        /* Action Buttons */
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: var(--transition);
+        }
+
+        .btn-accept {
+            background: var(--purple-gradient);
+            color: #ffffff;
+            box-shadow: 0 4px 6px rgba(74, 21, 75, 0.2);
+            border-bottom: 4px solid rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-accept:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-accept:active {
+            transform: translateY(1px);
+            border-bottom-width: 1px;
+        }
+
+        .btn-reject {
+            background: transparent;
+            border: 2px solid var(--error-color);
+            color: var(--error-color);
+        }
+
+        .btn-reject:hover {
+            background: rgba(198, 40, 40, 0.05);
+        }
+
+        /* Status Visual Helpers */
+        .status-center {
+            text-align: center;
+            padding: 30px 10px;
+        }
+
+        .status-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 16px auto;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .status-icon.success {
+            background: rgba(46, 125, 50, 0.1);
+            color: var(--success-color);
+        }
+
+        .status-icon.error {
+            background: rgba(198, 40, 40, 0.1);
+            color: var(--error-color);
+        }
+
+        .status-icon svg {
+            width: 36px;
+            height: 36px;
+            fill: currentColor;
+        }
+
+        .status-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--purple-dark);
+            margin-bottom: 8px;
+        }
+
+        .status-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(74, 21, 75, 0.1);
+            border-top-color: var(--purple-light);
+            border-radius: 50%;
+            animation: spin 1s infinite linear;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Header Section -->
+        <header class="app-header">
+            <div class="brand-logo">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3zm1 11h-2v-2h2v2zm0-4h-2V7h2v3z"/>
+                </svg>
+                Berger Paints CRM
+            </div>
+            <h1 class="header-title" id="headerTitle">Lead Assignment</h1>
+        </header>
+
+        <!-- Loading State -->
+        <div class="screen-state active" id="stateLoading">
+            <div class="spinner"></div>
+            <p style="text-align: center; color: var(--text-muted); font-size: 14px;">Retrieving assignment details...</p>
+        </div>
+
+        <!-- Expired State -->
+        <div class="screen-state" id="stateExpired">
+            <div class="status-center">
+                <div class="status-icon error">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                    </svg>
+                </div>
+                <h2 class="status-title">Assignment Expired</h2>
+                <p class="status-desc">Sorry, this lead opportunity is no longer active or has been assigned to another partner.</p>
+            </div>
+        </div>
+
+        <!-- Details State (Pending Accept/Reject Decision) -->
+        <div class="screen-state" id="stateDetails">
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 16px;">
+                You have been offered a new painting site assignment. Please review the schedule and location below:
+            </p>
+            
+            <div class="info-card">
+                <div class="info-row">
+                    <div class="info-label">Site Address</div>
+                    <div class="info-value" id="dispAddress1">Address Line 1</div>
+                    <div class="info-value" id="dispAddress2" style="font-size: 14px; color: var(--text-muted); margin-top: 2px;">Address Line 2</div>
+                    <div class="info-value" id="dispTownPincode" style="font-size: 14px; margin-top: 2px;">Town, Pincode</div>
+                </div>
+                <div style="height: 1.5px; background: rgba(74, 21, 75, 0.08); margin: 12px 0;"></div>
+                <div class="info-row">
+                    <div class="info-label">Scheduled Visit Time</div>
+                    <div class="info-value" id="dispVisitDateTime" style="font-weight: 600;">Date at Time</div>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-accept" id="btnAccept">
+                    Accept Assignment
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </button>
+                <button class="btn btn-reject" id="btnReject">
+                    Decline Lead
+                </button>
+            </div>
+        </div>
+
+        <!-- Accepted success State -->
+        <div class="screen-state" id="stateAccepted">
+            <div class="status-center" style="padding-bottom: 16px;">
+                <div class="status-icon success">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                    </svg>
+                </div>
+                <h2 class="status-title">Assignment Confirmed</h2>
+                <p class="status-desc">Thank you! You have accepted the assignment. Complete owner and site details are displayed below:</p>
+            </div>
+
+            <div class="info-card">
+                <div class="info-row">
+                    <div class="info-label">Customer Name</div>
+                    <div class="info-value" id="fullCustomerName" style="font-weight: 600;">-</div>
+                </div>
+                <div class="info-row" style="margin-top: 10px;">
+                    <div class="info-label">Customer Contact</div>
+                    <div class="info-value">
+                        <a href="#" id="customerMobileLink" style="color: var(--purple-light); font-weight: 600; text-decoration: none;">-</a>
+                    </div>
+                </div>
+                <div class="info-row" style="margin-top: 10px;">
+                    <div class="info-label">Full Site Location</div>
+                    <div class="info-value" id="fullSiteAddress">-</div>
+                </div>
+                <div class="info-row" style="margin-top: 10px;">
+                    <div class="info-label">Carpet Area Range</div>
+                    <div class="info-value" id="fullCarpetArea">-</div>
+                </div>
+                <div class="info-row" style="margin-top: 10px;">
+                    <div class="info-label">Estimated Budget</div>
+                    <div class="info-value" id="fullBudgetRange">-</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rejected Registered State -->
+        <div class="screen-state" id="stateRejected">
+            <div class="status-center">
+                <div class="status-icon success" style="background: rgba(74, 21, 75, 0.1); color: var(--purple-main);">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M18 7l-1.41-1.41-5.59 5.59-5.59-5.59-1.41 1.41 5.59 5.59-5.59 5.59 1.41 1.41 5.59-5.59 5.59 5.59 1.41-1.41-5.59-5.59z"/>
+                    </svg>
+                </div>
+                <h2 class="status-title">Decline Registered</h2>
+                <p class="status-desc">You have declined this lead. Your response has been logged, and the lead is being reassigned to another partner.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Configuration Parameter Script -->
+    <script src="config.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const painterId = urlParams.get('painter_id') || urlParams.get('id');
+        const leadId = urlParams.get('lead_id');
+
+        // UI states
+        const stateLoading = document.getElementById('stateLoading');
+        const stateExpired = document.getElementById('stateExpired');
+        const stateDetails = document.getElementById('stateDetails');
+        const stateAccepted = document.getElementById('stateAccepted');
+        const stateRejected = document.getElementById('stateRejected');
+        const headerTitle = document.getElementById('headerTitle');
+
+        // Elements
+        const dispAddress1 = document.getElementById('dispAddress1');
+        const dispAddress2 = document.getElementById('dispAddress2');
+        const dispTownPincode = document.getElementById('dispTownPincode');
+        const dispVisitDateTime = document.getElementById('dispVisitDateTime');
+
+        const btnAccept = document.getElementById('btnAccept');
+        const btnReject = document.getElementById('btnReject');
+
+        // Acceptance values
+        const fullCustomerName = document.getElementById('fullCustomerName');
+        const customerMobileLink = document.getElementById('customerMobileLink');
+        const fullSiteAddress = document.getElementById('fullSiteAddress');
+        const fullCarpetArea = document.getElementById('fullCarpetArea');
+        const fullBudgetRange = document.getElementById('fullBudgetRange');
+
+        // Load Initial Assignment Metadata
+        if (painterId && leadId) {
+            loadLeadDetails();
+        } else {
+            showState(stateExpired);
+            headerTitle.textContent = "Error";
+        }
+
+        async function loadLeadDetails() {
+            try {
+                const baseUrl = CONFIG.N8N_WEBHOOK_URL.endsWith('/') ? CONFIG.N8N_WEBHOOK_URL : CONFIG.N8N_WEBHOOK_URL + '/';
+                const response = await fetch(`${baseUrl}painter-lead-details?painter_id=${painterId}&lead_id=${leadId}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    if (!data || !data.lead_id) {
+                        showState(stateExpired);
+                        return;
+                    }
+                    
+                    // Render details
+                    dispAddress1.textContent = data.address_line1 || "-";
+                    
+                    if (data.address_line2 && data.address_line2.trim() !== "") {
+                        dispAddress2.textContent = data.address_line2;
+                        dispAddress2.style.display = "block";
+                    } else {
+                        dispAddress2.style.display = "none";
+                    }
+                    
+                    dispTownPincode.textContent = `${data.town || ""}${data.town && data.pincode ? ", " : ""}${data.pincode || ""}`;
+                    
+                    // Visit DateTime
+                    const formattedDate = data.visit_date ? new Date(data.visit_date).toLocaleDateString('en-IN', {
+                        day: 'numeric', month: 'short', year: 'numeric'
+                    }) : "-";
+                    const formattedTime = data.visit_time || "-";
+                    dispVisitDateTime.textContent = `${formattedDate} at ${formattedTime}`;
+
+                    showState(stateDetails);
+                } else {
+                    showState(stateExpired);
+                }
+            } catch (err) {
+                console.error("Fetch error, using expired fallback:", err);
+                showState(stateExpired);
+            }
+        }
+
+        // Action Handlers
+        btnAccept.addEventListener('click', async () => {
+            showState(stateLoading);
+            try {
+                const baseUrl = CONFIG.N8N_WEBHOOK_URL.endsWith('/') ? CONFIG.N8N_WEBHOOK_URL : CONFIG.N8N_WEBHOOK_URL + '/';
+                const response = await fetch(`${baseUrl}painter-response`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'accept', painter_id: painterId, lead_id: leadId })
+                });
+
+                if (response.ok) {
+                    const fullData = await response.json();
+                    
+                    // Populate complete client details
+                    fullCustomerName.textContent = fullData.site_owner_name || "-";
+                    customerMobileLink.textContent = fullData.site_owner_mobile || "-";
+                    customerMobileLink.href = `tel:${fullData.site_owner_mobile}`;
+                    
+                    const streetPart = fullData.address_line2 ? `, ${fullData.address_line2}` : '';
+                    fullSiteAddress.textContent = `${fullData.address_line1}${streetPart}, ${fullData.town || ""}, ${fullData.state || ""} - ${fullData.pincode || ""}`;
+                    
+                    fullCarpetArea.textContent = fullData.carpet_area ? `${fullData.carpet_area}` : "-";
+                    fullBudgetRange.textContent = fullData.budget_range || "-";
+
+                    headerTitle.textContent = "Confirmed";
+                    showState(stateAccepted);
+                } else {
+                    alert("Submission failed. The lead might have already expired.");
+                    showState(stateExpired);
+                }
+            } catch (err) {
+                console.error("Submission error:", err);
+                alert("Network error, please try again.");
+                showState(stateDetails);
+            }
+        });
+
+        btnReject.addEventListener('click', async () => {
+            if(!confirm("Are you sure you want to decline this lead? This cannot be undone.")) return;
+            
+            showState(stateLoading);
+            try {
+                const baseUrl = CONFIG.N8N_WEBHOOK_URL.endsWith('/') ? CONFIG.N8N_WEBHOOK_URL : CONFIG.N8N_WEBHOOK_URL + '/';
+                const response = await fetch(`${baseUrl}painter-response`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'reject', painter_id: painterId, lead_id: leadId })
+                });
+
+                if (response.ok) {
+                    headerTitle.textContent = "Declined";
+                    showState(stateRejected);
+                } else {
+                    showState(stateExpired);
+                }
+            } catch (err) {
+                console.error("Rejection error:", err);
+                alert("Network error, please try again.");
+                showState(stateDetails);
+            }
+        });
+
+        // UI state toggler
+        function showState(targetState) {
+            [stateLoading, stateExpired, stateDetails, stateAccepted, stateRejected].forEach(el => {
+                el.classList.remove('active');
+            });
+            targetState.classList.add('active');
+        }
+    </script>
+</body>
+</html>

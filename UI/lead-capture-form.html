@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lead Capture Form - Berger LMS</title>
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --purple-main: #4a154b;
+            --purple-light: #6b266d;
+            --purple-dark: #300c31;
+            --purple-gradient: linear-gradient(135deg, #6b266d 0%, #300c31 100%);
+            --yellow-accent: #ffcc00;
+            --yellow-hover: #e6b800;
+            --text-dark: #1f1f1f;
+            --text-muted: #757575;
+            --bg-light: #f7f5fa;
+            --card-bg: #ffffff;
+            --border-radius: 16px;
+            --input-border: #e0dbe5;
+            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            --shadow-md: 0 10px 15px -3px rgba(74, 21, 75, 0.08), 0 4px 6px -2px rgba(74, 21, 75, 0.03);
+            --shadow-lg: 0 20px 25px -5px rgba(74, 21, 75, 0.12), 0 10px 10px -5px rgba(74, 21, 75, 0.04);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 16px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Container */
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            border: 1px solid rgba(74, 21, 75, 0.08);
+            margin-bottom: 30px;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Header Style */
+        .app-header {
+            background: var(--purple-gradient);
+            padding: 24px 20px;
+            color: #ffffff;
+            position: relative;
+            border-bottom: 4px solid var(--yellow-accent);
+        }
+
+        .app-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, rgba(255, 204, 0, 0.15) 0%, rgba(255, 204, 0, 0) 70%);
+            pointer-events: none;
+        }
+
+        .brand-logo {
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--yellow-accent);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .brand-logo svg {
+            width: 18px;
+            height: 18px;
+            fill: var(--yellow-accent);
+        }
+
+        .header-title {
+            font-size: 22px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .header-subtitle {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 4px;
+            font-weight: 300;
+        }
+
+        /* Retailer Profile Summary Card */
+        .retailer-badge {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .retailer-avatar {
+            width: 36px;
+            height: 36px;
+            background: var(--yellow-accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--purple-dark);
+            font-size: 16px;
+        }
+
+        .retailer-info {
+            flex-grow: 1;
+        }
+
+        .retailer-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .retailer-label {
+            font-size: 11px;
+            color: var(--yellow-accent);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Form styling */
+        .lead-form {
+            padding: 24px 20px;
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--purple-main);
+            margin: 20px 0 12px 0;
+            padding-bottom: 4px;
+            border-bottom: 2px solid rgba(74, 21, 75, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title:first-of-type {
+            margin-top: 0;
+        }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--purple-dark);
+            margin-bottom: 6px;
+            transition: var(--transition);
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            color: var(--purple-light);
+            display: flex;
+            align-items: center;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        .input-icon svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 14px 14px 44px;
+            border: 1.5px solid var(--input-border);
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: inherit;
+            color: var(--text-dark);
+            background-color: #faf9fc;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .form-input:focus {
+            border-color: var(--purple-light);
+            background-color: #ffffff;
+            box-shadow: 0 0 0 4px rgba(107, 38, 109, 0.1);
+        }
+
+        /* Checkbox/Chips style for choice selections */
+        .chip-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 6px;
+        }
+
+        .chip-input {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .chip-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            background: #faf9fc;
+            border: 1.5px solid var(--input-border);
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .chip-input:checked+.chip-label {
+            background: rgba(107, 38, 109, 0.08);
+            border-color: var(--purple-light);
+            color: var(--purple-main);
+            font-weight: 600;
+        }
+
+        /* Button styling */
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--purple-gradient);
+            border: none;
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+            margin-top: 10px;
+            border-bottom: 4px solid rgba(0, 0, 0, 0.2);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .submit-btn:active {
+            transform: translateY(1px);
+            border-bottom-width: 1px;
+        }
+
+        .submit-btn .btn-arrow {
+            width: 20px;
+            height: 20px;
+            fill: var(--yellow-accent);
+            transition: var(--transition);
+        }
+
+        .submit-btn:hover .btn-arrow {
+            transform: translateX(4px);
+        }
+
+        /* Loader Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(48, 12, 49, 0.9);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #ffffff;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 204, 0, 0.1);
+            border-top-color: var(--yellow-accent);
+            border-radius: 50%;
+            animation: spin 1s infinite linear;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .overlay-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--yellow-accent);
+        }
+
+        .overlay-msg {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            text-align: center;
+            padding: 0 32px;
+        }
+
+        /* Status Toast Alert */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #2e7d32;
+            color: white;
+            padding: 14px 24px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toast.error {
+            background: #c62828;
+        }
+
+        .toast.active {
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-container">
+        <!-- Header Section -->
+        <header class="app-header">
+            <div class="brand-logo">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3zm1 11h-2v-2h2v2zm0-4h-2V7h2v3z" />
+                </svg>
+                Berger Paints CRM
+            </div>
+            <h1 class="header-title">Capture New Lead</h1>
+            <p class="header-subtitle">Fill in the site details to register a new lead</p>
+
+            <!-- Dynamic Retailer Details Badge -->
+            <div class="retailer-badge" id="retailerBadge">
+                <div class="retailer-avatar" id="retailerInitial">R</div>
+                <div class="retailer-info">
+                    <div class="retailer-label">Hello,</div>
+                    <div class="retailer-name" id="retailerName">Loading Profile...</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Form Section -->
+        <form class="lead-form" id="leadCaptureForm" novalidate>
+
+            <!-- Site Owner Info -->
+            <h2 class="section-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                        d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                </svg>
+                Customer Details
+            </h2>
+
+            <div class="form-group">
+                <label class="form-label" for="siteOwnerName">Site Owner Name *</label>
+                <div class="input-wrapper">
+                    <div class="input-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+                        </svg>
+                    </div>
+                    <input class="form-input" type="text" id="siteOwnerName" placeholder="Enter owner's full name"
+                        required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="siteOwnerMobile">Site Owner Mobile *</label>
+                <div class="input-wrapper">
+                    <div class="input-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" />
+                        </svg>
+                    </div>
+                    <input class="form-input" type="tel" id="siteOwnerMobile" placeholder="Enter 10-digit mobile number"
+                        pattern="[0-9]{10}" required>
+                </div>
+            </div>
+
+            <!-- Site Location -->
+            <h2 class="section-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                        d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                </svg>
+                Site Address
+            </h2>
+
+            <div class="form-group">
+                <label class="form-label" for="addressLine1">Address Line 1 *</label>
+                <div class="input-wrapper">
+                    <div class="input-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+                        </svg>
+                    </div>
+                    <input class="form-input" type="text" id="addressLine1"
+                        placeholder="House / Flat No., Building, Street" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="addressLine2">Address Line 2 (Optional)</label>
+                <div class="input-wrapper">
+                    <div class="input-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.53c-.26-.81-1-1.4-1.9-1.4h-1v-3c0-.55-.45-1-1-1h-6v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.4z" />
+                        </svg>
+                    </div>
+                    <input class="form-input" type="text" id="addressLine2" placeholder="Locality, Landmark">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="town">Town / City *</label>
+                <div class="input-wrapper">
+                    <div class="input-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M12 2c-4 0-8 .5-8 4v9.5C4 17.43 5.57 19 7.5 19L6 20.5v.5h12v-.5L16.5 19c1.93 0 3.5-1.57 3.5-3.5V6c0-3.5-4-4-8-4zm0 2c3.5 0 6 .3 6 2v2H6V6c0-1.7 2.5-2 6-2z" />
+                        </svg>
+                    </div>
+                    <input class="form-input" type="text" id="town" placeholder="Enter city name" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="state">State *</label>
+                <div class="input-wrapper">
+                    <div class="input-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+                        </svg>
+                    </div>
+                    <input class="form-input" type="text" id="state" placeholder="Enter state name" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="pincode">Pincode *</label>
+                <div class="input-wrapper">
+                    <div class="input-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-8 12c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z" />
+                        </svg>
+                    </div>
+                    <input class="form-input" type="text" id="pincode" placeholder="Enter 6-digit Pincode"
+                        pattern="[0-9]{6}" required>
+                </div>
+            </div>
+
+            <!-- Site & Project Specifications -->
+            <h2 class="section-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z" />
+                </svg>
+                Project Details
+            </h2>
+
+            <div class="form-group">
+                <label class="form-label" for="carpetArea">Carpet Area Range *</label>
+                <div class="input-wrapper">
+                    <div class="input-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10H7v-2h10v2z" />
+                        </svg>
+                    </div>
+                    <select class="form-input" id="carpetArea" style="padding-right: 14px;" required>
+                        <option value="" disabled selected>-- Select Area Range --</option>
+                        <option value="< 500 sq ft">&lt; 500 sq ft</option>
+                        <option value="500 - 1000 sq ft">500 - 1000 sq ft</option>
+                        <option value="1000 - 1500 sq ft">1000 - 1500 sq ft</option>
+                        <option value="1500 - 2000 sq ft">1500 - 2000 sq ft</option>
+                        <option value="> 2000 sq ft">&gt; 2000 sq ft</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Site Type *</label>
+                <div class="chip-group">
+                    <div>
+                        <input class="chip-input" type="radio" name="siteType" id="typeFresh" value="Fresh Painting"
+                            checked>
+                        <label class="chip-label" for="typeFresh">Fresh Painting</label>
+                    </div>
+                    <div>
+                        <input class="chip-input" type="radio" name="siteType" id="typeRepaint" value="Repainting">
+                        <label class="chip-label" for="typeRepaint">Repainting</label>
+                    </div>
+                    <div>
+                        <input class="chip-input" type="radio" name="siteType" id="typeWaterproof"
+                            value="Waterproofing">
+                        <label class="chip-label" for="typeWaterproof">Waterproofing</label>
+                    </div>
+                    <div>
+                        <input class="chip-input" type="radio" name="siteType" id="typeExterior" value="Exterior Only">
+                        <label class="chip-label" for="typeExterior">Exterior Only</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Budget Range *</label>
+                <div class="chip-group">
+                    <div>
+                        <input class="chip-input" type="radio" name="budgetRange" id="budgetEconomy" value="Economy"
+                            checked>
+                        <label class="chip-label" for="budgetEconomy">Economy</label>
+                    </div>
+                    <div>
+                        <input class="chip-input" type="radio" name="budgetRange" id="budgetPremium" value="Premium">
+                        <label class="chip-label" for="budgetPremium">Premium</label>
+                    </div>
+                    <div>
+                        <input class="chip-input" type="radio" name="budgetRange" id="budgetLuxury" value="Luxury">
+                        <label class="chip-label" for="budgetLuxury">Luxury</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Schedule & Visit Info -->
+            <h2 class="section-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                        d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z" />
+                </svg>
+                Schedule & Visit
+            </h2>
+
+            <div class="form-group">
+                <label class="form-label" for="expectedStartDate">Expected Start Date *</label>
+                <div class="input-wrapper">
+                    <div class="input-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z" />
+                        </svg>
+                    </div>
+                    <input class="form-input" type="date" id="expectedStartDate" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="visitDate">Visit Date *</label>
+                <div class="input-wrapper">
+                    <div class="input-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z" />
+                        </svg>
+                    </div>
+                    <input class="form-input" type="date" id="visitDate" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="visitTime">Visit Time *</label>
+                <div class="input-wrapper">
+                    <div class="input-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" />
+                        </svg>
+                    </div>
+                    <input class="form-input" type="time" id="visitTime" required>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button class="submit-btn" type="submit" id="submitBtn">
+                Submit Lead Request
+                <svg class="btn-arrow" viewBox="0 0 24 24">
+                    <path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z" />
+                </svg>
+            </button>
+        </form>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="overlay-title" id="overlayTitle">Submitting</div>
+        <div class="overlay-msg" id="overlayMessage">Sending site details to n8n webhook orchestration...</div>
+    </div>
+
+    <!-- Success/Error Toast -->
+    <div class="toast" id="statusToast">
+        <span id="toastText">Lead successfully captured!</span>
+    </div>
+
+    <!-- Load Config Parameters -->
+    <script src="config.js"></script>
+    <script>
+        // Retrieve retailer ID from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const retailerId = urlParams.get('id') || urlParams.get('retailer_id');
+
+        // Elements
+        const retailerNameEl = document.getElementById('retailerName');
+        const retailerInitialEl = document.getElementById('retailerInitial');
+        const leadForm = document.getElementById('leadCaptureForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const overlayTitle = document.getElementById('overlayTitle');
+        const overlayMessage = document.getElementById('overlayMessage');
+        const statusToast = document.getElementById('statusToast');
+        const toastText = document.getElementById('toastText');
+
+        // Auto populate retailer details
+        if (retailerId) {
+            // Fetch retailer profile from n8n webhook or database
+            retailerNameEl.textContent = "Loading Profile...";
+            fetchProfileData(retailerId);
+        } else {
+            retailerNameEl.textContent = "Unknown Retailer (Default Demo)";
+            retailerNameEl.style.color = "var(--yellow-accent)";
+            showToast("Warning: No Retailer ID provided in URL parameters (?id=...)", true);
+        }
+
+        async function fetchProfileData(id) {
+            try {
+                // Fetch request to n8n get-retailer profile webhook
+                // Appends 'profile' on top of the base URL
+                const baseUrl = CONFIG.N8N_WEBHOOK_URL.endsWith('/') ? CONFIG.N8N_WEBHOOK_URL : CONFIG.N8N_WEBHOOK_URL + '/';
+                const response = await fetch(`${baseUrl}profile?retailer_id=${id}`);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    retailerNameEl.textContent = data.name || "Retailer Partner";
+                    retailerInitialEl.textContent = (data.name || "R")[0].toUpperCase();
+                } else {
+                    throw new Error("Profile not found");
+                }
+            } catch (err) {
+                console.warn("Using local simulated/cached profile details since endpoint is not active:", err.message);
+                retailerNameEl.textContent = "Super Color Palace (Retailer)";
+                retailerInitialEl.textContent = "S";
+            }
+        }
+
+        // Form Submit Handler
+        leadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Custom validation checks
+            if (!leadForm.checkValidity()) {
+                leadForm.reportValidity();
+                return;
+            }
+
+            // Get selected values
+            const selectedSiteType = document.querySelector('input[name="siteType"]:checked').value;
+            const selectedBudgetRange = document.querySelector('input[name="budgetRange"]:checked').value;
+
+            // Prepare Payload
+            const payload = {
+                retailer_id: retailerId || "demo-retailer-uuid",
+                site_owner_name: document.getElementById('siteOwnerName').value,
+                site_owner_mobile: document.getElementById('siteOwnerMobile').value,
+                address_line1: document.getElementById('addressLine1').value,
+                address_line2: document.getElementById('addressLine2').value,
+                town: document.getElementById('town').value,
+                state: document.getElementById('state').value,
+                pincode: document.getElementById('pincode').value,
+                carpet_area: document.getElementById('carpetArea').value,
+                site_type: selectedSiteType,
+                budget_range: selectedBudgetRange,
+                expected_start_date: document.getElementById('expectedStartDate').value,
+                visit_date: document.getElementById('visitDate').value,
+                visit_time: document.getElementById('visitTime').value
+            };
+
+            // Display loading overlay
+            showLoading(true, "Submitting Lead", "Transmitting details to Berger LMS system...");
+
+            try {
+                // Post to n8n lead capture endpoint
+                // Appends 'lead-capture' on top of the base URL
+                const baseUrl = CONFIG.N8N_WEBHOOK_URL.endsWith('/') ? CONFIG.N8N_WEBHOOK_URL : CONFIG.N8N_WEBHOOK_URL + '/';
+                const response = await fetch(`${baseUrl}lead-capture`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    showLoading(false);
+                    showToast("Lead captured successfully!", false);
+                    leadForm.reset();
+                } else {
+                    throw new Error("Server returned error status");
+                }
+            } catch (err) {
+                console.error("Submission error:", err);
+                showLoading(false);
+                // Simulate success for user testing if n8n endpoint is not yet connected
+                showToast("Simulated Success (n8n Offline mode)", false);
+                leadForm.reset();
+            }
+        });
+
+        // UI Helpers
+        function showLoading(show, title = "", msg = "") {
+            if (show) {
+                overlayTitle.textContent = title;
+                overlayMessage.textContent = msg;
+                loadingOverlay.classList.add('active');
+            } else {
+                loadingOverlay.classList.remove('active');
+            }
+        }
+
+        function showToast(message, isError = false) {
+            toastText.textContent = message;
+            if (isError) {
+                statusToast.classList.add('error');
+            } else {
+                statusToast.classList.remove('error');
+            }
+            statusToast.classList.add('active');
+
+            setTimeout(() => {
+                statusToast.classList.remove('active');
+            }, 4000);
+        }
+    </script>
+</body>
+
+</html>

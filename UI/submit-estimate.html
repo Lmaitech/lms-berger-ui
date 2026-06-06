@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Estimate - Berger LMS</title>
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --purple-main: #4a154b;
+            --purple-light: #6b266d;
+            --purple-dark: #300c31;
+            --purple-gradient: linear-gradient(135deg, #6b266d 0%, #300c31 100%);
+            --yellow-accent: #ffcc00;
+            --yellow-hover: #e6b800;
+            --text-dark: #1f1f1f;
+            --text-muted: #757575;
+            --bg-light: #f7f5fa;
+            --card-bg: #ffffff;
+            --border-radius: 20px;
+            --input-border: #e2d9e8;
+            --shadow-lg: 0 20px 25px -5px rgba(74, 21, 75, 0.12), 0 10px 10px -5px rgba(74, 21, 75, 0.04);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --success-color: #2e7d32;
+            --error-color: #c62828;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 16px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            border: 1px solid rgba(74, 21, 75, 0.08);
+            margin-bottom: 30px;
+            animation: slideUp 0.4s ease-out;
+            position: relative;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .app-header {
+            background: var(--purple-gradient);
+            padding: 24px 20px;
+            color: #ffffff;
+            border-bottom: 4px solid var(--yellow-accent);
+        }
+
+        .brand-logo {
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--yellow-accent);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .brand-logo svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--yellow-accent);
+        }
+
+        .header-title {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        /* Info Summary Section */
+        .summary-card {
+            background: #faf8fc;
+            border: 1.5px solid #f0eaf5;
+            border-radius: 16px;
+            padding: 14px;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .summary-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .summary-label {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .summary-val {
+            color: var(--text-dark);
+            font-weight: 600;
+            text-align: right;
+            max-width: 65%;
+        }
+
+        /* Segment Controls / Pills */
+        .segment-container {
+            display: flex;
+            background: #f1ecf5;
+            border-radius: 10px;
+            padding: 4px;
+            margin-bottom: 16px;
+        }
+
+        .segment-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--purple-light);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .segment-btn.active {
+            background: var(--purple-main);
+            color: #ffffff;
+            box-shadow: 0 4px 6px rgba(74, 21, 75, 0.15);
+        }
+
+        .section-title {
+            font-size: 14px;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: var(--purple-light);
+            letter-spacing: 0.5px;
+            margin-top: 24px;
+            margin-bottom: 12px;
+            border-bottom: 1.5px solid #f0eaf5;
+            padding-bottom: 6px;
+        }
+
+        .section-title:first-of-type {
+            margin-top: 0;
+        }
+
+        /* Products Table */
+        .items-container {
+            margin-bottom: 16px;
+        }
+
+        .item-row {
+            background: #ffffff;
+            border: 1.5px solid var(--input-border);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 12px;
+            position: relative;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .item-index {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--purple-light);
+        }
+
+        .btn-remove-item {
+            background: transparent;
+            border: none;
+            color: var(--error-color);
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .form-select, .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1.5px solid var(--input-border);
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: inherit;
+            color: var(--text-dark);
+            background-color: #faf9fc;
+            outline: none;
+            transition: var(--transition);
+            margin-bottom: 8px;
+        }
+
+        .form-select:focus, .form-input:focus {
+            border-color: var(--purple-light);
+            background-color: #ffffff;
+        }
+
+        .item-fields-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .form-group-sub {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label-sub {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .btn-add-item {
+            width: 100%;
+            padding: 12px;
+            background: #faf8fc;
+            border: 1.5px dashed var(--purple-light);
+            color: var(--purple-main);
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-add-item:hover {
+            background: rgba(107, 38, 109, 0.04);
+        }
+
+        /* Totals Card */
+        .totals-card {
+            background: var(--purple-dark);
+            color: #ffffff;
+            border-radius: 16px;
+            padding: 16px;
+            margin-top: 24px;
+            box-shadow: 0 10px 15px rgba(48, 12, 49, 0.15);
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .total-row.grand-total {
+            border-top: 1px dashed rgba(255, 255, 255, 0.2);
+            padding-top: 10px;
+            margin-top: 10px;
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--yellow-accent);
+        }
+
+        .total-label {
+            opacity: 0.85;
+        }
+
+        .total-val {
+            font-weight: 700;
+        }
+
+        /* Collapsible / Previous Estimates */
+        .history-accordion {
+            margin-top: 24px;
+            background: #ffffff;
+            border: 1.5px solid var(--input-border);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .accordion-header {
+            padding: 16px;
+            background: #faf8fc;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--purple-main);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .accordion-content {
+            display: none;
+            padding: 16px;
+            border-top: 1.5px solid var(--input-border);
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .history-estimate-box {
+            padding: 12px;
+            background: #f7f5fa;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            font-size: 12px;
+            border: 1px solid #e2d9e8;
+        }
+
+        .history-estimate-box:last-child {
+            margin-bottom: 0;
+        }
+
+        .history-estimate-header {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 700;
+            color: var(--purple-light);
+            margin-bottom: 6px;
+            border-bottom: 1px dashed rgba(0, 0, 0, 0.08);
+            padding-bottom: 4px;
+        }
+
+        /* Buttons & Submissions */
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--purple-gradient);
+            border: none;
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(74, 21, 75, 0.15);
+            transition: var(--transition);
+            margin-top: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 12px rgba(74, 21, 75, 0.2);
+        }
+
+        .submit-btn:disabled {
+            background: #cbd5e1;
+            color: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-cancel {
+            display: block;
+            text-align: center;
+            margin-top: 16px;
+            padding: 12px;
+            background: transparent;
+            border: 2px solid var(--purple-light);
+            color: var(--purple-light);
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .btn-cancel:hover {
+            background: var(--purple-light);
+            color: #ffffff;
+        }
+
+        /* Success screen overlay */
+        .success-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 24px;
+            z-index: 100;
+        }
+
+        .success-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: #e8f5e9;
+            color: #2e7d32;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .success-icon svg {
+            width: 36px;
+            height: 36px;
+            fill: currentColor;
+        }
+
+        .success-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--purple-dark);
+            margin-bottom: 8px;
+        }
+
+        .success-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .error-message {
+            display: none;
+            background: #ffebee;
+            color: #c62828;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 16px;
+            font-weight: 500;
+            border-left: 4px solid #c62828;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2.5px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 0.8s infinite linear;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Success Screen Overlay -->
+        <div class="success-overlay" id="successScreen">
+            <div class="success-icon">
+                <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+            </div>
+            <h3 class="success-title">Estimate Submitted</h3>
+            <p class="success-desc" id="successDesc">The estimate version was logged successfully. Returning you to tools...</p>
+        </div>
+
+        <header class="app-header">
+            <div class="brand-logo">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3zm1 11h-2v-2h2v2zm0-4h-2V7h2v3z"/>
+                </svg>
+                Berger Paints CRM
+            </div>
+            <h1 class="header-title">Submit Estimate</h1>
+        </header>
+
+        <div class="content">
+            <!-- Project / Client Summary -->
+            <div class="summary-card">
+                <div class="summary-row">
+                    <span class="summary-label">Client Name</span>
+                    <span class="summary-val" id="summaryName">-</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Address</span>
+                    <span class="summary-val" id="summaryAddress">-</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Assigned Painter</span>
+                    <span class="summary-val" id="summaryPainter">-</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Logged Retailer</span>
+                    <span class="summary-val" id="summaryRetailer">-</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Visit Number</span>
+                    <span class="summary-val" id="summaryVisitNumber">-</span>
+                </div>
+            </div>
+
+            <!-- Error Banner -->
+            <div class="error-message" id="errorMessageBox"></div>
+
+            <form id="estimateForm">
+                <!-- Toggle Modes: Supply vs Supply & Apply -->
+                <div class="form-group">
+                    <label class="form-label">Estimation Mode</label>
+                    <div class="segment-container" id="modeSegment">
+                        <button type="button" class="segment-btn active" data-mode="SUPPLY">Supply Only</button>
+                        <button type="button" class="segment-btn" data-mode="SUPPLY_APPLY">Supply & Apply</button>
+                    </div>
+                </div>
+
+                <!-- Toggle Estimate Type: Volume vs Value -->
+                <div class="form-group">
+                    <label class="form-label">Estimate Type</label>
+                    <div class="segment-container" id="typeSegment">
+                        <button type="button" class="segment-btn active" data-type="VOLUME">Volume (L/Kg)</button>
+                        <button type="button" class="segment-btn" data-type="VALUE">Value (Price)</button>
+                    </div>
+                </div>
+
+                <h3 class="section-title">Material Items</h3>
+
+                <!-- Dynamic Item List Container -->
+                <div class="items-container" id="itemsList">
+                    <!-- Dynamic rows will be inserted here -->
+                </div>
+
+                <button type="button" class="btn-add-item" id="btnAddItem">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    Add Product Item
+                </button>
+
+                <!-- Manpower Cost input (Conditional) -->
+                <div id="manpowerCostContainer" style="display: none; margin-top: 20px;">
+                    <h3 class="section-title">Manpower / Application Cost</h3>
+                    <div class="form-group">
+                        <label class="form-label" for="manpowerCost">Manpower Charges (Rs)</label>
+                        <input class="form-input" type="number" id="manpowerCost" placeholder="Enter manpower application cost..." value="0" min="0">
+                    </div>
+                </div>
+
+                <!-- Previous Estimates Collapsible -->
+                <div class="history-accordion">
+                    <div class="accordion-header" id="accordionHeader">
+                        <span>Previous Site Estimates</span>
+                        <svg id="accordionArrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition: var(--transition);"><polyline points="6 9 12 15 18 9"/></svg>
+                    </div>
+                    <div class="accordion-content" id="accordionContent">
+                        <div id="previousEstimatesList" style="color: var(--text-muted); font-size: 13px; text-align: center; padding: 10px;">
+                            Loading history...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Totals Section Card -->
+                <div class="totals-card">
+                    <!-- Dynamic Subtotals Breakdown Container -->
+                    <div id="subtotalsBreakdown" style="margin-bottom: 12px; font-size: 13px; border-bottom: 1px dashed rgba(255, 255, 255, 0.2); padding-bottom: 10px;">
+                    </div>
+                    
+                    <div class="total-row" id="materialTotalRow">
+                        <span class="total-label">Material Total:</span>
+                        <span class="total-val" id="materialTotalVal">Rs 0.00</span>
+                    </div>
+                    <div class="total-row" id="manpowerCostTotalRow" style="display: none;">
+                        <span class="total-label">Manpower Cost:</span>
+                        <span class="total-val" id="manpowerCostTotalVal">Rs 0.00</span>
+                    </div>
+                    <div class="total-row grand-total">
+                        <span class="total-label">Grand Total:</span>
+                        <span class="total-val" id="grandTotalVal">Rs 0.00</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    Submit Estimate
+                </button>
+            </form>
+
+            <a href="#" class="btn-cancel" id="btnCancel">
+                Back to Tools
+            </a>
+        </div>
+    </div>
+
+    <!-- Webhook config and Scripts -->
+    <script src="config.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const leadId = urlParams.get('lead_id');
+        const painterId = urlParams.get('id');
+        const visitNumber = urlParams.get('visit_number') || '1';
+        const ownerName = urlParams.get('owner_name') || '';
+        const ownerMobile = urlParams.get('owner_mobile') || '';
+        const address = urlParams.get('address') || '';
+        const painterName = urlParams.get('painter_name') || '';
+        const retailerName = urlParams.get('retailer_name') || '';
+
+        // Populate summary
+        document.getElementById('summaryName').textContent = ownerName || '-';
+        document.getElementById('summaryAddress').textContent = address || '-';
+        document.getElementById('summaryPainter').textContent = painterName || '-';
+        document.getElementById('summaryRetailer').textContent = retailerName || '-';
+        document.getElementById('summaryVisitNumber').textContent = `Visit #${visitNumber}`;
+
+        const cancelBtn = document.getElementById('btnCancel');
+        const returnUrl = `project-tools.html?lead_id=${leadId}&id=${painterId}&visit_number=${visitNumber}&owner_name=${encodeURIComponent(ownerName)}&owner_mobile=${ownerMobile}&address=${encodeURIComponent(address)}&painter_name=${encodeURIComponent(painterName)}&retailer_name=${encodeURIComponent(retailerName)}`;
+        cancelBtn.href = returnUrl;
+
+        // Form parameters
+        let currentMode = 'SUPPLY'; // SUPPLY vs SUPPLY_APPLY
+        let currentType = 'VOLUME'; // VOLUME vs VALUE
+        let productsCatalog = [];
+        let itemsCount = 0;
+
+        // Mode Segment Toggle
+        document.querySelectorAll('#modeSegment button').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('#modeSegment button').forEach(b => b.classList.remove('active'));
+                button.classList.add('active');
+                currentMode = button.getAttribute('data-mode');
+                
+                const manpowerCostContainer = document.getElementById('manpowerCostContainer');
+                const manpowerCostTotalRow = document.getElementById('manpowerCostTotalRow');
+                
+                if (currentMode === 'SUPPLY_APPLY') {
+                    manpowerCostContainer.style.display = 'block';
+                    manpowerCostTotalRow.style.display = 'flex';
+                } else {
+                    manpowerCostContainer.style.display = 'none';
+                    manpowerCostTotalRow.style.display = 'none';
+                    document.getElementById('manpowerCost').value = 0;
+                }
+                calculateTotals();
+            });
+        });
+
+        // Type Segment Toggle
+        document.querySelectorAll('#typeSegment button').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('#typeSegment button').forEach(b => b.classList.remove('active'));
+                button.classList.add('active');
+                currentType = button.getAttribute('data-type');
+                
+                // Toggle rate inputs inside items list
+                document.querySelectorAll('.rate-group').forEach(group => {
+                    group.style.display = currentType === 'VALUE' ? 'flex' : 'none';
+                });
+                
+                calculateTotals();
+            });
+        });
+
+        // Previous Estimates Collapsible
+        const accordionHeader = document.getElementById('accordionHeader');
+        const accordionContent = document.getElementById('accordionContent');
+        const accordionArrow = document.getElementById('accordionArrow');
+
+        accordionHeader.addEventListener('click', () => {
+            const isContentVisible = accordionContent.style.display === 'block';
+            accordionContent.style.display = isContentVisible ? 'none' : 'block';
+            accordionArrow.style.transform = isContentVisible ? 'rotate(0deg)' : 'rotate(180deg)';
+            if (!isContentVisible) {
+                fetchPreviousEstimates();
+            }
+        });
+
+        // Initialize and load products catalog
+        window.addEventListener('load', async () => {
+            try {
+                const baseUrl = CONFIG.N8N_WEBHOOK_URL.endsWith('/') ? CONFIG.N8N_WEBHOOK_URL : CONFIG.N8N_WEBHOOK_URL + '/';
+                const response = await fetch(`${baseUrl}products`);
+                if (response.ok) {
+                    productsCatalog = await response.json();
+                    // Add first row by default
+                    addProductRow();
+                } else {
+                    showError('Failed to retrieve products catalog. Reload page.');
+                }
+            } catch (err) {
+                console.error("Products load error:", err);
+                showError('Network error connecting to products directory.');
+            }
+        });
+
+        // Add Product Row
+        const btnAddItem = document.getElementById('btnAddItem');
+        btnAddItem.addEventListener('click', () => addProductRow());
+
+        function addProductRow() {
+            itemsCount++;
+            const container = document.getElementById('itemsList');
+            
+            const row = document.createElement('div');
+            row.className = 'item-row';
+            row.id = `itemRow_${itemsCount}`;
+            
+            // Get unique categories from productsCatalog
+            const categories = [...new Set(productsCatalog.map(p => p.category).filter(Boolean))].sort();
+            let catOptionsHTML = '<option value="">-- Choose Category --</option>';
+            categories.forEach(cat => {
+                catOptionsHTML += `<option value="${cat}">${cat}</option>`;
+            });
+
+            row.innerHTML = `
+                <div class="item-header">
+                    <span class="item-index">PRODUCT ITEM #${itemsCount}</span>
+                    ${itemsCount > 1 ? `<button type="button" class="btn-remove-item" onclick="removeProductRow(${itemsCount})">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                        Remove
+                    </button>` : ''}
+                </div>
+                
+                <div class="form-group-sub" style="margin-bottom: 8px;">
+                    <span class="form-label-sub">Category</span>
+                    <select class="form-select category-select" required onchange="handleCategoryChange(${itemsCount}, this)">
+                        ${catOptionsHTML}
+                    </select>
+                </div>
+                
+                <div class="form-group-sub" style="margin-bottom: 8px;">
+                    <span class="form-label-sub">Product Name / SKU</span>
+                    <select class="form-select product-select" id="productSelect_${itemsCount}" required disabled onchange="handleProductChange(${itemsCount}, this)">
+                        <option value="">-- Choose Product SKU --</option>
+                    </select>
+                </div>
+                
+                <div class="item-fields-grid">
+                    <div class="form-group-sub">
+                        <span class="form-label-sub">Quantity <span class="unit-indicator" id="unit_${itemsCount}">(L/Kg)</span></span>
+                        <input class="form-input qty-input" type="number" step="0.01" min="0.01" placeholder="0.00" required oninput="calculateTotals()">
+                    </div>
+                    <div class="form-group-sub rate-group" style="display: ${currentType === 'VALUE' ? 'flex' : 'none'};">
+                        <span class="form-label-sub">Price per Unit (Rs)</span>
+                        <input class="form-input rate-input" type="number" step="0.01" min="0" placeholder="0.00" oninput="calculateTotals()">
+                    </div>
+                </div>
+            `;
+            container.appendChild(row);
+            calculateTotals();
+        }
+
+        function removeProductRow(id) {
+            const row = document.getElementById(`itemRow_${id}`);
+            if (row) {
+                row.remove();
+                calculateTotals();
+            }
+        }
+
+        function handleCategoryChange(id, selectElement) {
+            const category = selectElement.value;
+            const productSelect = document.getElementById(`productSelect_${id}`);
+            const unitLabel = document.getElementById(`unit_${id}`);
+            
+            productSelect.innerHTML = '<option value="">-- Choose Product SKU --</option>';
+            unitLabel.textContent = '(L/Kg)';
+            
+            if (!category) {
+                productSelect.disabled = true;
+                calculateTotals();
+                return;
+            }
+            
+            const filteredProducts = productsCatalog.filter(p => p.category === category);
+            filteredProducts.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.product_id;
+                opt.textContent = `${p.product_name} (${p.unit || 'L'})`;
+                opt.setAttribute('data-unit', p.unit || 'L');
+                productSelect.appendChild(opt);
+            });
+            productSelect.disabled = false;
+            calculateTotals();
+        }
+
+        function handleProductChange(id, selectElement) {
+            const selectedOption = selectElement.options[selectElement.selectedIndex];
+            const unit = selectedOption ? (selectedOption.getAttribute('data-unit') || 'L/Kg') : 'L/Kg';
+            document.getElementById(`unit_${id}`).textContent = `(${unit})`;
+            calculateTotals();
+        }
+
+        // Totals Calculations
+        function calculateTotals() {
+            const itemRows = document.querySelectorAll('.item-row');
+            const subtotalsContainer = document.getElementById('subtotalsBreakdown');
+            
+            const categorySums = {}; 
+            let grandMaterialValue = 0;
+            const grandVolumeSums = {};
+            
+            itemRows.forEach(row => {
+                const productSelect = row.querySelector('.product-select');
+                if (!productSelect) return;
+                
+                const productId = productSelect.value;
+                if (!productId) return;
+                
+                const product = productsCatalog.find(p => p.product_id === productId);
+                if (!product) return;
+                
+                const qtyInput = row.querySelector('.qty-input');
+                const qty = parseFloat(qtyInput.value) || 0;
+                
+                const category = product.category || 'Uncategorized';
+                let unit = product.unit || 'L';
+                
+                // Normalize units
+                const upperUnit = unit.toUpperCase().trim();
+                if (['L', 'LTR', 'LITRE', 'LITRES', 'LTRS'].includes(upperUnit)) {
+                    unit = 'L';
+                } else if (['KG', 'KGS', 'KILOGRAM', 'KILOGRAMS'].includes(upperUnit)) {
+                    unit = 'Kg';
+                }
+                
+                if (currentType === 'VALUE') {
+                    const rateInput = row.querySelector('.rate-input');
+                    const rate = parseFloat(rateInput.value) || 0;
+                    const lineTotal = qty * rate;
+                    
+                    grandMaterialValue += lineTotal;
+                    
+                    if (!categorySums[category]) {
+                        categorySums[category] = 0;
+                    }
+                    categorySums[category] += lineTotal;
+                } else {
+                    // VOLUME mode
+                    if (!categorySums[category]) {
+                        categorySums[category] = {};
+                    }
+                    if (!categorySums[category][unit]) {
+                        categorySums[category][unit] = 0;
+                    }
+                    categorySums[category][unit] += qty;
+                    
+                    grandVolumeSums[unit] = (grandVolumeSums[unit] || 0) + qty;
+                }
+            });
+
+            const manpowerCost = parseFloat(document.getElementById('manpowerCost').value) || 0;
+            
+            // Render subtotals
+            let subtotalHTML = '<div style="font-weight: 700; margin-bottom: 6px; color: var(--yellow-accent);">Category Subtotals</div>';
+            const categories = Object.keys(categorySums);
+            
+            if (categories.length === 0) {
+                subtotalHTML += '<div style="color: rgba(255,255,255,0.7); font-style: italic;">No items added yet.</div>';
+            } else {
+                categories.forEach(cat => {
+                    if (currentType === 'VALUE') {
+                        subtotalHTML += `<div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
+                            <span>${cat}:</span>
+                            <span style="font-weight: 600;">Rs ${categorySums[cat].toFixed(2)}</span>
+                        </div>`;
+                    } else {
+                        const units = categorySums[cat];
+                        const unitStrings = Object.keys(units)
+                            .map(u => `${units[u].toFixed(2)} ${u}`)
+                            .join(' + ');
+                        subtotalHTML += `<div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
+                            <span>${cat}:</span>
+                            <span style="font-weight: 600;">${unitStrings}</span>
+                        </div>`;
+                    }
+                });
+            }
+            subtotalsContainer.innerHTML = subtotalHTML;
+
+            // Render Material Total Row and Grand Total
+            const materialTotalRow = document.getElementById('materialTotalRow');
+            const materialTotalVal = document.getElementById('materialTotalVal');
+            const grandTotalVal = document.getElementById('grandTotalVal');
+            const manpowerRow = document.getElementById('manpowerCostTotalRow');
+            const isSupplyApply = currentMode === 'SUPPLY_APPLY';
+
+            if (currentType === 'VALUE') {
+                materialTotalRow.style.display = 'flex';
+                materialTotalVal.textContent = `Rs ${grandMaterialValue.toFixed(2)}`;
+                
+                const grandTotal = grandMaterialValue + manpowerCost;
+                grandTotalVal.textContent = `Rs ${grandTotal.toFixed(2)}`;
+            } else {
+                // VOLUME mode
+                materialTotalRow.style.display = 'flex';
+                const volParts = [];
+                Object.keys(grandVolumeSums).forEach(u => {
+                    if (grandVolumeSums[u] > 0) {
+                        volParts.push(`${grandVolumeSums[u].toFixed(2)} ${u}`);
+                    }
+                });
+                
+                const volString = volParts.length > 0 ? volParts.join(' + ') : '0.00 L/Kg';
+                materialTotalVal.textContent = volString;
+                
+                if (isSupplyApply) {
+                    grandTotalVal.innerHTML = `<span style="font-size: 13px; font-weight: normal; color: rgba(255,255,255,0.7);">Rs ${manpowerCost.toFixed(2)} (Manpower) +</span><br/>${volString}`;
+                } else {
+                    grandTotalVal.textContent = volString;
+                }
+            }
+
+            // Show/Hide manpower cost row depending on Mode
+            if (isSupplyApply) {
+                manpowerRow.style.display = 'flex';
+                document.getElementById('manpowerCostTotalVal').textContent = `Rs ${manpowerCost.toFixed(2)}`;
+            } else {
+                manpowerRow.style.display = 'none';
+            }
+        }
+
+        // Manpower input change listener
+        document.getElementById('manpowerCost').addEventListener('input', () => calculateTotals());
+
+        // Previous Estimates Loader
+        async function fetchPreviousEstimates() {
+            const container = document.getElementById('previousEstimatesList');
+            container.innerHTML = `<div class="spinner" style="width: 16px; height: 16px; margin: 0 auto; border-color: rgba(74,21,75,0.2); border-top-color: var(--purple-light);"></div>`;
+            
+            try {
+                const baseUrl = CONFIG.N8N_WEBHOOK_URL.endsWith('/') ? CONFIG.N8N_WEBHOOK_URL : CONFIG.N8N_WEBHOOK_URL + '/';
+                const response = await fetch(`${baseUrl}previous-estimates?lead_id=${leadId}`);
+                if (response.ok) {
+                    let data = await response.json();
+                    // Filter empty objects returned due to n8n alwaysOutputData
+                    data = data.filter(item => item && item.estimate_id);
+                    
+                    if (data.length === 0) {
+                        container.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 10px;">No previous estimates found.</div>';
+                        return;
+                    }
+
+                    // Group by version
+                    const grouped = {};
+                    data.forEach(item => {
+                        if (!grouped[item.estimate_version]) {
+                            grouped[item.estimate_version] = {
+                                grand_total: item.grand_total,
+                                material_total: item.material_total,
+                                labour_cost: item.labour_cost,
+                                submitted_at: item.submitted_at,
+                                estimate_mode: item.estimate_mode,
+                                estimate_type: item.estimate_type,
+                                items: []
+                            };
+                        }
+                        grouped[item.estimate_version].items.push(item);
+                    });
+
+                    let html = '';
+                    const istOptions = { timeZone: 'Asia/Kolkata', hour12: true, month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+                    
+                    Object.keys(grouped).sort((a, b) => b - a).forEach(v => {
+                        const g = grouped[v];
+                        const dateStr = new Date(g.submitted_at).toLocaleString('en-IN', istOptions);
+                        
+                        const isValueEst = g.estimate_type === 'VALUE';
+                        const isSupplyApply = g.estimate_mode === 'SUPPLY_APPLY';
+                        
+                        let itemsHTML = '';
+                        g.items.forEach(item => {
+                            const valStr = (isValueEst && item.rate > 0) ? ` @ Rs ${parseFloat(item.rate).toFixed(2)}` : '';
+                            itemsHTML += `<div style="padding: 2px 0;">&bull; ${item.product_name}: <b>${parseFloat(item.quantity)} ${item.unit}</b>${valStr}</div>`;
+                        });
+
+                        const modeLabel = isSupplyApply ? 'Supply & Apply' : 'Supply Only';
+                        const typeLabel = isValueEst ? 'Value-based' : 'Volume-based';
+
+                        let costFooterHTML = '';
+                        if (isValueEst) {
+                            costFooterHTML = `
+                                <div style="display: flex; justify-content: space-between; font-weight: 700; border-top: 1px dotted rgba(0,0,0,0.05); padding-top: 6px; margin-top: 6px;">
+                                    <span>Material: Rs ${parseFloat(g.material_total).toFixed(2)}</span>
+                                    ${isSupplyApply ? `<span>Manpower: Rs ${parseFloat(g.labour_cost).toFixed(2)}</span>` : ''}
+                                    <span style="color: var(--purple-main);">Total: Rs ${parseFloat(g.grand_total).toFixed(2)}</span>
+                                </div>
+                            `;
+                        } else {
+                            costFooterHTML = `
+                                <div style="display: flex; justify-content: space-between; font-weight: 700; border-top: 1px dotted rgba(0,0,0,0.05); padding-top: 6px; margin-top: 6px;">
+                                    <span>Material: Volume Only</span>
+                                    ${isSupplyApply ? `<span>Manpower: Rs ${parseFloat(g.labour_cost).toFixed(2)}</span>` : ''}
+                                    <span style="color: var(--purple-main);">Total: ${isSupplyApply ? `Rs ${parseFloat(g.labour_cost).toFixed(2)}` : 'Volume Only'}</span>
+                                </div>
+                            `;
+                        }
+
+                        html += `
+                            <div class="history-estimate-box">
+                                <div class="history-estimate-header">
+                                    <span>Version #${v} (${modeLabel} - ${typeLabel})</span>
+                                    <span>${dateStr} (IST)</span>
+                                </div>
+                                <div style="margin-bottom: 8px;">
+                                    ${itemsHTML}
+                                </div>
+                                ${costFooterHTML}
+                            </div>
+                        `;
+                    });
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 10px;">No previous estimates found.</div>';
+                }
+            } catch (err) {
+                console.error("History loading error:", err);
+                container.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 10px;">No previous estimates found.</div>';
+            }
+        }
+
+        // Form Submit
+        document.getElementById('estimateForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const errorMessageBox = document.getElementById('errorMessageBox');
+            const successScreen = document.getElementById('successScreen');
+            
+            errorMessageBox.style.display = 'none';
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<div class="spinner"></div> Submitting Estimate...`;
+
+            // Collect items
+            const estimateItems = [];
+            const itemRows = document.querySelectorAll('.item-row');
+            let hasSelectionError = false;
+
+            itemRows.forEach(row => {
+                const productSelect = row.querySelector('.product-select');
+                const qtyInput = row.querySelector('.qty-input');
+                const rateInput = row.querySelector('.rate-input');
+                
+                const productId = productSelect ? productSelect.value : '';
+                const qty = qtyInput ? (parseFloat(qtyInput.value) || 0) : 0;
+                const rate = currentType === 'VALUE' ? (rateInput ? (parseFloat(rateInput.value) || 0) : 0) : 0;
+
+                if (!productId) {
+                    hasSelectionError = true;
+                }
+
+                estimateItems.push({
+                    product_id: productId,
+                    quantity: qty,
+                    rate: rate
+                });
+            });
+
+            if (hasSelectionError) {
+                showError('Please select a valid product for all rows.');
+                return;
+            }
+
+            // Calculate totals for backend safety
+            let materialTotal = 0;
+            if (currentType === 'VALUE') {
+                estimateItems.forEach(item => {
+                    materialTotal += item.quantity * item.rate;
+                });
+            }
+
+            const manpowerCost = parseFloat(document.getElementById('manpowerCost').value) || 0;
+            const grandTotal = materialTotal + manpowerCost;
+
+            try {
+                const baseUrl = CONFIG.N8N_WEBHOOK_URL.endsWith('/') ? CONFIG.N8N_WEBHOOK_URL : CONFIG.N8N_WEBHOOK_URL + '/';
+                const response = await fetch(`${baseUrl}submit-estimate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        lead_id: leadId,
+                        painter_id: painterId,
+                        mode: currentMode,
+                        estimate_type: currentType,
+                        estimate_items: estimateItems,
+                        material_total: materialTotal,
+                        labour_cost: manpowerCost,
+                        discount: 0,
+                        grand_total: grandTotal
+                    })
+                });
+
+                if (response.ok) {
+                    const resJson = await response.json();
+                    document.getElementById('successDesc').textContent = `Estimate Version #${resJson.version} submitted successfully. Returning you to tools...`;
+                    successScreen.style.display = 'flex';
+                    setTimeout(() => {
+                        window.location.href = returnUrl;
+                    }, 1800);
+                } else {
+                    showError('Failed to submit estimate. Please verify inputs and try again.');
+                }
+            } catch (err) {
+                console.error("Submission error:", err);
+                showError('Network error submitting estimate. Check internet connection.');
+            }
+        });
+
+        function showError(msg) {
+            const errorMessageBox = document.getElementById('errorMessageBox');
+            const submitBtn = document.getElementById('submitBtn');
+            errorMessageBox.textContent = msg;
+            errorMessageBox.style.display = 'block';
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Submit Estimate';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

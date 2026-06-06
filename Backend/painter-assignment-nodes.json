@@ -1,0 +1,265 @@
+{
+  "name": "LMS - Painter Assignment",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "assign-painter",
+        "responseMode": "responseNode",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "POST, OPTIONS"
+              }
+            ]
+          }
+        }
+      },
+      "name": "Webhook - Assign Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        100,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=SELECT \n    painter_id,\n    painter_name,\n    painter_mobile,\n    calculated_acceptance_rate,\n    calculated_conversion_rate,\n    calculated_availability_score,\n    ((0.4 * calculated_acceptance_rate) + (0.4 * calculated_conversion_rate) + (0.2 * calculated_availability_score)) AS final_score,\n    is_new_priority\nFROM painter_matching_scores\nWHERE retailer_id = '{{$node[\"Webhook - Assign Trigger\"].json[\"body\"][\"retailer_id\"]}}'\n  AND painter_id NOT IN (\n      SELECT painter_id \n      FROM lead_assignment_history \n      WHERE lead_id = '{{$node[\"Webhook - Assign Trigger\"].json[\"body\"][\"lead_id\"]}}'\n  )\nORDER BY \n    is_new_priority DESC,\n    final_score DESC,\n    last_assigned_at ASC NULLS FIRST\nLIMIT 1;"
+      },
+      "name": "Postgres - Select Match",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        320,
+        300
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$node[\"Postgres - Select Match\"].json[\"painter_id\"]}}",
+              "operation": "notEmpty"
+            }
+          ]
+        }
+      },
+      "name": "Painter Found?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        540,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=UPDATE leads \nSET current_painter_id = '{{$node[\"Postgres - Select Match\"].json[\"painter_id\"]}}',\n    current_status = 'ASSIGNED',\n    updated_at = NOW()\nWHERE lead_id = '{{$node[\"Webhook - Assign Trigger\"].json[\"body\"][\"lead_id\"]}}'\nRETURNING lead_id;"
+      },
+      "name": "Postgres - Update Lead Painter",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        760,
+        200
+      ],
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=INSERT INTO lead_assignment_history (\n    lead_id,\n    painter_id,\n    response_status,\n    assigned_at\n) VALUES (\n    '{{$node[\"Webhook - Assign Trigger\"].json[\"body\"][\"lead_id\"]}}',\n    '{{$node[\"Postgres - Select Match\"].json[\"painter_id\"]}}',\n    'PENDING',\n    NOW()\n) RETURNING assignment_id;"
+      },
+      "name": "Postgres - Create Assignment History",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        980,
+        200
+      ],
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=INSERT INTO lead_status_history (\n    lead_id,\n    old_status,\n    new_status,\n    remarks\n) VALUES (\n    '{{$node[\"Webhook - Assign Trigger\"].json[\"body\"][\"lead_id\"]}}',\n    'CREATED',\n    'ASSIGNED',\n    'Auto-assignment engine matches painter'\n) RETURNING status_history_id;"
+      },
+      "name": "Postgres - Status History Insert",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        200
+      ],
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=INSERT INTO painter_performance (\n    painter_id,\n    allocated_sites,\n    last_assigned_at,\n    updated_at\n) VALUES (\n    '{{$node[\"Postgres - Select Match\"].json[\"painter_id\"]}}',\n    1,\n    NOW(),\n    NOW()\n) ON CONFLICT (painter_id) DO UPDATE SET\n    allocated_sites = painter_performance.allocated_sites + 1,\n    last_assigned_at = EXCLUDED.last_assigned_at,\n    updated_at = EXCLUDED.updated_at\nRETURNING painter_id;"
+      },
+      "name": "Postgres - Update Performance",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        1420,
+        200
+      ],
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ status: \"assigned\", painter_id: ($node[\"Postgres - Select Match\"].json[\"painter_id\"] || null), painter_name: ($node[\"Postgres - Select Match\"].json[\"painter_name\"] || null), painter_mobile: ($node[\"Postgres - Select Match\"].json[\"painter_mobile\"] || null), final_score: ($node[\"Postgres - Select Match\"].json[\"final_score\"] || null) }) }}"
+      },
+      "name": "Respond OK - Matched",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1640,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseCode": 404,
+        "responseBody": "{\n  \"status\": \"unassigned\",\n  \"message\": \"No available painters found mapping the target retailer details for this lead\"\n}"
+      },
+      "name": "Respond 404 - No Match",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        760,
+        400
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook - Assign Trigger": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Select Match",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Select Match": {
+      "main": [
+        [
+          {
+            "node": "Painter Found?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Painter Found?": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Update Lead Painter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond 404 - No Match",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Update Lead Painter": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Create Assignment History",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Create Assignment History": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Status History Insert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Status History Insert": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Update Performance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Update Performance": {
+      "main": [
+        [
+          {
+            "node": "Respond OK - Matched",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
