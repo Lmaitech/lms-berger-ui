@@ -339,6 +339,30 @@ The data is persisted across three Supabase tables:
   #### 3. Sub-Hierarchy Drill-down (GET `/dashboard-drilldown`)
   - Retrieves active child sub-nodes (Retailer lists, Leads arrays, and tabbed Profile logs) matching parent UUID inputs.
 
+---
+
+## 6. Secure Product Knowledge Base
+
+### A. Frontend Pages
+
+#### 1. Product Knowledge Base
+* **File Path:** [berger-paints-product-knowledgebase.html](file:///Users/kaustavroychoudhury/Desktop/LMS%20Berger/UI/berger-paints-product-knowledgebase.html)
+* **Access URL:** `http://<host>:<port>/UI/berger-paints-product-knowledgebase.html?userid=<user_id>&leadid=<lead_id>`
+* **Description:** A mobile-first searchable database page styled in Berger Purple/Yellow. Allows viewing product descriptions, unit packs, and detailed bullet specifications.
+* **Key Features:**
+  - **Tight Geofence/Hierarchy Lock:** Prompts with security overlays if query parameters are missing or if the server returns 403 Forbidden.
+  - **Mobile-First CSS Grid:** Adapts from multi-column grid cards to single-column cards on mobile viewports.
+  - **Live Global Search:** Input searches globally across all product categories instantly while snapping back to tab filters when empty.
+  - **Back to Tools:** Direct return link routing to `project-tools.html`.
+
+### B. Backend Workflows
+* **File Path:** [user-landing-nodes.json](file:///Users/kaustavroychoudhury/Desktop/LMS%20Berger/Backend/user-landing-nodes.json)
+* **Workflows Included:**
+
+  #### 1. Fetch Products Knowledgebase (GET `/products-knowledgebase`)
+  - Validates `userid` and `leadid` formats using PostgreSQL regex constraints inside standard Postgres nodes.
+  - Interrogates `lead_detail_drilldown_view` to verify user hierarchy access. Returns complete product registry on success, otherwise routes to a `403` response node.
+
 
 
 

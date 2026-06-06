@@ -35,6 +35,11 @@ erDiagram
     users ||--o{ estimates : "painter_id"
     users ||--o{ notifications : "recipient_user_id"
     users ||--o| painter_performance : "painter_id (1:1)"
+    users ||--o| user_credentials : "user_id (1:1)"
+    users ||--o{ dse_retailer_mapping : "dse_id"
+    users ||--o{ dse_retailer_mapping : "retailer_id"
+    users ||--o{ dso_dse_mapping : "dso_id"
+    users ||--o{ dso_dse_mapping : "dse_id"
 
     leads ||--o{ lead_assignment_history : "lead_id"
     leads ||--o{ site_visits : "lead_id"
@@ -79,6 +84,10 @@ erDiagram
    - `product_name` (VARCHAR)
    - `category` (VARCHAR)
    - `unit` (VARCHAR)
+   - `description` (TEXT)
+   - `specifications` (JSONB, default '[]'::jsonb)
+   - `segment` (VARCHAR)
+   - `tags` (JSONB, default '[]'::jsonb)
    - `active` (BOOLEAN, default TRUE)
    - `created_at` (TIMESTAMPTZ)
 
@@ -177,6 +186,27 @@ erDiagram
     - `acceptance_rate`, `conversion_rate`, `availability_score`, `final_score` (NUMERIC)
     - `last_assigned_at` (TIMESTAMPTZ)
     - `updated_at` (TIMESTAMPTZ)
+
+14. **`user_credentials`**
+    - `id` (UUID, PK)
+    - `user_id` (UUID, FK -> `users.id` ON DELETE CASCADE)
+    - `username` (VARCHAR)
+    - `password` (TEXT)
+    - `created_at` (TIMESTAMPTZ)
+
+15. **`dse_retailer_mapping`**
+    - `id` (UUID, PK)
+    - `dse_id` (UUID, FK -> `users.id` ON DELETE CASCADE)
+    - `retailer_id` (UUID, Unique, FK -> `users.id` ON DELETE CASCADE)
+    - `active` (BOOLEAN)
+    - `created_at` (TIMESTAMPTZ)
+
+16. **`dso_dse_mapping`**
+    - `id` (UUID, PK)
+    - `dso_id` (UUID, FK -> `users.id` ON DELETE CASCADE)
+    - `dse_id` (UUID, Unique, FK -> `users.id` ON DELETE CASCADE)
+    - `active` (BOOLEAN)
+    - `created_at` (TIMESTAMPTZ)
 
 ---
 

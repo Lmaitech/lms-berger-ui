@@ -322,6 +322,31 @@ sequenceDiagram
     end
 ```
 
+---
+
+## 11. Secure Product Knowledge Base Sequence
+
+```mermaid
+sequenceDiagram
+    participant UI as Knowledge Base (berger-paints-product-knowledgebase.html)
+    participant HW as HTTP Webhook (products-knowledgebase)
+    participant DB as Postgres Database (Supabase)
+
+    UI->>HW: 1. GET /products-knowledgebase (userid, leadid)
+    activate HW
+    HW->>DB: 2. Verify UUID format and query lead_detail_drilldown_view
+    DB-->>HW: Returns authorized flag & products json array
+    alt Authorized is True
+        HW-->>UI: 3a. Respond HTTP 200 with catalog array
+        UI->>UI: Populate stats counters
+        UI->>UI: Render products cards grid
+    else Authorized is False / Format Invalid
+        HW-->>UI: 3b. Respond HTTP 403 Forbidden / Error details
+        UI->>UI: Render Access Denied overlay lock
+    end
+    deactivate HW
+```
+
 
 
 

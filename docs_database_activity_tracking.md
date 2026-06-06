@@ -285,6 +285,16 @@ This document acts as a registry to track which user activities, front-end actio
   - **`estimates`**: Returns estimate history logs for a specific lead.
   - **`lead_status_history`**: Returns status change audit trials for a specific lead.
 
+---
+
+## 14. Activity: Fetch Product Knowledge Catalog
+* **Trigger Component:** `UI/berger-paints-product-knowledgebase.html` (onload check)
+* **Backend Endpoint:** GET `/products-knowledgebase?userid=...&leadid=...`
+* **Database Action:** Read (SELECT)
+* **Tables/Views Affected:**
+  - **`lead_detail_drilldown_view`**: Checks that the requested `userid` matches one of the assigned roles (`dso_id`, `dse_id`, `retailer_id`, `painter_id`) associated with the `leadid` row.
+  - **`products`**: If authorized, retrieves the list of active products including `product_id`, `sku_code`, `product_name`, `category`, `unit`, `description`, `specifications`, `segment`, and `tags`.
+
 
 
 
