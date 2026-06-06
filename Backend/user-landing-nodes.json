@@ -473,6 +473,103 @@
     {
       "parameters": {
         "httpMethod": "GET",
+        "path": "products-knowledgebase",
+        "responseMode": "responseNode",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET, OPTIONS"
+              }
+            ]
+          }
+        }
+      },
+      "name": "Webhook - GET Products Knowledgebase",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        100,
+        1050
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=WITH params AS (\n  SELECT \n    CASE WHEN '{{$node[\"Webhook - GET Products Knowledgebase\"].json[\"query\"][\"leadid\"]}}' ~ '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$' \n         THEN '{{$node[\"Webhook - GET Products Knowledgebase\"].json[\"query\"][\"leadid\"]}}'::uuid \n         ELSE NULL \n    END AS target_lead_id,\n    CASE WHEN '{{$node[\"Webhook - GET Products Knowledgebase\"].json[\"query\"][\"userid\"]}}' ~ '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$' \n         THEN '{{$node[\"Webhook - GET Products Knowledgebase\"].json[\"query\"][\"userid\"]}}'::uuid \n         ELSE NULL \n    END AS target_user_id\n),\nauth AS (\n  SELECT EXISTS (\n    SELECT 1 \n    FROM lead_detail_drilldown_view ldd, params p\n    WHERE ldd.lead_id = p.target_lead_id \n      AND p.target_lead_id IS NOT NULL \n      AND p.target_user_id IS NOT NULL \n      AND (\n        ldd.dso_id = p.target_user_id OR \n        ldd.dse_id = p.target_user_id OR \n        ldd.retailer_id = p.target_user_id OR \n        ldd.painter_id = p.target_user_id\n      )\n  ) AS authorized\n)\nSELECT \n  auth.authorized,\n  CASE \n    WHEN auth.authorized THEN \n      COALESCE(\n        (SELECT json_agg(prod.*) \n         FROM (\n           SELECT product_id, sku_code, product_name, category, unit, description, specifications, segment, tags \n           FROM products \n           WHERE active = true \n           ORDER BY category, product_name\n         ) prod\n        ), '[]'::json\n      )\n    ELSE '[]'::json\n  END AS list\nFROM auth;"
+      },
+      "name": "Postgres - Fetch Products Knowledgebase",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        300,
+        1050
+      ],
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$node[\"Postgres - Fetch Products Knowledgebase\"].json[\"authorized\"]}}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "name": "IF - Authorized Knowledgebase?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        500,
+        1050
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{$node[\"Postgres - Fetch Products Knowledgebase\"].json[\"list\"]}}"
+      },
+      "name": "Respond OK - Products Knowledgebase",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        700,
+        980
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseCode": 403,
+        "responseBody": "{\n  \"status\": \"error\",\n  \"message\": \"Access Forbidden: You are not authorized to view the product knowledgebase for this site lead.\"\n}"
+      },
+      "name": "Respond 403 - Forbidden Knowledgebase",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        700,
+        1120
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "GET",
         "path": "previous-estimates",
         "responseMode": "responseNode",
         "options": {
@@ -1145,6 +1242,46 @@
         [
           {
             "node": "Respond OK - Products",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - GET Products Knowledgebase": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Fetch Products Knowledgebase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Fetch Products Knowledgebase": {
+      "main": [
+        [
+          {
+            "node": "IF - Authorized Knowledgebase?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Authorized Knowledgebase?": {
+      "main": [
+        [
+          {
+            "node": "Respond OK - Products Knowledgebase",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond 403 - Forbidden Knowledgebase",
             "type": "main",
             "index": 0
           }

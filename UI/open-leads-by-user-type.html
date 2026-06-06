@@ -1029,7 +1029,7 @@
                         const escapedAddress = fullAddress.replace(/'/g, "\\'");
                         actionBtnHTML = `
                             <div style="margin-top: 24px;">
-                                <button id="startVisitBtn" onclick="handleStartVisit('${leadId}', '${leadSummary.registered_latitude || ""}', '${leadSummary.registered_longitude || ""}', ${leadSummary.latest_visit_number || 0}, '${escapedOwnerName}', '${leadSummary.site_owner_mobile || ""}', '${escapedAddress}')" class="submit-btn" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #1976d2 0%, #0d47a1 100%); border: none; border-radius: 12px; color: #ffffff; font-size: 15px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 6px rgba(21, 101, 192, 0.2); transition: var(--transition);">
+                                <button id="startVisitBtn" onclick="handleStartVisit('${leadId}', '${leadSummary.registered_latitude || ""}', '${leadSummary.registered_longitude || ""}', ${leadSummary.latest_visit_number || 0}, '${escapedOwnerName}', '${leadSummary.site_owner_mobile || ""}', '${escapedAddress}', '${(leadSummary.painter_name || "").replace(/'/g, "\\'")}', '${(leadSummary.retailer_name || "").replace(/'/g, "\\'")}')" class="submit-btn" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #1976d2 0%, #0d47a1 100%); border: none; border-radius: 12px; color: #ffffff; font-size: 15px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 6px rgba(21, 101, 192, 0.2); transition: var(--transition);">
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
                                     Start Site Visit
                                 </button>
@@ -1087,7 +1087,7 @@
         }
 
         // Painter Start Site Visit Handler
-        function handleStartVisit(leadId, regLat, regLng, latestVisitNum, ownerName, ownerMobile, fullAddress) {
+        function handleStartVisit(leadId, regLat, regLng, latestVisitNum, ownerName, ownerMobile, fullAddress, painterName = "", retailerName = "") {
             const btn = document.getElementById('startVisitBtn');
             const feedback = document.getElementById('visitFeedback');
 
@@ -1145,7 +1145,7 @@
                             const result = await response.json();
                             showFeedback('Visit logged successfully! Redirecting to tools...', '#2e7d32');
                             setTimeout(() => {
-                                window.location.href = `project-tools.html?lead_id=${leadId}&id=${userId}&visit_number=${result.visit_number}&owner_name=${encodeURIComponent(ownerName)}&owner_mobile=${ownerMobile}&address=${encodeURIComponent(fullAddress)}&painter_name=${encodeURIComponent(leadSummary.painter_name || "")}&retailer_name=${encodeURIComponent(leadSummary.retailer_name || "")}`;
+                                window.location.href = `project-tools.html?lead_id=${leadId}&id=${userId}&visit_number=${result.visit_number}&owner_name=${encodeURIComponent(ownerName)}&owner_mobile=${ownerMobile}&address=${encodeURIComponent(fullAddress)}&painter_name=${encodeURIComponent(painterName)}&retailer_name=${encodeURIComponent(retailerName)}`;
                             }, 1500);
                         } else {
                             showFeedback('Failed to log site visit. Please try again.', '#c62828');

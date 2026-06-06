@@ -266,6 +266,63 @@ sequenceDiagram
 - **GET `/previous-estimates`**: Connects via `estimate_details_view` to read historic version cards.
 - **POST `/submit-estimate`**: Batch logs calculations and updates lead status.
 
+---
+
+## 9. Partner Portal Login Sequence
+
+```mermaid
+sequenceDiagram
+    participant UI as Login Page (login.html)
+    participant HW as HTTP Webhook (login)
+    participant DB as Postgres Database (Supabase)
+
+    UI->>HW: 1. POST login (username, password)
+    activate HW
+    HW->>DB: 2. Query check credentials against user_credentials and users
+    DB-->>HW: Returns match id, name, user_type
+    alt Match Found
+        HW-->>UI: 3a. Respond success with user details
+        UI->>UI: Save user to localStorage
+        UI->>UI: Redirect to dashboard.html
+    else Match Not Found
+        HW-->>UI: 3b. Respond 401 Unauthorized
+    end
+    deactivate HW
+```
+
+---
+
+## 10. Partner Portal Summary & Drilldown Sequence
+
+```mermaid
+sequenceDiagram
+    participant UI as Executive Dashboard (dashboard.html)
+    participant HW as HTTP Webhook (dashboard-summary / dashboard-drilldown)
+    participant DB as Postgres Database (Supabase)
+
+    UI->>HW: 1. GET /dashboard-summary (user_id, user_type)
+    activate HW
+    HW->>DB: 2. Query stats, list, funnel from lead_detail_drilldown_view
+    DB-->>HW: Returns dashboard data object
+    HW-->>UI: 3. Respond summary payload
+    deactivate HW
+    UI->>UI: Populate KPIs
+    UI->>UI: Render Funnel stage and Sales value charts
+    UI->>UI: Render initial Child Table
+
+    opt Drill Down on Row Click
+        UI->>HW: 4. GET /dashboard-drilldown (parent_type, parent_id)
+        activate HW
+        HW->>DB: 5. Query sub-level (Retailers / Leads / Profile)
+        DB-->>HW: Returns list / logs details
+        HW-->>UI: 6. Respond drilldown data
+        deactivate HW
+        UI->>UI: Append Breadcrumb path
+        UI->>UI: Re-render Table sheet or tabbed Profile panel
+    end
+```
+
+
 
 
 

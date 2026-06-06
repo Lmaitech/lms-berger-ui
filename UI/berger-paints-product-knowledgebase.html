@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Knowledge Base - Berger LMS</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --primary: #512da8; /* Berger Purple */
+            --primary-light: #7e57c2;
+            --accent: #ffd600; /* Berger Yellow */
+            --bg-gradient: linear-gradient(135deg, #120b24 0%, #06040d 100%);
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-bg-hover: rgba(255, 255, 255, 0.06);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text: #ffffff;
+            --text-muted: #b0aec4;
+            --success: #00e676;
+            --warning: #ffb300;
+            --danger: #ff5252;
+            --info: #00b0ff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Header Navigation */
+        header {
+            background: rgba(18, 11, 36, 0.85);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 40px 20px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        /* Decorative glowing blur background */
+        header::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            left: -100px;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(81, 45, 168, 0.2) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: -100px;
+            right: -100px;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255, 214, 0, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .header-badge {
+            background: var(--accent);
+            color: #000000;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 4px 14px;
+            border-radius: 30px;
+            margin-bottom: 15px;
+            box-shadow: 0 0 15px rgba(255, 214, 0, 0.25);
+        }
+
+        header h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 36px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            background: linear-gradient(90deg, #ffffff 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            max-width: 600px;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        /* Statistics Counter */
+        .stats-row {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+            z-index: 2;
+        }
+
+        .stat-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-val {
+            font-family: 'Outfit', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 2px;
+        }
+
+        /* Navigation Tabs */
+        nav {
+            background: rgba(18, 11, 36, 0.95);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            overflow-x: auto;
+            padding: 0 10px;
+        }
+
+        nav a {
+            display: inline-block;
+            padding: 18px 24px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        nav a:hover {
+            color: #ffffff;
+        }
+
+        nav a.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+            text-shadow: 0 0 10px rgba(255, 214, 0, 0.2);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        /* Search & Info Panels */
+        .control-bar {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+            width: 18px;
+            height: 18px;
+        }
+
+        .search-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: #ffffff;
+            padding: 12px 16px 12px 48px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 15px rgba(255, 214, 0, 0.1);
+        }
+
+        /* Info Banner */
+        .info-banner {
+            background: rgba(81, 45, 168, 0.1);
+            border: 1px solid rgba(81, 45, 168, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+            backdrop-filter: blur(10px);
+        }
+
+        .info-banner i {
+            color: var(--primary-light);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .info-banner p {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* Product Grid */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        /* Product Cards */
+        .product-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            backdrop-filter: blur(10px);
+        }
+
+        .product-card:hover {
+            border-color: rgba(126, 87, 194, 0.4);
+            box-shadow: 0 15px 35px rgba(81, 45, 168, 0.15), 0 0 1px 1px rgba(126, 87, 194, 0.2);
+            transform: translateY(-3px);
+        }
+
+        /* Glowing indicator representing product quality tier */
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--primary-light);
+        }
+
+        .product-card.premium::before { background: var(--accent); }
+        .product-card.standard::before { background: var(--info); }
+        .product-card.economy::before { background: var(--success); }
+
+        .card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .card-header h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .quality-badge {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 3px 10px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        .quality-badge.premium { background: rgba(255, 214, 0, 0.15); color: var(--accent); }
+        .quality-badge.standard { background: rgba(0, 176, 255, 0.15); color: var(--info); }
+        .quality-badge.economy { background: rgba(0, 230, 118, 0.15); color: var(--success); }
+
+        .product-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.6;
+            flex: 1;
+        }
+
+        /* Features List */
+        .specs-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 15px;
+        }
+
+        .specs-list li {
+            font-size: 12px;
+            color: #e0dff0;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            line-height: 1.5;
+        }
+
+        .specs-list li i {
+            color: var(--accent);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        /* Tag row */
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: auto;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 15px;
+        }
+
+        .tag-pill {
+            font-size: 11px;
+            font-weight: 500;
+            padding: 3px 10px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+        }
+
+        .tag-pill:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Empty & Loading states */
+        .empty-state {
+            grid-column: 1 / -1;
+            padding: 80px 20px;
+            text-align: center;
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+        }
+
+        .empty-state i {
+            opacity: 0.4;
+        }
+
+        .loading-shimmer {
+            background: linear-gradient(90deg, var(--card-bg) 25%, rgba(255, 255, 255, 0.06) 50%, var(--card-bg) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(18, 11, 36, 0.9);
+            border-top: 1px solid var(--border-color);
+            padding: 25px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: auto;
+        }
+
+        footer strong {
+            color: #ffffff;
+        }
+
+        .back-btn-kb {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .back-btn-kb:hover {
+            color: #ffffff;
+            border-color: var(--accent);
+            background: rgba(255, 214, 0, 0.1);
+            box-shadow: 0 0 10px rgba(255, 214, 0, 0.15);
+        }
+
+        @media (max-width: 600px) {
+            header {
+                padding: 20px 16px;
+            }
+            header h1 {
+                font-size: 24px;
+            }
+            header p {
+                font-size: 12px;
+                margin-bottom: 15px;
+            }
+            .back-btn-kb {
+                position: static;
+                align-self: flex-start;
+                margin-bottom: 12px;
+            }
+            .stats-row {
+                gap: 15px;
+                justify-content: space-around;
+                width: 100%;
+            }
+            .stat-val {
+                font-size: 20px;
+            }
+            .stat-label {
+                font-size: 8px;
+            }
+            .container {
+                padding: 12px;
+                gap: 15px;
+            }
+            .control-bar {
+                padding: 12px;
+            }
+            .product-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            .product-card {
+                padding: 16px;
+                gap: 12px;
+            }
+            .card-header h3 {
+                font-size: 16px;
+            }
+            nav a {
+                padding: 15px 16px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="#" id="btnBack" class="back-btn-kb">
+            <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i> Back to Tools
+        </a>
+        <div class="header-badge">Berger Paints CRM</div>
+        <h1>Product Knowledge Directory</h1>
+        <p>Your instant product matching guide — Interior, Exterior, Enamel, Wood, and Waterproofing</p>
+        
+        <div class="stats-row" id="statsRow">
+            <div class="stat-card">
+                <div class="stat-val" id="statTotal">-</div>
+                <div class="stat-label">Total catalog items</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val" id="statPremium">-</div>
+                <div class="stat-label">Premium Solutions</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val" id="statCategories">-</div>
+                <div class="stat-label">Product Categories</div>
+            </div>
+        </div>
+    </header>
+
+    <nav id="categoryNav">
+        <a href="#INTERIOR" class="active" onclick="switchCategory('INTERIOR')">Interior</a>
+        <a href="#EXTERIOR" onclick="switchCategory('EXTERIOR')">Exterior</a>
+        <a href="#ENAMEL" onclick="switchCategory('ENAMEL')">Enamels</a>
+        <a href="#WOOD" onclick="switchCategory('WOOD')">Wood Finishes</a>
+        <a href="#WATERPROOF" onclick="switchCategory('WATERPROOF')">Waterproofing</a>
+        <a href="#PRIMER" onclick="switchCategory('PRIMER')">Primers & Putty</a>
+    </nav>
+
+    <div class="container">
+        <!-- Search and info bar -->
+        <div class="control-bar">
+            <div class="search-box">
+                <i data-lucide="search"></i>
+                <input type="text" id="searchInput" class="search-input" placeholder="Search catalog by product name, description, tags..." oninput="onSearchChange()">
+            </div>
+        </div>
+
+        <div class="info-banner">
+            <i data-lucide="info" style="width: 20px; height: 20px;"></i>
+            <p>Ensure that surfaces are thoroughly prepared (scraped, cleaned, and sanded) and primer base coats are applied before administering topcoat paints. Water-based options require dry, moisture-free conditions during application.</p>
+        </div>
+
+        <!-- Product Cards Grid -->
+        <div class="product-grid" id="productGrid">
+            <!-- Loading state placeholder templates -->
+            <div class="product-card loading-shimmer" style="height: 300px;"></div>
+            <div class="product-card loading-shimmer" style="height: 300px;"></div>
+            <div class="product-card loading-shimmer" style="height: 300px;"></div>
+        </div>
+    </div>
+
+    <footer>
+<footer>
+        <p>&copy; 2026 <strong>Berger Paints LMS</strong>. All technical specifications are sourced from standard product data sheets.</p>
+    </footer>
+
+    <!-- Configuration parameters and scripts -->
+    <script src="config.js"></script>
+    <script>
+        // Global variables
+        let allProductsList = [];
+        let currentCategory = 'INTERIOR';
+        let userid = null;
+        let leadid = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            // Load and build icons
+            lucide.createIcons();
+
+            // Extract security parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            userid = urlParams.get('userid') || urlParams.get('id');
+            leadid = urlParams.get('leadid');
+
+            // Enforce tight security: verify that both userid and leadid parameters are provided
+            if (!userid || !leadid) {
+                showAccessDeniedError("Access Denied: Missing authentication parameters. Please access the knowledgebase from an active project workspace.");
+                return;
+            }
+
+            // Set back button link dynamically
+            const backBtn = document.getElementById('btnBack');
+            if (backBtn) {
+                backBtn.href = `project-tools.html?lead_id=${leadid}&id=${userid}`;
+            }
+            
+            // Check for hash parameters in URL to load categories
+            const hash = window.location.hash.substring(1);
+            if (['INTERIOR', 'EXTERIOR', 'ENAMEL', 'WOOD', 'WATERPROOF', 'PRIMER'].includes(hash)) {
+                currentCategory = hash;
+                document.querySelectorAll('#categoryNav a').forEach(a => {
+                    a.classList.remove('active');
+                    if (a.getAttribute('href') === `#${hash}`) {
+                        a.classList.add('active');
+                    }
+                });
+            }
+
+            // Load from Postgres n8n webhook
+            fetchProductCatalog();
+        });
+
+        async function fetchProductCatalog() {
+            const grid = document.getElementById('productGrid');
+            try {
+                const baseUrl = CONFIG.N8N_WEBHOOK_URL.endsWith('/') ? CONFIG.N8N_WEBHOOK_URL : CONFIG.N8N_WEBHOOK_URL + '/';
+                const response = await fetch(`${baseUrl}products-knowledgebase?userid=${encodeURIComponent(userid)}&leadid=${encodeURIComponent(leadid)}`);
+                
+                if (response.ok) {
+                    allProductsList = await response.json();
+                    
+                    // Render stats and lists
+                    populateDashboardStats();
+                    renderProductGrid();
+                } else if (response.status === 403) {
+                    const errData = await response.json().catch(() => ({}));
+                    showAccessDeniedError(errData.message || "Access Forbidden: You are not authorized to view the product knowledgebase for this site lead.");
+                } else {
+                    showErrorMessage();
+                }
+            } catch (err) {
+                console.error("Error loading products:", err);
+                showErrorMessage();
+            }
+        }
+
+        // Render calculated statistics counters
+        function populateDashboardStats() {
+            document.getElementById('statTotal').textContent = allProductsList.length;
+            document.getElementById('statPremium').textContent = allProductsList.filter(p => p.segment === 'Premium').length;
+            
+            // Categories count
+            const categories = new Set(allProductsList.map(p => p.category));
+            document.getElementById('statCategories').textContent = categories.size;
+        }
+
+        // Switch category tabs
+        function switchCategory(catName) {
+            currentCategory = catName;
+            document.querySelectorAll('#categoryNav a').forEach(a => {
+                a.classList.remove('active');
+                if (a.getAttribute('href') === `#${catName}`) {
+                    a.classList.add('active');
+                }
+            });
+            renderProductGrid();
+        }
+
+        // Search trigger
+        function onSearchChange() {
+            renderProductGrid();
+        }
+
+        // Filter and Render products grid
+        function renderProductGrid() {
+            const grid = document.getElementById('productGrid');
+            const searchVal = document.getElementById('searchInput').value.toLowerCase();
+            
+            grid.innerHTML = '';
+
+            const filtered = allProductsList.filter(p => {
+                // Must match category
+                const matchesCategory = p.category === currentCategory;
+                if (!matchesCategory) return false;
+
+                // Match search
+                if (!searchVal) return true;
+
+                const nameMatch = p.product_name && p.product_name.toLowerCase().includes(searchVal);
+                const descMatch = p.description && p.description.toLowerCase().includes(searchVal);
+                const segMatch = p.segment && p.segment.toLowerCase().includes(searchVal);
+                
+                // Spec list matching
+                let specsMatch = false;
+                if (p.specifications && Array.isArray(p.specifications)) {
+                    specsMatch = p.specifications.some(s => s.toLowerCase().includes(searchVal));
+                }
+
+                // Tag list matching
+                let tagsMatch = false;
+                if (p.tags && Array.isArray(p.tags)) {
+                    tagsMatch = p.tags.some(t => t.toLowerCase().includes(searchVal));
+                }
+
+                return nameMatch || descMatch || segMatch || specsMatch || tagsMatch;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <i data-lucide="package-search" style="width: 48px; height: 48px;"></i>
+                        <h3>No Products Found</h3>
+                        <p>We couldn't find any products matching your search criteria under this category.</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            // Create cards
+            filtered.forEach(p => {
+                const card = document.createElement('div');
+                const segmentClass = (p.segment || 'standard').toLowerCase();
+                card.className = `product-card ${segmentClass}`;
+                
+                // Specifications parsing
+                let specsHTML = '';
+                if (p.specifications && Array.isArray(p.specifications) && p.specifications.length > 0) {
+                    specsHTML = `
+                        <ul class="specs-list">
+                            ${p.specifications.map(s => `<li><i data-lucide="arrow-right" style="width: 14px; height: 14px;"></i><span>${s}</span></li>`).join('')}
+                        </ul>
+                    `;
+                }
+
+                // Tags parsing
+                let tagsHTML = '';
+                if (p.tags && Array.isArray(p.tags) && p.tags.length > 0) {
+                    tagsHTML = `
+                        <div class="tags-container">
+                            ${p.tags.map(t => `<span class="tag-pill">${t}</span>`).join('')}
+                        </div>
+                    `;
+                }
+
+                card.innerHTML = `
+                    <div class="card-header">
+                        <h3>${p.product_name}</h3>
+                        <span class="quality-badge ${segmentClass}">${p.segment || 'Standard'}</span>
+                    </div>
+                    <p class="product-desc">${p.description || 'No description available for this product.'}</p>
+                    ${specsHTML}
+                    <div style="font-size: 11px; color: var(--text-muted); margin-top: auto; padding-top: 5px;">
+                        Standard packing unit: <strong>${p.unit || 'L'}</strong>
+                    </div>
+                    ${tagsHTML}
+                `;
+
+                grid.appendChild(card);
+            });
+
+            lucide.createIcons();
+        }
+
+        function showAccessDeniedError(message) {
+            const grid = document.getElementById('productGrid');
+            document.getElementById('statsRow').style.display = 'none';
+            document.getElementById('categoryNav').style.display = 'none';
+            document.querySelector('.control-bar').style.display = 'none';
+            document.querySelector('.info-banner').style.display = 'none';
+            
+            grid.innerHTML = `
+                <div class="empty-state" style="border-color: rgba(255, 82, 82, 0.3); background: rgba(255, 82, 82, 0.03); max-width: 600px; margin: 40px auto;">
+                    <i data-lucide="shield-alert" style="width: 64px; height: 64px; color: var(--danger); filter: drop-shadow(0 0 10px rgba(255,82,82,0.3));"></i>
+                    <h2 style="color: #ffffff; font-family: 'Outfit', sans-serif; font-size: 24px;">Security Violation</h2>
+                    <p style="color: var(--text-muted); line-height: 1.6;">${message}</p>
+                    <button onclick="window.history.back()" style="margin-top: 20px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); color: #ffffff; padding: 10px 24px; border-radius: 12px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                        <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i> Go Back
+                    </button>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        function showErrorMessage() {
+            const grid = document.getElementById('productGrid');
+            grid.innerHTML = `
+                <div class="empty-state" style="border-color: rgba(255, 82, 82, 0.2); background: rgba(255, 82, 82, 0.02);">
+                    <i data-lucide="alert-triangle" style="width: 48px; height: 48px; color: var(--danger);"></i>
+                    <h3 style="color: var(--danger);">Network Error</h3>
+                    <p>Failed to query the database product knowledge catalog. Verify that the n8n webhook server is online.</p>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+    </script>
+</body>
+</html>

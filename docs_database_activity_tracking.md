@@ -254,6 +254,38 @@ This document acts as a registry to track which user activities, front-end actio
   - `remarks` &larr; Submission version notes.
   - `changed_at` &larr; `NOW()`.
 
+---
+
+## 11. Activity: Partner Portal Authentication
+* **Trigger Component:** `UI/login.html` (Form submit check)
+* **Backend Endpoint:** POST `/login`
+* **Database Action:** Read (SELECT)
+* **Tables Affected:**
+  - **`user_credentials`**: Selects where username matches (case-insensitive) and checks if plaintext password is correct.
+  - **`users`**: Selects related user profile details (`id`, `name`, `user_type`).
+
+---
+
+## 12. Activity: Load Partner Portal Summary Aggregations
+* **Trigger Component:** `UI/dashboard.html` (onload check)
+* **Backend Endpoint:** GET `/dashboard-summary?user_id=...&user_type=...`
+* **Database Action:** Read (SELECT)
+* **Tables/Views Affected:**
+  - **`lead_detail_drilldown_view`**: Queries all nested children nodes, computing totals, conversion rates, won counts, estimate sums, and stage status counts (`funnel`) matching active user type (`DSO` or `DSE`).
+
+---
+
+## 13. Activity: Load Partner Portal Sub-Hierarchy Drill-down
+* **Trigger Component:** `UI/dashboard.html` (Table row click event / Breadcrumb toggle)
+* **Backend Endpoint:** GET `/dashboard-drilldown?parent_type=...&parent_id=...`
+* **Database Action:** Read (SELECT)
+* **Tables/Views Affected:**
+  - **`lead_detail_drilldown_view`**: Returns retailers under a DSE, or leads under a retailer.
+  - **`site_visits`**: Returns all visit check-ins for a specific lead.
+  - **`estimates`**: Returns estimate history logs for a specific lead.
+  - **`lead_status_history`**: Returns status change audit trials for a specific lead.
+
+
 
 
 

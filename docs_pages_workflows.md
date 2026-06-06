@@ -303,6 +303,43 @@ The data is persisted across three Supabase tables:
    - Joins `estimates`, `estimate_items`, and `products` to provide unified query access. 
    - Included in migrations `00004` and `00005` to support version grouping in the UI historical accordion.
 
+---
+
+## 5. DSO & DSE Partner Portal (Tableau/Odoo-Style Portal)
+
+### A. Frontend Pages
+
+#### 1. Login Page
+* **File Path:** [login.html](file:///Users/kaustavroychoudhury/Desktop/LMS%20Berger/UI/login.html)
+* **Access URL:** `http://<host>:<port>/UI/login.html`
+* **Description:** Clean credential matching login portal with Berger branding. Saves user session details in browser storage on success.
+
+#### 2. Executive Dashboard
+* **File Path:** [dashboard.html](file:///Users/kaustavroychoudhury/Desktop/LMS%20Berger/UI/dashboard.html)
+* **Access URL:** `http://<host>:<port>/UI/dashboard.html`
+* **Description:** Tableau-style executive metrics overview and drill-down tool. Adaptable depending on role (`DSE`, `DSO`, `ADMIN`).
+* **Key Features:**
+  - **KPI Cards**: Live aggregations for total pipeline opportunities, closed won counts, conversion rates, and total sales value.
+  - **Breadcrumbs**: Hierarchical drill-down tracking showing nested stack navigation (e.g. DSO &rarr; DSEs &rarr; Retailers &rarr; Leads).
+  - **Interactive Chart.js Funnels**: Dynamically displays lead volumes per status stage as a horizontal bar funnel and sales value allocation as a doughnut chart.
+  - **Sales Goal Target Progress Tracker**: Compares won contract values against a target threshold of ₹5,00,000, displaying progress indicators.
+  - **Header Column Sorting**: Clickable table headers that re-sort rows dynamically.
+  - **Odoo-Style Tabbed Profiles**: Displays Estimates, Visits, and History logs for individual leads inside a tabbed dashboard profile.
+
+### B. Backend Workflows
+* **File Path:** [dse-dso-dashboard-nodes.json](file:///Users/kaustavroychoudhury/Desktop/LMS%20Berger/Backend/dse-dso-dashboard-nodes.json)
+* **Workflows Included:**
+  
+  #### 1. User Authenticator (POST `/login`)
+  - Queries `user_credentials` table joining `users` to match username and plaintext password.
+  
+  #### 2. Dashboard Summary Handler (GET `/dashboard-summary`)
+  - Aggregates overall opportunities metrics, child nodes lists, and status-funnel value splits from `lead_detail_drilldown_view` view.
+  
+  #### 3. Sub-Hierarchy Drill-down (GET `/dashboard-drilldown`)
+  - Retrieves active child sub-nodes (Retailer lists, Leads arrays, and tabbed Profile logs) matching parent UUID inputs.
+
+
 
 
 

@@ -1,0 +1,316 @@
+{
+  "name": "LMS - DSE & DSO Dashboard",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "login",
+        "responseMode": "responseNode",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "POST, OPTIONS"
+              }
+            ]
+          }
+        }
+      },
+      "name": "Webhook - Login",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        100,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=SELECT u.id, u.name, u.user_type \nFROM user_credentials uc \nJOIN users u ON uc.user_id = u.id \nWHERE LOWER(uc.username) = LOWER('{{$node[\"Webhook - Login\"].json[\"body\"][\"username\"]}}') \n  AND uc.password = '{{$node[\"Webhook - Login\"].json[\"body\"][\"password\"]}}' \nLIMIT 1;"
+      },
+      "name": "Postgres - Check Credentials",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        300,
+        200
+      ],
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$node[\"Postgres - Check Credentials\"].json[\"id\"]}}",
+              "operation": "isNotEmpty"
+            }
+          ]
+        }
+      },
+      "name": "User Exists?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        500,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\"status\": \"success\", \"user\": {\"id\": \"{{$node[\"Postgres - Check Credentials\"].json[\"id\"]}}\", \"name\": \"{{$node[\"Postgres - Check Credentials\"].json[\"name\"]}}\", \"user_type\": \"{{$node[\"Postgres - Check Credentials\"].json[\"user_type\"]}}\"}}"
+      },
+      "name": "Respond OK - Login",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        700,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseCode": 401,
+        "responseBody": "{\n  \"status\": \"error\",\n  \"message\": \"Invalid username or password\"\n}"
+      },
+      "name": "Respond 401 - Unauthorized",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        700,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "dashboard-summary",
+        "responseMode": "responseNode",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET, OPTIONS"
+              }
+            ]
+          }
+        }
+      },
+      "name": "Webhook - Summary",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        100,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "={{ $node[\"Webhook - Summary\"].json[\"query\"][\"user_type\"] === \"DSO\" ? \"WITH stats AS (SELECT COUNT(DISTINCT lead_id) FILTER (WHERE lead_id IS NOT NULL) AS total_leads, COUNT(DISTINCT lead_id) FILTER (WHERE current_status = 'WON') AS won_leads, ROUND(COALESCE((COUNT(DISTINCT lead_id) FILTER (WHERE current_status = 'WON')::NUMERIC / NULLIF(COUNT(DISTINCT lead_id) FILTER (WHERE lead_id IS NOT NULL), 0)) * 100, 0), 2) AS conversion_rate, COALESCE(SUM(latest_estimate_total), 0) AS total_business_value FROM lead_detail_drilldown_view WHERE dso_id = '\" + $node[\"Webhook - Summary\"].json[\"query\"][\"user_id\"] + \"'), dse_breakdown AS (SELECT dse_id AS id, dse_name AS name, dse_mobile AS mobile, 'DSE' AS type, COUNT(DISTINCT lead_id) FILTER (WHERE lead_id IS NOT NULL) AS total_leads, COUNT(DISTINCT lead_id) FILTER (WHERE current_status = 'WON') AS won_leads, ROUND(COALESCE((COUNT(DISTINCT lead_id) FILTER (WHERE current_status = 'WON')::NUMERIC / NULLIF(COUNT(DISTINCT lead_id) FILTER (WHERE lead_id IS NOT NULL), 0)) * 100, 0), 2) AS conversion_rate, COALESCE(SUM(latest_estimate_total), 0) AS total_business_value FROM lead_detail_drilldown_view WHERE dso_id = '\" + $node[\"Webhook - Summary\"].json[\"query\"][\"user_id\"] + \"' GROUP BY dse_id, dse_name, dse_mobile), funnel AS (SELECT current_status AS stage, COUNT(*) AS count, COALESCE(SUM(latest_estimate_total), 0) AS value FROM lead_detail_drilldown_view WHERE dso_id = '\" + $node[\"Webhook - Summary\"].json[\"query\"][\"user_id\"] + \"' GROUP BY current_status) SELECT (SELECT row_to_json(stats.*) FROM stats) AS summary, COALESCE((SELECT json_agg(dse_breakdown.*) FROM dse_breakdown), '[]'::json) AS list, COALESCE((SELECT json_agg(funnel.*) FROM funnel), '[]'::json) AS funnel;\" : \"WITH stats AS (SELECT COUNT(DISTINCT lead_id) FILTER (WHERE lead_id IS NOT NULL) AS total_leads, COUNT(DISTINCT lead_id) FILTER (WHERE current_status = 'WON') AS won_leads, ROUND(COALESCE((COUNT(DISTINCT lead_id) FILTER (WHERE current_status = 'WON')::NUMERIC / NULLIF(COUNT(DISTINCT lead_id) FILTER (WHERE lead_id IS NOT NULL), 0)) * 100, 0), 2) AS conversion_rate, COALESCE(SUM(latest_estimate_total), 0) AS total_business_value FROM lead_detail_drilldown_view WHERE dse_id = '\" + $node[\"Webhook - Summary\"].json[\"query\"][\"user_id\"] + \"'), retailer_breakdown AS (SELECT retailer_id AS id, retailer_name AS name, retailer_mobile AS mobile, 'RETAILER' AS type, COUNT(DISTINCT lead_id) FILTER (WHERE lead_id IS NOT NULL) AS total_leads, COUNT(DISTINCT lead_id) FILTER (WHERE current_status = 'WON') AS won_leads, ROUND(COALESCE((COUNT(DISTINCT lead_id) FILTER (WHERE current_status = 'WON')::NUMERIC / NULLIF(COUNT(DISTINCT lead_id) FILTER (WHERE lead_id IS NOT NULL), 0)) * 100, 0), 2) AS conversion_rate, COALESCE(SUM(latest_estimate_total), 0) AS total_business_value FROM lead_detail_drilldown_view WHERE dse_id = '\" + $node[\"Webhook - Summary\"].json[\"query\"][\"user_id\"] + \"' GROUP BY retailer_id, retailer_name, retailer_mobile), funnel AS (SELECT current_status AS stage, COUNT(*) AS count, COALESCE(SUM(latest_estimate_total), 0) AS value FROM lead_detail_drilldown_view WHERE dse_id = '\" + $node[\"Webhook - Summary\"].json[\"query\"][\"user_id\"] + \"' GROUP BY current_status) SELECT (SELECT row_to_json(stats.*) FROM stats) AS summary, COALESCE((SELECT json_agg(retailer_breakdown.*) FROM retailer_breakdown), '[]'::json) AS list, COALESCE((SELECT json_agg(funnel.*) FROM funnel), '[]'::json) AS funnel;\" }}"
+      },
+      "name": "Postgres - Fetch Summary",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        300,
+        500
+      ],
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $node[\"Postgres - Fetch Summary\"].json }}"
+      },
+      "name": "Respond - Summary Data",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        500,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "dashboard-drilldown",
+        "responseMode": "responseNode",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET, OPTIONS"
+              }
+            ]
+          }
+        }
+      },
+      "name": "Webhook - Drilldown",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        100,
+        750
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "={{ $node[\"Webhook - Drilldown\"].json[\"query\"][\"parent_type\"] === \"DSE\" ? \"SELECT retailer_id AS id, retailer_name AS name, retailer_mobile AS mobile, 'RETAILER' AS type, COUNT(DISTINCT lead_id) FILTER (WHERE lead_id IS NOT NULL) AS total_leads, COUNT(DISTINCT lead_id) FILTER (WHERE current_status = 'WON') AS won_leads, ROUND(COALESCE((COUNT(DISTINCT lead_id) FILTER (WHERE current_status = 'WON')::NUMERIC / NULLIF(COUNT(DISTINCT lead_id) FILTER (WHERE lead_id IS NOT NULL), 0)) * 100, 0), 2) AS conversion_rate, COALESCE(SUM(latest_estimate_total), 0) AS total_business_value FROM lead_detail_drilldown_view WHERE dse_id = '\" + $node[\"Webhook - Drilldown\"].json[\"query\"][\"parent_id\"] + \"' GROUP BY retailer_id, retailer_name, retailer_mobile;\" : ($node[\"Webhook - Drilldown\"].json[\"query\"][\"parent_type\"] === \"RETAILER\" ? \"SELECT lead_id AS id, site_owner_name AS name, site_owner_mobile AS mobile, 'LEAD' AS type, town, pincode, current_status, carpet_area, site_type, painter_id, painter_name, COALESCE(latest_estimate_total, 0) AS total_business_value FROM lead_detail_drilldown_view WHERE retailer_id = '\" + $node[\"Webhook - Drilldown\"].json[\"query\"][\"parent_id\"] + \"';\" : \"SELECT (SELECT json_agg(v.*) FROM site_visits v WHERE v.lead_id = '\" + $node[\"Webhook - Drilldown\"].json[\"query\"][\"parent_id\"] + \"') AS visits, (SELECT json_agg(e.*) FROM estimates e WHERE e.lead_id = '\" + $node[\"Webhook - Drilldown\"].json[\"query\"][\"parent_id\"] + \"') AS estimates, (SELECT json_agg(h.*) FROM lead_status_history h WHERE h.lead_id = '\" + $node[\"Webhook - Drilldown\"].json[\"query\"][\"parent_id\"] + \"') AS history;\") }}"
+      },
+      "name": "Postgres - Fetch Drilldown",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        300,
+        750
+      ],
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $items(\"Postgres - Fetch Drilldown\").map(item => item.json) }}"
+      },
+      "name": "Respond - Drilldown Data",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        500,
+        750
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook - Login": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Check Credentials",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Check Credentials": {
+      "main": [
+        [
+          {
+            "node": "User Exists?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "User Exists?": {
+      "main": [
+        [
+          {
+            "node": "Respond OK - Login",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond 401 - Unauthorized",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - Summary": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Fetch Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Fetch Summary": {
+      "main": [
+        [
+          {
+            "node": "Respond - Summary Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - Drilldown": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Fetch Drilldown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Fetch Drilldown": {
+      "main": [
+        [
+          {
+            "node": "Respond - Drilldown Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
