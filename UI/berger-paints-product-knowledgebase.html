@@ -678,33 +678,43 @@
             const grid = document.getElementById('productGrid');
             const searchVal = document.getElementById('searchInput').value.toLowerCase();
             
+            const categoryNames = {
+                'INTERIOR': 'Interior',
+                'EXTERIOR': 'Exterior',
+                'ENAMEL': 'Enamels',
+                'WOOD': 'Wood Finishes',
+                'WATERPROOF': 'Waterproofing',
+                'PRIMER': 'Primers & Putty'
+            };
+
             grid.innerHTML = '';
 
             const filtered = allProductsList.filter(p => {
-                // Must match category
-                const matchesCategory = p.category === currentCategory;
-                if (!matchesCategory) return false;
-
-                // Match search
-                if (!searchVal) return true;
-
-                const nameMatch = p.product_name && p.product_name.toLowerCase().includes(searchVal);
-                const descMatch = p.description && p.description.toLowerCase().includes(searchVal);
-                const segMatch = p.segment && p.segment.toLowerCase().includes(searchVal);
+                const hasSearch = !!searchVal;
                 
-                // Spec list matching
-                let specsMatch = false;
-                if (p.specifications && Array.isArray(p.specifications)) {
-                    specsMatch = p.specifications.some(s => s.toLowerCase().includes(searchVal));
+                // If search value exists, check matches globally across categories
+                if (hasSearch) {
+                    const nameMatch = p.product_name && p.product_name.toLowerCase().includes(searchVal);
+                    const descMatch = p.description && p.description.toLowerCase().includes(searchVal);
+                    const segMatch = p.segment && p.segment.toLowerCase().includes(searchVal);
+                    const catFriendly = (categoryNames[p.category] || "").toLowerCase();
+                    const catMatch = (p.category && p.category.toLowerCase().includes(searchVal)) || catFriendly.includes(searchVal);
+                    
+                    let specsMatch = false;
+                    if (p.specifications && Array.isArray(p.specifications)) {
+                        specsMatch = p.specifications.some(s => s.toLowerCase().includes(searchVal));
+                    }
+
+                    let tagsMatch = false;
+                    if (p.tags && Array.isArray(p.tags)) {
+                        tagsMatch = p.tags.some(t => t.toLowerCase().includes(searchVal));
+                    }
+
+                    return nameMatch || descMatch || segMatch || catMatch || specsMatch || tagsMatch;
                 }
 
-                // Tag list matching
-                let tagsMatch = false;
-                if (p.tags && Array.isArray(p.tags)) {
-                    tagsMatch = p.tags.some(t => t.toLowerCase().includes(searchVal));
-                }
-
-                return nameMatch || descMatch || segMatch || specsMatch || tagsMatch;
+                // If no search input, filter strictly by selected category tab
+                return p.category === currentCategory;
             });
 
             if (filtered.length === 0) {
@@ -712,7 +722,7 @@
                     <div class="empty-state">
                         <i data-lucide="package-search" style="width: 48px; height: 48px;"></i>
                         <h3>No Products Found</h3>
-                        <p>We couldn't find any products matching your search criteria under this category.</p>
+                        <p>We couldn't find any products matching your search criteria.</p>
                     </div>
                 `;
                 lucide.createIcons();
@@ -747,7 +757,10 @@
 
                 card.innerHTML = `
                     <div class="card-header">
-                        <h3>${p.product_name}</h3>
+                        <div>
+                            <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--primary-light); letter-spacing: 0.5px; display: block; margin-bottom: 2px;">${categoryNames[p.category] || p.category}</span>
+                            <h3>${p.product_name}</h3>
+                        </div>
                         <span class="quality-badge ${segmentClass}">${p.segment || 'Standard'}</span>
                     </div>
                     <p class="product-desc">${p.description || 'No description available for this product.'}</p>
