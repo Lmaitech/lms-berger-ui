@@ -116,7 +116,76 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
       "position": [
+        1500,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=SELECT name AS retailer_name, mobile AS retailer_mobile FROM users WHERE id = '{{$node[\"Webhook - Lead Submit\"].json[\"body\"][\"retailer_id\"]}}';"
+      },
+      "name": "Postgres - Query Retailer Details",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
         900,
+        200
+      ],
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v19.0/1034929049696068/messages",
+        "sendHeaders": true,
+        "headersTemplates": {
+          "entries": [
+            {
+              "name": "Authorization",
+              "value": "Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Query Retailer Details\"].json[\"retailer_mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"cta_url\",\n    \"header\": {\n      \"type\": \"image\",\n      \"image\": {\n        \"link\": \"https://raw.githubusercontent.com/Lmaitech/whatsapp-assets/main/LeadRegistered.jpg\"\n      }\n    },\n    \"body\": {\n      \"text\": \"Dear {{$node[\"Postgres - Query Retailer Details\"].json[\"retailer_name\"]}},\nYour lead has been registered successfully.\nCustomer: {{$node[\"Webhook - Lead Submit\"].json[\"body\"][\"site_owner_name\"]}}\nLocation: {{$node[\"Webhook - Lead Submit\"].json[\"body\"][\"address_line1\"]}}{{$node[\"Webhook - Lead Submit\"].json[\"body\"][\"address_line2\"] ? \", \" + $node[\"Webhook - Lead Submit\"].json[\"body\"][\"address_line2\"] : \"\"}}, {{$node[\"Webhook - Lead Submit\"].json[\"body\"][\"town\"]}}, {{$node[\"Webhook - Lead Submit\"].json[\"body\"][\"state\"]}} - {{$node[\"Webhook - Lead Submit\"].json[\"body\"][\"pincode\"]}}\nOur system is now identifying the most suitable painter for this opportunity.\nYou can track the status of your lead here:\nhttps://lms-berger-ui.vercel.app/UI/open-leads-by-user-type.html?id={{$node[\"Webhook - Lead Submit\"].json[\"body\"][\"retailer_id\"]}}\nThank you,\nBerger Paints\"\n    },\n    \"action\": {\n      \"name\": \"cta_url\",\n      \"parameters\": {\n        \"display_text\": \"Track Lead\",\n        \"url\": \"https://lms-berger-ui.vercel.app/UI/open-leads-by-user-type.html?id={{$node[\"Webhook - Lead Submit\"].json[\"body\"][\"retailer_id\"]}}\"\n      }\n    }\n  }\n}"
+      },
+      "name": "HTTP Request - Send Retailer WhatsApp",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1100,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v19.0/1034929049696068/messages",
+        "sendHeaders": true,
+        "headersTemplates": {
+          "entries": [
+            {
+              "name": "Authorization",
+              "value": "Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Webhook - Lead Submit\"].json[\"body\"][\"site_owner_mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"cta_url\",\n    \"header\": {\n      \"type\": \"image\",\n      \"image\": {\n        \"link\": \"https://raw.githubusercontent.com/Lmaitech/whatsapp-assets/main/LeadRegistered.jpg\"\n      }\n    },\n    \"body\": {\n      \"text\": \"Dear {{$node[\"Webhook - Lead Submit\"].json[\"body\"][\"site_owner_name\"]}},\nThank you for choosing Berger Paints.\nYour painting enquiry has been registered successfully.\n\nA suitable painter is currently being assigned and will contact you shortly.\nTrack your request here:\nhttps://lms-berger-ui.vercel.app/UI/open-leads-by-user-type.html?id={{$node[\"Postgres - Upsert Customer\"].json[\"id\"]}}\nThank you,\nBerger Paints\"\n    },\n    \"action\": {\n      \"name\": \"cta_url\",\n      \"parameters\": {\n        \"display_text\": \"Track Enquiry\",\n        \"url\": \"https://lms-berger-ui.vercel.app/UI/open-leads-by-user-type.html?id={{$node[\"Postgres - Upsert Customer\"].json[\"id\"]}}\"\n      }\n    }\n  }\n}"
+      },
+      "name": "HTTP Request - Send Customer WhatsApp",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1300,
         200
       ]
     },
@@ -231,6 +300,39 @@
       ]
     },
     "HTTP Request - Trigger Assignment": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Query Retailer Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Query Retailer Details": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Send Retailer WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Send Retailer WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Send Customer WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Send Customer WhatsApp": {
       "main": [
         [
           {

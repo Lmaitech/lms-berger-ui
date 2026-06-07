@@ -268,6 +268,100 @@
     },
     {
       "parameters": {
+        "operation": "executeQuery",
+        "query": "=SELECT \n    l.lead_id,\n    l.retailer_id,\n    r.name AS retailer_name,\n    r.mobile AS retailer_mobile,\n    l.site_owner_name AS customer_name,\n    l.site_owner_mobile AS customer_mobile,\n    c.id AS customer_id,\n    l.address_line1,\n    COALESCE(l.address_line2, '') AS address_line2,\n    l.town,\n    l.state,\n    l.pincode,\n    TO_CHAR(l.visit_date, 'DD-MM-YYYY') AS formatted_visit_date,\n    TO_CHAR(l.visit_time, 'HH12:MI AM') AS formatted_visit_time,\n    p.name AS painter_name,\n    p.mobile AS painter_mobile\nFROM leads l\nJOIN users p ON l.current_painter_id = p.id\nLEFT JOIN users r ON l.retailer_id = r.id\nLEFT JOIN users c ON l.site_owner_mobile = c.mobile AND c.user_type = 'CUSTOMER'\nWHERE l.lead_id = '{{$node[\"Webhook - POST Response\"].json[\"body\"][\"lead_id\"]}}'\nLIMIT 1;"
+      },
+      "name": "Postgres - Query Accept Details",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        1720,
+        400
+      ],
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v19.0/1034929049696068/messages",
+        "sendHeaders": true,
+        "headersTemplates": {
+          "entries": [
+            {
+              "name": "Authorization",
+              "value": "Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Query Accept Details\"].json[\"retailer_mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"cta_url\",\n    \"header\": {\n      \"type\": \"text\",\n      \"text\": \"Painter Visit Scheduled\"\n    },\n    \"body\": {\n      \"text\": \"Dear {{$node[\"Postgres - Query Accept Details\"].json[\"retailer_name\"]}},\nVisit of site {{$node[\"Postgres - Query Accept Details\"].json[\"address_line1\"]}}{{$node[\"Postgres - Query Accept Details\"].json[\"address_line2\"] ? \", \" + $node[\"Postgres - Query Accept Details\"].json[\"address_line2\"] : \"\"}}, {{$node[\"Postgres - Query Accept Details\"].json[\"town\"]}}, {{$node[\"Postgres - Query Accept Details\"].json[\"state\"]}} - {{$node[\"Postgres - Query Accept Details\"].json[\"pincode\"]}} has been scheduled.\n\nVisit Details:\nDate: {{$node[\"Postgres - Query Accept Details\"].json[\"formatted_visit_date\"]}}\nTime: {{$node[\"Postgres - Query Accept Details\"].json[\"formatted_visit_time\"]}} (12hr format IST)\nPainter Name: {{$node[\"Postgres - Query Accept Details\"].json[\"painter_name\"]}}\nPainter Phone Number: {{$node[\"Postgres - Query Accept Details\"].json[\"painter_mobile\"]}}\nTrack Lead:\nhttps://lms-berger-ui.vercel.app/UI/open-leads-by-user-type.html?id={{$node[\"Postgres - Query Accept Details\"].json[\"retailer_id\"]}}\nThank you,\nBerger Paints\"\n    },\n    \"action\": {\n      \"name\": \"cta_url\",\n      \"parameters\": {\n        \"display_text\": \"Track Lead\",\n        \"url\": \"https://lms-berger-ui.vercel.app/UI/open-leads-by-user-type.html?id={{$node[\"Postgres - Query Accept Details\"].json[\"retailer_id\"]}}\"\n      }\n    }\n  }\n}"
+      },
+      "name": "HTTP Request - Send Retailer Visit Scheduled",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1920,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v19.0/1034929049696068/messages",
+        "sendHeaders": true,
+        "headersTemplates": {
+          "entries": [
+            {
+              "name": "Authorization",
+              "value": "Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Query Accept Details\"].json[\"customer_mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"cta_url\",\n    \"header\": {\n      \"type\": \"text\",\n      \"text\": \"Painter Visit Scheduled\"\n    },\n    \"body\": {\n      \"text\": \"Dear {{$node[\"Postgres - Query Accept Details\"].json[\"customer_name\"]}},\nVisit of site {{$node[\"Postgres - Query Accept Details\"].json[\"address_line1\"]}}{{$node[\"Postgres - Query Accept Details\"].json[\"address_line2\"] ? \", \" + $node[\"Postgres - Query Accept Details\"].json[\"address_line2\"] : \"\"}}, {{$node[\"Postgres - Query Accept Details\"].json[\"town\"]}}, {{$node[\"Postgres - Query Accept Details\"].json[\"state\"]}} - {{$node[\"Postgres - Query Accept Details\"].json[\"pincode\"]}} has been scheduled.\n\nVisit Details:\nDate: {{$node[\"Postgres - Query Accept Details\"].json[\"formatted_visit_date\"]}}\nTime: {{$node[\"Postgres - Query Accept Details\"].json[\"formatted_visit_time\"]}} (12hr format IST)\nPainter Name: {{$node[\"Postgres - Query Accept Details\"].json[\"painter_name\"]}}\nPainter Phone Number: {{$node[\"Postgres - Query Accept Details\"].json[\"painter_mobile\"]}}\nTrack Lead:\nhttps://lms-berger-ui.vercel.app/UI/open-leads-by-user-type.html?id={{$node[\"Postgres - Query Accept Details\"].json[\"customer_id\"]}}\nThank you,\nBerger Paints\"\n    },\n    \"action\": {\n      \"name\": \"cta_url\",\n      \"parameters\": {\n        \"display_text\": \"Track Lead\",\n        \"url\": \"https://lms-berger-ui.vercel.app/UI/open-leads-by-user-type.html?id={{$node[\"Postgres - Query Accept Details\"].json[\"customer_id\"]}}\"\n      }\n    }\n  }\n}"
+      },
+      "name": "HTTP Request - Send Customer Visit Scheduled",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2120,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v19.0/1034929049696068/messages",
+        "sendHeaders": true,
+        "headersTemplates": {
+          "entries": [
+            {
+              "name": "Authorization",
+              "value": "Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Query Accept Details\"].json[\"painter_mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"cta_url\",\n    \"header\": {\n      \"type\": \"text\",\n      \"text\": \"Your Visit has been scheduled\"\n    },\n    \"body\": {\n      \"text\": \"Dear {{$node[\"Postgres - Query Accept Details\"].json[\"painter_name\"]}},\n\nVisit of site {{$node[\"Postgres - Query Accept Details\"].json[\"address_line1\"]}}{{$node[\"Postgres - Query Accept Details\"].json[\"address_line2\"] ? \", \" + $node[\"Postgres - Query Accept Details\"].json[\"address_line2\"] : \"\"}}, {{$node[\"Postgres - Query Accept Details\"].json[\"town\"]}}, {{$node[\"Postgres - Query Accept Details\"].json[\"state\"]}} - {{$node[\"Postgres - Query Accept Details\"].json[\"pincode\"]}} has been scheduled.\n\nVisit Details:\nDate: {{$node[\"Postgres - Query Accept Details\"].json[\"formatted_visit_date\"]}}\nTime: {{$node[\"Postgres - Query Accept Details\"].json[\"formatted_visit_time\"]}} (12hr format IST)\n\nStart Visit and See other open lead:\nhttps://lms-berger-ui.vercel.app/UI/open-leads-by-user-type.html?id={{$node[\"Webhook - POST Response\"].json[\"body\"][\"painter_id\"]}}\nThank you,\nBerger Paints\"\n    },\n    \"action\": {\n      \"name\": \"cta_url\",\n      \"parameters\": {\n        \"display_text\": \"Start Visit\",\n        \"url\": \"https://lms-berger-ui.vercel.app/UI/open-leads-by-user-type.html?id={{$node[\"Webhook - POST Response\"].json[\"body\"][\"painter_id\"]}}\"\n      }\n    }\n  }\n}"
+      },
+      "name": "HTTP Request - Send Painter Visit Scheduled",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2320,
+        400
+      ]
+    },
+    {
+      "parameters": {
         "respondWith": "json",
         "responseBody": "={{ JSON.stringify($node[\"Postgres - Validate Pending\"].json) }}"
       },
@@ -275,7 +369,7 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
       "position": [
-        1720,
+        2520,
         400
       ]
     },
@@ -514,6 +608,50 @@
       ]
     },
     "Postgres - Update Accept Performance": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Query Accept Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Query Accept Details": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Send Retailer Visit Scheduled",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Send Retailer Visit Scheduled": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Send Customer Visit Scheduled",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Send Customer Visit Scheduled": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Send Painter Visit Scheduled",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Send Painter Visit Scheduled": {
       "main": [
         [
           {

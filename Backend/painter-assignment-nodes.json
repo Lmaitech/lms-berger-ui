@@ -157,7 +157,51 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
       "position": [
+        2080,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=SELECT \n  lead_id,\n  site_owner_name,\n  site_owner_mobile,\n  address_line1,\n  COALESCE(address_line2, '') AS address_line2,\n  town,\n  state,\n  pincode,\n  carpet_area,\n  TO_CHAR(visit_date, 'DD-MM-YYYY') AS formatted_visit_date,\n  TO_CHAR(visit_time, 'HH12:MI AM') AS formatted_visit_time\nFROM leads \nWHERE lead_id = '{{$node[\"Webhook - Assign Trigger\"].json[\"body\"][\"lead_id\"]}}';"
+      },
+      "name": "Postgres - Query Lead Details",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
         1640,
+        200
+      ],
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v19.0/1034929049696068/messages",
+        "sendHeaders": true,
+        "headersTemplates": {
+          "entries": [
+            {
+              "name": "Authorization",
+              "value": "Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Select Match\"].json[\"painter_mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"cta_url\",\n    \"header\": {\n      \"type\": \"image\",\n      \"image\": {\n        \"link\": \"https://raw.githubusercontent.com/Lmaitech/whatsapp-assets/main/LeadAssigned.jpg\"\n      }\n    },\n    \"body\": {\n      \"text\": \"Dear {{$node[\"Postgres - Select Match\"].json[\"painter_name\"]}},\nA new lead has been assigned to you.\nLocation: {{$node[\"Postgres - Query Lead Details\"].json[\"address_line1\"]}}{{$node[\"Postgres - Query Lead Details\"].json[\"address_line2\"] ? \", \" + $node[\"Postgres - Query Lead Details\"].json[\"address_line2\"] : \"\"}}, {{$node[\"Postgres - Query Lead Details\"].json[\"town\"]}}, {{$node[\"Postgres - Query Lead Details\"].json[\"state\"]}} - {{$node[\"Postgres - Query Lead Details\"].json[\"pincode\"]}}\nCarpet Area: {{$node[\"Postgres - Query Lead Details\"].json[\"carpet_area\"]}} sq ft\nVisit Date and Time: {{$node[\"Postgres - Query Lead Details\"].json[\"formatted_visit_date\"]}} at {{$node[\"Postgres - Query Lead Details\"].json[\"formatted_visit_time\"]}}\n\nPlease review and respond using the link below:\nhttps://lms-berger-ui.vercel.app/UI/painter-response.html?painter_id={{$node[\"Postgres - Select Match\"].json[\"painter_id\"]}}&lead_id={{$node[\"Webhook - Assign Trigger\"].json[\"body\"][\"lead_id\"]}}\nThank you,\nBerger Paints\"\n    },\n    \"action\": {\n      \"name\": \"cta_url\",\n      \"parameters\": {\n        \"display_text\": \"Review Lead\",\n        \"url\": \"https://lms-berger-ui.vercel.app/UI/painter-response.html?painter_id={{$node[\"Postgres - Select Match\"].json[\"painter_id\"]}}&lead_id={{$node[\"Webhook - Assign Trigger\"].json[\"body\"][\"lead_id\"]}}\"\n      }\n    }\n  }\n}"
+      },
+      "name": "HTTP Request - Send Painter WhatsApp",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1860,
         200
       ]
     },
@@ -251,6 +295,28 @@
       ]
     },
     "Postgres - Update Performance": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Query Lead Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Query Lead Details": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Send Painter WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Send Painter WhatsApp": {
       "main": [
         [
           {
