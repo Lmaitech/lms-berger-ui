@@ -59,7 +59,7 @@
           "string": [
             {
               "value1": "={{$node[\"Postgres - Select Match\"].json[\"painter_id\"]}}",
-              "operation": "notEmpty"
+              "operation": "isNotEmpty"
             }
           ]
         }
