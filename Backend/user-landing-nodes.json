@@ -395,6 +395,100 @@
     },
     {
       "parameters": {
+        "operation": "executeQuery",
+        "query": "=SELECT \n    l.lead_id,\n    l.retailer_id,\n    r.name AS retailer_name,\n    r.mobile AS retailer_mobile,\n    l.site_owner_name AS customer_name,\n    l.site_owner_mobile AS customer_mobile,\n    c.id AS customer_id,\n    p.id AS painter_id,\n    p.name AS painter_name,\n    p.mobile AS painter_mobile,\n    TO_CHAR(f.followup_date, 'DD-MM-YYYY') AS formatted_followup_date,\n    TO_CHAR(f.followup_time, 'HH12:MI AM') AS formatted_followup_time,\n    f.remarks\nFROM followups f\nJOIN leads l ON f.lead_id = l.lead_id\nLEFT JOIN users p ON l.current_painter_id = p.id\nLEFT JOIN users r ON l.retailer_id = r.id\nLEFT JOIN users c ON l.site_owner_mobile = c.mobile AND c.user_type = 'CUSTOMER'\nWHERE f.followup_id = '{{$node[\"Postgres - Log Followup\"].json[\"followup_id\"]}}'\nLIMIT 1;"
+      },
+      "name": "Postgres - Query Followup Details",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        900,
+        800
+      ],
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v19.0/1034929049696068/messages",
+        "sendHeaders": true,
+        "headersTemplates": {
+          "entries": [
+            {
+              "name": "Authorization",
+              "value": "Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Query Followup Details\"].json[\"painter_mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"cta_url\",\n    \"header\": {\n      \"type\": \"text\",\n      \"text\": \"Follow Up Visit Scheduled\"\n    },\n    \"body\": {\n      \"text\": \"Dear {{$node[\"Postgres - Query Followup Details\"].json[\"painter_name\"]}},\nA follow-up has been scheduled\nFollow-Up Date: {{$node[\"Postgres - Query Followup Details\"].json[\"formatted_followup_date\"]}}\nFollow-Up Time: {{$node[\"Postgres - Query Followup Details\"].json[\"formatted_followup_time\"]}} (IST 12hr format)\nRemarks:\n{{$node[\"Postgres - Query Followup Details\"].json[\"remarks\"]}}\nTrack Lead:\nhttps://lms-berger-ui.vercel.app/UI/open-leads-by-user-type.html?id={{$node[\"Postgres - Query Followup Details\"].json[\"painter_id\"]}}\n\nThank you,\nBerger Paints\"\n    },\n    \"action\": {\n      \"name\": \"cta_url\",\n      \"parameters\": {\n        \"display_text\": \"Track Lead\",\n        \"url\": \"https://lms-berger-ui.vercel.app/UI/open-leads-by-user-type.html?id={{$node[\"Postgres - Query Followup Details\"].json[\"painter_id\"]}}\"\n      }\n    }\n  }\n}"
+      },
+      "name": "HTTP Request - Send Painter Followup Scheduled",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1100,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v19.0/1034929049696068/messages",
+        "sendHeaders": true,
+        "headersTemplates": {
+          "entries": [
+            {
+              "name": "Authorization",
+              "value": "Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Query Followup Details\"].json[\"retailer_mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"cta_url\",\n    \"header\": {\n      \"type\": \"text\",\n      \"text\": \"Follow Up Visit Scheduled\"\n    },\n    \"body\": {\n      \"text\": \"Dear {{$node[\"Postgres - Query Followup Details\"].json[\"retailer_name\"]}},\nA follow-up has been scheduled\nFollow-Up Date: {{$node[\"Postgres - Query Followup Details\"].json[\"formatted_followup_date\"]}}\nFollow-Up Time: {{$node[\"Postgres - Query Followup Details\"].json[\"formatted_followup_time\"]}} (IST 12hr format)\nRemarks:\n{{$node[\"Postgres - Query Followup Details\"].json[\"remarks\"]}}\nTrack Lead:\nhttps://lms-berger-ui.vercel.app/UI/open-leads-by-user-type.html?id={{$node[\"Postgres - Query Followup Details\"].json[\"retailer_id\"]}}\n\nThank you,\nBerger Paints\"\n    },\n    \"action\": {\n      \"name\": \"cta_url\",\n      \"parameters\": {\n        \"display_text\": \"Track Lead\",\n        \"url\": \"https://lms-berger-ui.vercel.app/UI/open-leads-by-user-type.html?id={{$node[\"Postgres - Query Followup Details\"].json[\"retailer_id\"]}}\"\n      }\n    }\n  }\n}"
+      },
+      "name": "HTTP Request - Send Retailer Followup Scheduled",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1300,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v19.0/1034929049696068/messages",
+        "sendHeaders": true,
+        "headersTemplates": {
+          "entries": [
+            {
+              "name": "Authorization",
+              "value": "Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Query Followup Details\"].json[\"customer_mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"cta_url\",\n    \"header\": {\n      \"type\": \"text\",\n      \"text\": \"Follow Up Visit Scheduled\"\n    },\n    \"body\": {\n      \"text\": \"Dear {{$node[\"Postgres - Query Followup Details\"].json[\"customer_name\"]}},\nA follow-up has been scheduled\nFollow-Up Date: {{$node[\"Postgres - Query Followup Details\"].json[\"formatted_followup_date\"]}}\nFollow-Up Time: {{$node[\"Postgres - Query Followup Details\"].json[\"formatted_followup_time\"]}} (IST 12hr format)\nRemarks:\n{{$node[\"Postgres - Query Followup Details\"].json[\"remarks\"]}}\nTrack Lead:\nhttps://lms-berger-ui.vercel.app/UI/open-leads-by-user-type.html?id={{$node[\"Postgres - Query Followup Details\"].json[\"customer_id\"]}}\n\nThank you,\nBerger Paints\"\n    },\n    \"action\": {\n      \"name\": \"cta_url\",\n      \"parameters\": {\n        \"display_text\": \"Track Lead\",\n        \"url\": \"https://lms-berger-ui.vercel.app/UI/open-leads-by-user-type.html?id={{$node[\"Postgres - Query Followup Details\"].json[\"customer_id\"]}}\"\n      }\n    }\n  }\n}"
+      },
+      "name": "HTTP Request - Send Customer Followup Scheduled",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1500,
+        800
+      ]
+    },
+    {
+      "parameters": {
         "respondWith": "json",
         "responseBody": "={\n  \"status\": \"success\",\n  \"message\": \"Follow-up scheduled successfully\"\n}"
       },
@@ -402,7 +496,7 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
       "position": [
-        900,
+        1700,
         800
       ]
     },
@@ -1216,6 +1310,50 @@
       ]
     },
     "Postgres - Followup Status History": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Query Followup Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Query Followup Details": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Send Painter Followup Scheduled",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Send Painter Followup Scheduled": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Send Retailer Followup Scheduled",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Send Retailer Followup Scheduled": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Send Customer Followup Scheduled",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Send Customer Followup Scheduled": {
       "main": [
         [
           {
