@@ -1323,6 +1323,100 @@
     },
     {
       "parameters": {
+        "operation": "executeQuery",
+        "query": "=SELECT \n    l.lead_id,\n    l.retailer_id,\n    r.name AS retailer_name,\n    r.mobile AS retailer_mobile,\n    l.site_owner_name AS customer_name,\n    l.site_owner_mobile AS customer_mobile,\n    c.id AS customer_id,\n    p.id AS painter_id,\n    p.name AS painter_name,\n    p.mobile AS painter_mobile,\n    l.address_line1,\n    COALESCE(l.address_line2, '') AS address_line2,\n    l.town,\n    l.state,\n    l.pincode,\n    lr.reason_name AS loss_reason\nFROM leads l\nLEFT JOIN users p ON l.current_painter_id = p.id\nLEFT JOIN users r ON l.retailer_id = r.id\nLEFT JOIN users c ON l.site_owner_mobile = c.mobile AND c.user_type = 'CUSTOMER'\nLEFT JOIN lost_reasons lr ON l.lost_reason_id = lr.lost_reason_id\nWHERE l.lead_id = '{{$node[\"Webhook - POST Mark Site Lost\"].json[\"body\"][\"lead_id\"]}}'\nLIMIT 1;"
+      },
+      "name": "Postgres - Query Site Lost Details",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        900,
+        2000
+      ],
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v19.0/1034929049696068/messages",
+        "sendHeaders": true,
+        "headersTemplates": {
+          "entries": [
+            {
+              "name": "Authorization",
+              "value": "Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Query Site Lost Details\"].json[\"painter_mobile\"]}}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"preview_url\": false,\n    \"body\": \"*Site Lost*\\n\\nDear {{$node[\"Postgres - Query Site Lost Details\"].json[\"painter_name\"]}},\\n\\nSite at {{$node[\"Postgres - Query Site Lost Details\"].json[\"address_line1\"]}}{{$node[\"Postgres - Query Site Lost Details\"].json[\"address_line2\"] ? \", \" + $node[\"Postgres - Query Site Lost Details\"].json[\"address_line2\"] : \"\"}}, {{$node[\"Postgres - Query Site Lost Details\"].json[\"town\"]}}, {{$node[\"Postgres - Query Site Lost Details\"].json[\"state\"]}} - {{$node[\"Postgres - Query Site Lost Details\"].json[\"pincode\"]}} has been marked as lost.\\nLoss reason: {{$node[\"Postgres - Query Site Lost Details\"].json[\"loss_reason\"] || 'Not Specified'}}\"\n  }\n}"
+      },
+      "name": "HTTP Request - Send Painter Site Lost",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1100,
+        2000
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v19.0/1034929049696068/messages",
+        "sendHeaders": true,
+        "headersTemplates": {
+          "entries": [
+            {
+              "name": "Authorization",
+              "value": "Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Query Site Lost Details\"].json[\"retailer_mobile\"]}}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"preview_url\": false,\n    \"body\": \"*Site Lost*\\n\\nDear {{$node[\"Postgres - Query Site Lost Details\"].json[\"retailer_name\"]}},\\n\\nSite at {{$node[\"Postgres - Query Site Lost Details\"].json[\"address_line1\"]}}{{$node[\"Postgres - Query Site Lost Details\"].json[\"address_line2\"] ? \", \" + $node[\"Postgres - Query Site Lost Details\"].json[\"address_line2\"] : \"\"}}, {{$node[\"Postgres - Query Site Lost Details\"].json[\"town\"]}}, {{$node[\"Postgres - Query Site Lost Details\"].json[\"state\"]}} - {{$node[\"Postgres - Query Site Lost Details\"].json[\"pincode\"]}} has been marked as lost.\\nLoss reason: {{$node[\"Postgres - Query Site Lost Details\"].json[\"loss_reason\"] || 'Not Specified'}}\"\n  }\n}"
+      },
+      "name": "HTTP Request - Send Retailer Site Lost",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1300,
+        2000
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v19.0/1034929049696068/messages",
+        "sendHeaders": true,
+        "headersTemplates": {
+          "entries": [
+            {
+              "name": "Authorization",
+              "value": "Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Query Site Lost Details\"].json[\"customer_mobile\"]}}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"preview_url\": false,\n    \"body\": \"*Site Lost*\\n\\nDear {{$node[\"Postgres - Query Site Lost Details\"].json[\"customer_name\"]}},\\n\\nSite at {{$node[\"Postgres - Query Site Lost Details\"].json[\"address_line1\"]}}{{$node[\"Postgres - Query Site Lost Details\"].json[\"address_line2\"] ? \", \" + $node[\"Postgres - Query Site Lost Details\"].json[\"address_line2\"] : \"\"}}, {{$node[\"Postgres - Query Site Lost Details\"].json[\"town\"]}}, {{$node[\"Postgres - Query Site Lost Details\"].json[\"state\"]}} - {{$node[\"Postgres - Query Site Lost Details\"].json[\"pincode\"]}} has been marked as lost.\\nLoss reason: {{$node[\"Postgres - Query Site Lost Details\"].json[\"loss_reason\"] || 'Not Specified'}}\"\n  }\n}"
+      },
+      "name": "HTTP Request - Send Customer Site Lost",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1500,
+        2000
+      ]
+    },
+    {
+      "parameters": {
         "respondWith": "json",
         "responseBody": "={\n  \"status\": \"success\",\n  \"message\": \"Site registered as LOST successfully\"\n}"
       },
@@ -1330,7 +1424,7 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
       "position": [
-        900,
+        1700,
         2000
       ]
     },
@@ -1965,6 +2059,50 @@
       ]
     },
     "Postgres - Update Painter Stats Lost": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Query Site Lost Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Query Site Lost Details": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Send Painter Site Lost",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Send Painter Site Lost": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Send Retailer Site Lost",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Send Retailer Site Lost": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Send Customer Site Lost",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Send Customer Site Lost": {
       "main": [
         [
           {
