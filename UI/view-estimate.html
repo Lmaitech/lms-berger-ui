@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Estimate - Berger LMS</title>
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --purple-main: #4a154b;
+            --purple-light: #6b266d;
+            --purple-dark: #300c31;
+            --purple-gradient: linear-gradient(135deg, #6b266d 0%, #300c31 100%);
+            --yellow-accent: #ffcc00;
+            --yellow-hover: #e6b800;
+            --text-dark: #1f1f1f;
+            --text-muted: #757575;
+            --bg-light: #f7f5fa;
+            --card-bg: #ffffff;
+            --border-radius: 20px;
+            --shadow-lg: 0 20px 25px -5px rgba(74, 21, 75, 0.12), 0 10px 10px -5px rgba(74, 21, 75, 0.04);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --success-color: #2e7d32;
+            --border-color: #f0eaf5;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 16px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            border: 1px solid rgba(74, 21, 75, 0.08);
+            margin-bottom: 30px;
+            animation: slideUp 0.4s ease-out;
+            position: relative;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .app-header {
+            background: var(--purple-gradient);
+            padding: 24px 20px;
+            color: #ffffff;
+            border-bottom: 4px solid var(--yellow-accent);
+            text-align: center;
+        }
+
+        .brand-logo {
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--yellow-accent);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .brand-logo img {
+            height: 24px;
+        }
+
+        .header-title {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        /* Loading & Error Overlays */
+        .overlay {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(74, 21, 75, 0.1);
+            border-top: 4px solid var(--purple-main);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-icon {
+            width: 60px;
+            height: 60px;
+            background: #ffebee;
+            color: #c62828;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            margin-bottom: 16px;
+        }
+
+        /* Estimate Info Cards */
+        .info-card {
+            background: #faf8fc;
+            border: 1.5px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .info-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--purple-main);
+            margin-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 6px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .info-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-label {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .info-val {
+            color: var(--text-dark);
+            font-weight: 600;
+            text-align: right;
+        }
+
+        /* Items List */
+        .item-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .item-details {
+            max-width: 70%;
+        }
+
+        .item-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .item-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .item-total {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--purple-main);
+        }
+
+        /* Cost Summary Card */
+        .cost-summary {
+            background: var(--purple-gradient);
+            color: #ffffff;
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 24px;
+            box-shadow: 0 10px 15px -3px rgba(74, 21, 75, 0.3);
+        }
+
+        .cost-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .cost-row.grand-total {
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 20px;
+            font-weight: 700;
+            opacity: 1;
+            color: var(--yellow-accent);
+        }
+
+        .btn-back {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px;
+            background: #ffffff;
+            border: 1.5px solid var(--purple-main);
+            color: var(--purple-main);
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            text-decoration: none;
+            margin-top: 24px;
+            transition: var(--transition);
+        }
+
+        .btn-back:hover {
+            background: rgba(74, 21, 75, 0.04);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="brand-logo">
+                <img src="assets/berger_logo.png" alt="Berger Paints" onerror="this.style.display='none'">
+                <span>Berger Paints</span>
+            </div>
+            <h1 class="header-title">Estimate Details</h1>
+        </header>
+
+        <div class="content" id="mainContent">
+            <!-- Loading Overlay -->
+            <div class="overlay" id="loadingOverlay">
+                <div class="spinner"></div>
+                <p>Loading latest estimate...</p>
+            </div>
+
+            <!-- Error State -->
+            <div class="overlay" id="errorOverlay" style="display: none;">
+                <div class="error-icon">⚠️</div>
+                <h3 style="margin-bottom: 8px; font-weight: 700;">No Estimate Found</h3>
+                <p id="errorMessage" style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">You might not be authorized to view this estimate, or no estimate has been submitted yet.</p>
+                <a href="#" class="btn-back" id="btnErrorBack" style="margin-top: 0;">Back to Dashboard</a>
+            </div>
+
+            <!-- Estimate Detail Card -->
+            <div id="estimateDetails" style="display: none;">
+                <div class="info-card">
+                    <div class="info-title">Site & Contact Information</div>
+                    <div class="info-row">
+                        <span class="info-label">Customer Name</span>
+                        <span class="info-val" id="custName">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Site Address</span>
+                        <span class="info-val" id="siteAddress">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Retailer Assigned</span>
+                        <span class="info-val" id="retailerName">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Painter Assigned</span>
+                        <span class="info-val" id="painterName">-</span>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-title">Estimate Metadata</div>
+                    <div class="info-row">
+                        <span class="info-label">Estimate Version</span>
+                        <span class="info-val" id="estVersion">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Service Type</span>
+                        <span class="info-val" id="estMode">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Submission Date</span>
+                        <span class="info-val" id="estDate">-</span>
+                    </div>
+                </div>
+
+                <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 12px; color: var(--purple-main);">Estimate Items</h3>
+                <div id="itemsList">
+                    <!-- Dynamic Items -->
+                </div>
+
+                <div class="cost-summary">
+                    <div class="cost-row">
+                        <span>Material Total</span>
+                        <span id="costMaterial">₹0.00</span>
+                    </div>
+                    <div class="cost-row">
+                        <span>Labour & Manpower</span>
+                        <span id="costLabour">₹0.00</span>
+                    </div>
+                    <div class="cost-row">
+                        <span>Discount Applied</span>
+                        <span id="costDiscount">₹0.00</span>
+                    </div>
+                    <div class="cost-row grand-total">
+                        <span>Grand Total</span>
+                        <span id="costGrand">₹0.00</span>
+                    </div>
+                </div>
+
+                <a href="#" class="btn-back" id="btnDashboardBack">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                    Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const leadId = urlParams.get('lead_id') || urlParams.get('leadid');
+        const userId = urlParams.get('userid') || urlParams.get('id');
+
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const errorOverlay = document.getElementById('errorOverlay');
+        const estimateDetails = document.getElementById('estimateDetails');
+        const errorMessage = document.getElementById('errorMessage');
+
+        // Setup back buttons
+        const backDashboard = `open-leads-by-user-type.html?id=${userId}`;
+        document.getElementById('btnDashboardBack').href = backDashboard;
+        document.getElementById('btnErrorBack').href = backDashboard;
+
+        if (!leadId || !userId) {
+            showError("Missing lead_id or userid parameters in URL.");
+        } else {
+            fetchLatestEstimate();
+        }
+
+        async function fetchLatestEstimate() {
+            try {
+                const response = await fetch(`${CONFIG.API_BASE_URL}/latest-estimate?lead_id=${leadId}&user_id=${userId}`);
+                if (!response.ok) {
+                    throw new Error("Unable to retrieve estimate or authorization failed.");
+                }
+                const data = await response.json();
+                if (!data || data.length === 0) {
+                    showError("No estimates found for this lead or unauthorized access.");
+                    return;
+                }
+                renderEstimate(data);
+            } catch (err) {
+                showError(err.message);
+            }
+        }
+
+        function showError(msg) {
+            errorMessage.textContent = msg;
+            loadingOverlay.style.display = 'none';
+            errorOverlay.style.display = 'flex';
+        }
+
+        function renderEstimate(rows) {
+            const firstRow = rows[0];
+
+            // Render Site Info
+            document.getElementById('custName').textContent = firstRow.site_owner_name;
+            document.getElementById('siteAddress').textContent = `${firstRow.address_line1}${firstRow.address_line2 ? ', ' + firstRow.address_line2 : ''}, ${firstRow.town}, ${firstRow.state} - ${firstRow.pincode}`;
+            document.getElementById('retailerName').textContent = firstRow.retailer_name || 'Direct / None';
+            document.getElementById('painterName').textContent = firstRow.painter_name || '-';
+
+            // Render Metadata
+            document.getElementById('estVersion').textContent = `v${firstRow.estimate_version}`;
+            document.getElementById('estMode').textContent = firstRow.estimate_mode === 'SUPPLY_APPLY' ? 'Supply & Apply' : 'Supply Only';
+            document.getElementById('estDate').textContent = firstRow.formatted_submitted_at;
+
+            // Render Cost aggregation
+            document.getElementById('costMaterial').textContent = `₹${parseFloat(firstRow.material_total).toLocaleString('en-IN')}`;
+            document.getElementById('costLabour').textContent = `₹${parseFloat(firstRow.labour_cost).toLocaleString('en-IN')}`;
+            document.getElementById('costDiscount').textContent = `₹${parseFloat(firstRow.discount).toLocaleString('en-IN')}`;
+            document.getElementById('costGrand').textContent = `₹${parseFloat(firstRow.grand_total).toLocaleString('en-IN')}`;
+
+            // Render Items List
+            const itemsList = document.getElementById('itemsList');
+            itemsList.innerHTML = '';
+            rows.forEach(item => {
+                const itemCard = document.createElement('div');
+                itemCard.className = 'item-card';
+
+                // Setup metric display based on type (Volume in L/Kg or Value)
+                const isVolume = firstRow.estimate_type === 'VOLUME';
+                const metaString = isVolume 
+                    ? `Qty: ${parseFloat(item.quantity)} ${item.unit} | Rate: ₹${parseFloat(item.rate)}/${item.unit}` 
+                    : `Estimated Value | Unit Rate: ₹${parseFloat(item.rate)}`;
+
+                itemCard.innerHTML = `
+                    <div class="item-details">
+                        <div class="item-name">${item.product_name}</div>
+                        <div class="item-meta">${metaString}</div>
+                    </div>
+                    <div class="item-total">₹${parseFloat(item.line_total).toLocaleString('en-IN')}</div>
+                `;
+                itemsList.appendChild(itemCard);
+            });
+
+            // Transition visibility
+            loadingOverlay.style.display = 'none';
+            estimateDetails.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
