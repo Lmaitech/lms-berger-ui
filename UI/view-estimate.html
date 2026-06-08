@@ -384,7 +384,8 @@
 
         async function fetchLatestEstimate() {
             try {
-                const response = await fetch(`${CONFIG.API_BASE_URL}/latest-estimate?lead_id=${leadId}&user_id=${userId}`);
+                const baseUrl = CONFIG.N8N_WEBHOOK_URL.endsWith('/') ? CONFIG.N8N_WEBHOOK_URL : CONFIG.N8N_WEBHOOK_URL + '/';
+                const response = await fetch(`${baseUrl}latest-estimate?lead_id=${leadId}&user_id=${userId}`);
                 if (!response.ok) {
                     throw new Error("Unable to retrieve estimate or authorization failed.");
                 }
