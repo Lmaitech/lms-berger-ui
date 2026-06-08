@@ -3,6 +3,20 @@
   "nodes": [
     {
       "parameters": {
+        "content": "### Painter Intelligent Auto-Assignment System\n\n**Functions & Features:**\n- **POST /assign-painter**: Performs candidate ranking using performance metric calculations (Acceptance, Conversion, Availability).\n- **Database Audit Logs**: Logs assignments in history tables and increases allocated counters.\n- **WhatsApp dispatch**: Dispatches invitations with links to the response portal.",
+        "height": 220,
+        "width": 340
+      },
+      "name": "Sticky Note - Painter Intelligent Auto-Assignment System",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        100
+      ]
+    },
+    {
+      "parameters": {
         "httpMethod": "POST",
         "path": "assign-painter",
         "responseMode": "responseNode",

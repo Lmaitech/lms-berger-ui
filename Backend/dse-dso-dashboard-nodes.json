@@ -3,6 +3,20 @@
   "nodes": [
     {
       "parameters": {
+        "content": "### DSO & DSE Executive Dashboard Portal API\n\n**Functions & Features:**\n- **POST /login**: Validates credentials and parses roles.\n- **GET /dashboard-summary**: Returns top-level KPIs and lists direct reports.\n- **GET /dashboard-drilldown**: Resolves sub-tier details, inspection drawer timelines, and goal metrics.",
+        "height": 220,
+        "width": 340
+      },
+      "name": "Sticky Note - DSO & DSE Executive Dashboard Portal API",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        100
+      ]
+    },
+    {
+      "parameters": {
         "httpMethod": "POST",
         "path": "login",
         "responseMode": "responseNode",

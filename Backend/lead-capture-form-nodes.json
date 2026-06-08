@@ -3,6 +3,20 @@
   "nodes": [
     {
       "parameters": {
+        "content": "### Lead Capture Pipeline & Notifications\n\n**Functions & Features:**\n- **POST /submit-lead**: Collects new site consult records.\n- **Upsert Customer**: Dynamically registers a customer user profile using phone credentials.\n- **WhatsApp Alerts**: Sends personalized tracking dashboards to both Retailers and Customers.",
+        "height": 220,
+        "width": 340
+      },
+      "name": "Sticky Note - Lead Capture Pipeline & Notifications",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        100
+      ]
+    },
+    {
+      "parameters": {
         "httpMethod": "POST",
         "path": "lead-capture",
         "responseMode": "responseNode",

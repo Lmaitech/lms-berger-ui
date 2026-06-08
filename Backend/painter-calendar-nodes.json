@@ -3,6 +3,20 @@
   "nodes": [
     {
       "parameters": {
+        "content": "### Painter Consultation Calendar API\n\n**Functions & Features:**\n- **GET /painter-visits**: Serves scheduled and completed visit timelines.\n- **Count Check**: Determines completion stats based on geolocated visits.",
+        "height": 220,
+        "width": 340
+      },
+      "name": "Sticky Note - Painter Consultation Calendar API",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        100
+      ]
+    },
+    {
+      "parameters": {
         "httpMethod": "GET",
         "path": "painter-visits",
         "responseMode": "responseNode",

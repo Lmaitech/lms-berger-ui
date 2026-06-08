@@ -3,6 +3,20 @@
   "nodes": [
     {
       "parameters": {
+        "content": "### WhatsApp Webhook Receiver & AI Agent Router\n\n**Functions & Features:**\n- **POST /whatsapp-message-trigger**: Intercepts inbound WhatsApp replies.\n- **Lookup & Switch**: Searches user roles and routes to greeting templates.\n- **DSE/DSO AI Agent**: Routes to a secure LLM pipeline with aggregated database context.",
+        "height": 220,
+        "width": 340
+      },
+      "name": "Sticky Note - WhatsApp Webhook Receiver & AI Agent Router",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        100
+      ]
+    },
+    {
+      "parameters": {
         "httpMethod": "POST",
         "path": "whatsapp-message-trigger",
         "responseMode": "onReceived",

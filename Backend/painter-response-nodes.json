@@ -3,6 +3,20 @@
   "nodes": [
     {
       "parameters": {
+        "content": "### Painter Decision Portal API & Visits Schedule\n\n**Functions & Features:**\n- **GET /painter-lead-details**: Serves masked site information for landing portal check.\n- **POST /painter-response**: Handles 'Accept' (shares location coordinates and contacts) and 'Decline' (triggers candidate selection).",
+        "height": 220,
+        "width": 340
+      },
+      "name": "Sticky Note - Painter Decision Portal API & Visits Schedule",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        100
+      ]
+    },
+    {
+      "parameters": {
         "httpMethod": "GET",
         "path": "painter-lead-details",
         "responseMode": "responseNode",

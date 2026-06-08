@@ -3,6 +3,20 @@
   "nodes": [
     {
       "parameters": {
+        "content": "### Painter Assignment Timeout Checker\n\n**Functions & Features:**\n- **Schedule Trigger**: Cron job running automatically every 2 hours.\n- **Timeout Detection**: Selects active assignments older than 6 hours.\n- **Status Update**: Modifies records to 'EXPIRED' status.\n- **Re-assignment webhook**: Triggers painter selection webhook.",
+        "height": 220,
+        "width": 340
+      },
+      "name": "Sticky Note - Painter Assignment Timeout Checker",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        100
+      ]
+    },
+    {
+      "parameters": {
         "rule": {
           "interval": [
             {

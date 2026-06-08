@@ -3,6 +3,20 @@
   "nodes": [
     {
       "parameters": {
+        "content": "### Stakeholder Dashboard API & Visit Check-in Geofencing\n\n**Functions & Features:**\n- **GET /user-open-leads**: Serves pipeline cards mapping to active roles.\n- **POST /start-visit**: Checks distance coordinates relative to registered location.\n- **POST /submit-estimate**: Saves new estimate specs and aggregates totals.\n- **Follow-up / Won / Lost webhooks**: Updates lead pipeline.",
+        "height": 220,
+        "width": 340
+      },
+      "name": "Sticky Note - Stakeholder Dashboard API & Visit Check-in Geofencing",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        100
+      ]
+    },
+    {
+      "parameters": {
         "httpMethod": "GET",
         "path": "user-open-leads",
         "responseMode": "responseNode",

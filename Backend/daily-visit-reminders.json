@@ -3,6 +3,20 @@
   "nodes": [
     {
       "parameters": {
+        "content": "### Daily Site Visit Reminders Cron\n\n**Functions & Features:**\n- **Daily 8AM Cron**: Triggers consultation checks for today's visits.\n- **Painter Alert**: Sends detailed requirements and link to schedule calendar.\n- **Customer Alert**: Sends consultation time and painter contact card details.",
+        "height": 220,
+        "width": 340
+      },
+      "name": "Sticky Note - Daily Site Visit Reminders Cron",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        100
+      ]
+    },
+    {
+      "parameters": {
         "rule": {
           "interval": [
             {
