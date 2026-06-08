@@ -51,10 +51,18 @@
             {
               "value2": "PAINTER",
               "output": 2
+            },
+            {
+              "value2": "DSE",
+              "output": 3
+            },
+            {
+              "value2": "DSO",
+              "output": 4
             }
           ]
         },
-        "fallbackOutput": 3
+        "fallbackOutput": 5
       },
       "name": "Switch - User Type Router",
       "type": "n8n-nodes-base.switch",
@@ -90,7 +98,7 @@
       "typeVersion": 4.1,
       "position": [
         780,
-        150
+        100
       ]
     },
     {
@@ -119,7 +127,7 @@
       "typeVersion": 4.1,
       "position": [
         780,
-        300
+        220
       ]
     },
     {
@@ -148,7 +156,84 @@
       "typeVersion": 4.1,
       "position": [
         780,
-        450
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=SELECT COALESCE(json_agg(t), '[]'::json) as scoped_data FROM ( SELECT lead_id, site_owner_name, site_owner_mobile, town, current_status, latest_estimate_total, painter_name, retailer_name FROM lead_detail_drilldown_view WHERE dse_id = '{{$node[\"Postgres - Look Up User\"].json[\"id\"]}}' OR dso_id = '{{$node[\"Postgres - Look Up User\"].json[\"id\"]}}' ) t;"
+      },
+      "name": "Postgres - Fetch Scoped Data",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        780,
+        480
+      ],
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "sendHeaders": true,
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"model\": \"gpt-4o-mini\", \"messages\": [{\"role\": \"system\", \"content\": \"You are the Berger Paints AI Agent assistant for DSEs (District Sales Executives) and DSOs (District Sales Officers). The following is the real-time database view representing all leads, retailers, and painters that report to you or are within your scope. You have access to NO other data.\\n\\n[SCOPED DATA]:\\n{{JSON.stringify($json.scoped_data)}}\\n\\nAnswer the user's question accurately, concisely, and professionally using only this data. Do not hallucinate or refer to external entities outside this scoped data. If they ask for something you do not have, politely state you do not have access to that information.\"}, {\"role\": \"user\", \"content\": \"{{$node[\"Webhook - WhatsApp Trigger\"].json[\"body\"][\"entry\"][0][\"changes\"][0][\"value\"][\"messages\"][0][\"text\"][\"body\"]}}\"}]}",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer your-openai-api-key-here"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        }
+      },
+      "name": "HTTP Request - OpenAI Agent",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1000,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v19.0/1034929049696068/messages",
+        "sendHeaders": true,
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Look Up User\"].json[\"mobile\"]}}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": \"{{$json[\"choices\"][0][\"message\"][\"content\"].replace(/\\\"/g, '\\\\\\\"').replace(/\\n/g, '\\\\n')}}\"\n  }\n}",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        }
+      },
+      "name": "HTTP Request - Send Agent WhatsApp",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1220,
+        480
       ]
     },
     {
@@ -177,7 +262,7 @@
       "typeVersion": 4.1,
       "position": [
         780,
-        600
+        640
       ]
     }
   ],
@@ -229,7 +314,43 @@
         ],
         [
           {
+            "node": "Postgres - Fetch Scoped Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Postgres - Fetch Scoped Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
             "node": "HTTP Request - Non Registered User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Fetch Scoped Data": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - OpenAI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - OpenAI Agent": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Send Agent WhatsApp",
             "type": "main",
             "index": 0
           }
