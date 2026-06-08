@@ -417,14 +417,8 @@
         "method": "POST",
         "url": "https://graph.facebook.com/v19.0/1034929049696068/messages",
         "sendHeaders": true,
-        "headersTemplates": {
-          "entries": [
-            {
-              "name": "Authorization",
-              "value": "Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD"
-            }
-          ]
-        },
+        "specifyHeaders": "json",
+        "headersJson": "={\n  \"Authorization\": \"Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD\",\n  \"Content-Type\": \"application/json\"\n}",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Query Followup Details\"].json[\"painter_mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"cta_url\",\n    \"header\": {\n      \"type\": \"text\",\n      \"text\": \"Follow Up Visit Scheduled\"\n    },\n    \"body\": {\n      \"text\": \"Dear {{$node[\"Postgres - Query Followup Details\"].json[\"painter_name\"]}},\nA follow-up has been scheduled for site: {{$node[\"Postgres - Query Followup Details\"].json[\"address_line1\"]}}{{$node[\"Postgres - Query Followup Details\"].json[\"address_line2\"] ? \", \" + $node[\"Postgres - Query Followup Details\"].json[\"address_line2\"] : \"\"}}, {{$node[\"Postgres - Query Followup Details\"].json[\"town\"]}}, {{$node[\"Postgres - Query Followup Details\"].json[\"state\"]}} - {{$node[\"Postgres - Query Followup Details\"].json[\"pincode\"]}}\nFollow-Up Date: {{$node[\"Postgres - Query Followup Details\"].json[\"formatted_followup_date\"]}}\nFollow-Up Time: {{$node[\"Postgres - Query Followup Details\"].json[\"formatted_followup_time\"]}} (IST 12hr format)\nRemarks:\n{{$node[\"Postgres - Query Followup Details\"].json[\"remarks\"]}}\nTrack Lead:\nhttps://lms-berger-ui.vercel.app/UI/open-leads-by-user-type.html?id={{$node[\"Postgres - Query Followup Details\"].json[\"painter_id\"]}}\n\nThank you,\nBerger Paints\"\n    },\n    \"action\": {\n      \"name\": \"cta_url\",\n      \"parameters\": {\n        \"display_text\": \"Track Lead\",\n        \"url\": \"https://lms-berger-ui.vercel.app/UI/open-leads-by-user-type.html?id={{$node[\"Postgres - Query Followup Details\"].json[\"painter_id\"]}}\"\n      }\n    }\n  }\n}"
@@ -442,14 +436,8 @@
         "method": "POST",
         "url": "https://graph.facebook.com/v19.0/1034929049696068/messages",
         "sendHeaders": true,
-        "headersTemplates": {
-          "entries": [
-            {
-              "name": "Authorization",
-              "value": "Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD"
-            }
-          ]
-        },
+        "specifyHeaders": "json",
+        "headersJson": "={\n  \"Authorization\": \"Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD\",\n  \"Content-Type\": \"application/json\"\n}",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Query Followup Details\"].json[\"retailer_mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"cta_url\",\n    \"header\": {\n      \"type\": \"text\",\n      \"text\": \"Follow Up Visit Scheduled\"\n    },\n    \"body\": {\n      \"text\": \"Dear {{$node[\"Postgres - Query Followup Details\"].json[\"retailer_name\"]}},\nA follow-up has been scheduled for site: {{$node[\"Postgres - Query Followup Details\"].json[\"address_line1\"]}}{{$node[\"Postgres - Query Followup Details\"].json[\"address_line2\"] ? \", \" + $node[\"Postgres - Query Followup Details\"].json[\"address_line2\"] : \"\"}}, {{$node[\"Postgres - Query Followup Details\"].json[\"town\"]}}, {{$node[\"Postgres - Query Followup Details\"].json[\"state\"]}} - {{$node[\"Postgres - Query Followup Details\"].json[\"pincode\"]}}\nFollow-Up Date: {{$node[\"Postgres - Query Followup Details\"].json[\"formatted_followup_date\"]}}\nFollow-Up Time: {{$node[\"Postgres - Query Followup Details\"].json[\"formatted_followup_time\"]}} (IST 12hr format)\nRemarks:\n{{$node[\"Postgres - Query Followup Details\"].json[\"remarks\"]}}\nTrack Lead:\nhttps://lms-berger-ui.vercel.app/UI/open-leads-by-user-type.html?id={{$node[\"Postgres - Query Followup Details\"].json[\"retailer_id\"]}}\n\nThank you,\nBerger Paints\"\n    },\n    \"action\": {\n      \"name\": \"cta_url\",\n      \"parameters\": {\n        \"display_text\": \"Track Lead\",\n        \"url\": \"https://lms-berger-ui.vercel.app/UI/open-leads-by-user-type.html?id={{$node[\"Postgres - Query Followup Details\"].json[\"retailer_id\"]}}\"\n      }\n    }\n  }\n}"
@@ -467,14 +455,8 @@
         "method": "POST",
         "url": "https://graph.facebook.com/v19.0/1034929049696068/messages",
         "sendHeaders": true,
-        "headersTemplates": {
-          "entries": [
-            {
-              "name": "Authorization",
-              "value": "Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD"
-            }
-          ]
-        },
+        "specifyHeaders": "json",
+        "headersJson": "={\n  \"Authorization\": \"Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD\",\n  \"Content-Type\": \"application/json\"\n}",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Query Followup Details\"].json[\"customer_mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"cta_url\",\n    \"header\": {\n      \"type\": \"text\",\n      \"text\": \"Follow Up Visit Scheduled\"\n    },\n    \"body\": {\n      \"text\": \"Dear {{$node[\"Postgres - Query Followup Details\"].json[\"customer_name\"]}},\nA follow-up has been scheduled for site: {{$node[\"Postgres - Query Followup Details\"].json[\"address_line1\"]}}{{$node[\"Postgres - Query Followup Details\"].json[\"address_line2\"] ? \", \" + $node[\"Postgres - Query Followup Details\"].json[\"address_line2\"] : \"\"}}, {{$node[\"Postgres - Query Followup Details\"].json[\"town\"]}}, {{$node[\"Postgres - Query Followup Details\"].json[\"state\"]}} - {{$node[\"Postgres - Query Followup Details\"].json[\"pincode\"]}}\nFollow-Up Date: {{$node[\"Postgres - Query Followup Details\"].json[\"formatted_followup_date\"]}}\nFollow-Up Time: {{$node[\"Postgres - Query Followup Details\"].json[\"formatted_followup_time\"]}} (IST 12hr format)\nRemarks:\n{{$node[\"Postgres - Query Followup Details\"].json[\"remarks\"]}}\nTrack Lead:\nhttps://lms-berger-ui.vercel.app/UI/open-leads-by-user-type.html?id={{$node[\"Postgres - Query Followup Details\"].json[\"customer_id\"]}}\n\nThank you,\nBerger Paints\"\n    },\n    \"action\": {\n      \"name\": \"cta_url\",\n      \"parameters\": {\n        \"display_text\": \"Track Lead\",\n        \"url\": \"https://lms-berger-ui.vercel.app/UI/open-leads-by-user-type.html?id={{$node[\"Postgres - Query Followup Details\"].json[\"customer_id\"]}}\"\n      }\n    }\n  }\n}"
@@ -889,14 +871,8 @@
         "method": "POST",
         "url": "https://graph.facebook.com/v19.0/1034929049696068/messages",
         "sendHeaders": true,
-        "headersTemplates": {
-          "entries": [
-            {
-              "name": "Authorization",
-              "value": "Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD"
-            }
-          ]
-        },
+        "specifyHeaders": "json",
+        "headersJson": "={\n  \"Authorization\": \"Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD\",\n  \"Content-Type\": \"application/json\"\n}",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Query Submitted Estimate Details\"].json[\"painter_mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"cta_url\",\n    \"header\": {\n      \"type\": \"text\",\n      \"text\": \"Estimate Submitted\"\n    },\n    \"body\": {\n      \"text\": \"Dear {{$node[\"Postgres - Query Submitted Estimate Details\"].json[\"painter_name\"]}},\nAn estimate has been submitted for site: {{$node[\"Postgres - Query Submitted Estimate Details\"].json[\"address_line1\"]}}{{$node[\"Postgres - Query Submitted Estimate Details\"].json[\"address_line2\"] ? \", \" + $node[\"Postgres - Query Submitted Estimate Details\"].json[\"address_line2\"] : \"\"}}, {{$node[\"Postgres - Query Submitted Estimate Details\"].json[\"town\"]}}, {{$node[\"Postgres - Query Submitted Estimate Details\"].json[\"state\"]}} - {{$node[\"Postgres - Query Submitted Estimate Details\"].json[\"pincode\"]}}\nEstimate Amount:\n₹{{$node[\"Postgres - Query Submitted Estimate Details\"].json[\"estimate_amount\"]}}\nView Estimate:\nhttps://lms-berger-ui.vercel.app/UI/view-estimate.html?userid={{$node[\"Postgres - Query Submitted Estimate Details\"].json[\"painter_id\"]}}&lead_id={{$node[\"Postgres - Query Submitted Estimate Details\"].json[\"lead_id\"]}}\n\nThank you,\nBerger Paints\"\n    },\n    \"action\": {\n      \"name\": \"cta_url\",\n      \"parameters\": {\n        \"display_text\": \"View Estimate\",\n        \"url\": \"https://lms-berger-ui.vercel.app/UI/view-estimate.html?userid={{$node[\"Postgres - Query Submitted Estimate Details\"].json[\"painter_id\"]}}&lead_id={{$node[\"Postgres - Query Submitted Estimate Details\"].json[\"lead_id\"]}}\"\n      }\n    }\n  }\n}"
@@ -914,14 +890,8 @@
         "method": "POST",
         "url": "https://graph.facebook.com/v19.0/1034929049696068/messages",
         "sendHeaders": true,
-        "headersTemplates": {
-          "entries": [
-            {
-              "name": "Authorization",
-              "value": "Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD"
-            }
-          ]
-        },
+        "specifyHeaders": "json",
+        "headersJson": "={\n  \"Authorization\": \"Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD\",\n  \"Content-Type\": \"application/json\"\n}",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Query Submitted Estimate Details\"].json[\"retailer_mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"cta_url\",\n    \"header\": {\n      \"type\": \"text\",\n      \"text\": \"Estimate Submitted\"\n    },\n    \"body\": {\n      \"text\": \"Dear {{$node[\"Postgres - Query Submitted Estimate Details\"].json[\"retailer_name\"]}},\nAn estimate has been submitted for site: {{$node[\"Postgres - Query Submitted Estimate Details\"].json[\"address_line1\"]}}{{$node[\"Postgres - Query Submitted Estimate Details\"].json[\"address_line2\"] ? \", \" + $node[\"Postgres - Query Submitted Estimate Details\"].json[\"address_line2\"] : \"\"}}, {{$node[\"Postgres - Query Submitted Estimate Details\"].json[\"town\"]}}, {{$node[\"Postgres - Query Submitted Estimate Details\"].json[\"state\"]}} - {{$node[\"Postgres - Query Submitted Estimate Details\"].json[\"pincode\"]}}\nEstimate Amount:\n₹{{$node[\"Postgres - Query Submitted Estimate Details\"].json[\"estimate_amount\"]}}\nView Estimate:\nhttps://lms-berger-ui.vercel.app/UI/view-estimate.html?userid={{$node[\"Postgres - Query Submitted Estimate Details\"].json[\"retailer_id\"]}}&lead_id={{$node[\"Postgres - Query Submitted Estimate Details\"].json[\"lead_id\"]}}\n\nThank you,\nBerger Paints\"\n    },\n    \"action\": {\n      \"name\": \"cta_url\",\n      \"parameters\": {\n        \"display_text\": \"View Estimate\",\n        \"url\": \"https://lms-berger-ui.vercel.app/UI/view-estimate.html?userid={{$node[\"Postgres - Query Submitted Estimate Details\"].json[\"retailer_id\"]}}&lead_id={{$node[\"Postgres - Query Submitted Estimate Details\"].json[\"lead_id\"]}}\"\n      }\n    }\n  }\n}"
@@ -939,14 +909,8 @@
         "method": "POST",
         "url": "https://graph.facebook.com/v19.0/1034929049696068/messages",
         "sendHeaders": true,
-        "headersTemplates": {
-          "entries": [
-            {
-              "name": "Authorization",
-              "value": "Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD"
-            }
-          ]
-        },
+        "specifyHeaders": "json",
+        "headersJson": "={\n  \"Authorization\": \"Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD\",\n  \"Content-Type\": \"application/json\"\n}",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Query Submitted Estimate Details\"].json[\"customer_mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"cta_url\",\n    \"header\": {\n      \"type\": \"text\",\n      \"text\": \"Estimate Submitted\"\n    },\n    \"body\": {\n      \"text\": \"Dear {{$node[\"Postgres - Query Submitted Estimate Details\"].json[\"customer_name\"]}},\nAn estimate has been submitted for site: {{$node[\"Postgres - Query Submitted Estimate Details\"].json[\"address_line1\"]}}{{$node[\"Postgres - Query Submitted Estimate Details\"].json[\"address_line2\"] ? \", \" + $node[\"Postgres - Query Submitted Estimate Details\"].json[\"address_line2\"] : \"\"}}, {{$node[\"Postgres - Query Submitted Estimate Details\"].json[\"town\"]}}, {{$node[\"Postgres - Query Submitted Estimate Details\"].json[\"state\"]}} - {{$node[\"Postgres - Query Submitted Estimate Details\"].json[\"pincode\"]}}\nEstimate Amount:\n₹{{$node[\"Postgres - Query Submitted Estimate Details\"].json[\"estimate_amount\"]}}\nView Estimate:\nhttps://lms-berger-ui.vercel.app/UI/view-estimate.html?userid={{$node[\"Postgres - Query Submitted Estimate Details\"].json[\"customer_id\"]}}&lead_id={{$node[\"Postgres - Query Submitted Estimate Details\"].json[\"lead_id\"]}}\n\nThank you,\nBerger Paints\"\n    },\n    \"action\": {\n      \"name\": \"cta_url\",\n      \"parameters\": {\n        \"display_text\": \"View Estimate\",\n        \"url\": \"https://lms-berger-ui.vercel.app/UI/view-estimate.html?userid={{$node[\"Postgres - Query Submitted Estimate Details\"].json[\"customer_id\"]}}&lead_id={{$node[\"Postgres - Query Submitted Estimate Details\"].json[\"lead_id\"]}}\"\n      }\n    }\n  }\n}"
@@ -1085,14 +1049,8 @@
         "method": "POST",
         "url": "https://graph.facebook.com/v19.0/1034929049696068/messages",
         "sendHeaders": true,
-        "headersTemplates": {
-          "entries": [
-            {
-              "name": "Authorization",
-              "value": "Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD"
-            }
-          ]
-        },
+        "specifyHeaders": "json",
+        "headersJson": "={\n  \"Authorization\": \"Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD\",\n  \"Content-Type\": \"application/json\"\n}",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Query Site Won Details\"].json[\"painter_mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"cta_url\",\n    \"header\": {\n      \"type\": \"text\",\n      \"text\": \"Site Converted\"\n    },\n    \"body\": {\n      \"text\": \"Dear {{$node[\"Postgres - Query Site Won Details\"].json[\"painter_name\"]}},\n\nCongratulations! Site at {{$node[\"Postgres - Query Site Won Details\"].json[\"address_line1\"]}}{{$node[\"Postgres - Query Site Won Details\"].json[\"address_line2\"] ? \", \" + $node[\"Postgres - Query Site Won Details\"].json[\"address_line2\"] : \"\"}}, {{$node[\"Postgres - Query Site Won Details\"].json[\"town\"]}}, {{$node[\"Postgres - Query Site Won Details\"].json[\"state\"]}} - {{$node[\"Postgres - Query Site Won Details\"].json[\"pincode\"]}} has been converted. To view latest estimate click link below.\n\nThank you,\nBerger Paints\"\n    },\n    \"action\": {\n      \"name\": \"cta_url\",\n      \"parameters\": {\n        \"display_text\": \"View Estimate\",\n        \"url\": \"https://lms-berger-ui.vercel.app/UI/view-estimate.html?userid={{$node[\"Postgres - Query Site Won Details\"].json[\"painter_id\"]}}&lead_id={{$node[\"Postgres - Query Site Won Details\"].json[\"lead_id\"]}}\"\n      }\n    }\n  }\n}"
@@ -1110,14 +1068,8 @@
         "method": "POST",
         "url": "https://graph.facebook.com/v19.0/1034929049696068/messages",
         "sendHeaders": true,
-        "headersTemplates": {
-          "entries": [
-            {
-              "name": "Authorization",
-              "value": "Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD"
-            }
-          ]
-        },
+        "specifyHeaders": "json",
+        "headersJson": "={\n  \"Authorization\": \"Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD\",\n  \"Content-Type\": \"application/json\"\n}",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Query Site Won Details\"].json[\"retailer_mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"cta_url\",\n    \"header\": {\n      \"type\": \"text\",\n      \"text\": \"Site Converted\"\n    },\n    \"body\": {\n      \"text\": \"Dear {{$node[\"Postgres - Query Site Won Details\"].json[\"retailer_name\"]}},\n\nCongratulations! Site at {{$node[\"Postgres - Query Site Won Details\"].json[\"address_line1\"]}}{{$node[\"Postgres - Query Site Won Details\"].json[\"address_line2\"] ? \", \" + $node[\"Postgres - Query Site Won Details\"].json[\"address_line2\"] : \"\"}}, {{$node[\"Postgres - Query Site Won Details\"].json[\"town\"]}}, {{$node[\"Postgres - Query Site Won Details\"].json[\"state\"]}} - {{$node[\"Postgres - Query Site Won Details\"].json[\"pincode\"]}} has been converted. To view latest estimate click link below.\n\nThank you,\nBerger Paints\"\n    },\n    \"action\": {\n      \"name\": \"cta_url\",\n      \"parameters\": {\n        \"display_text\": \"View Estimate\",\n        \"url\": \"https://lms-berger-ui.vercel.app/UI/view-estimate.html?userid={{$node[\"Postgres - Query Site Won Details\"].json[\"retailer_id\"]}}&lead_id={{$node[\"Postgres - Query Site Won Details\"].json[\"lead_id\"]}}\"\n      }\n    }\n  }\n}"
@@ -1135,14 +1087,8 @@
         "method": "POST",
         "url": "https://graph.facebook.com/v19.0/1034929049696068/messages",
         "sendHeaders": true,
-        "headersTemplates": {
-          "entries": [
-            {
-              "name": "Authorization",
-              "value": "Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD"
-            }
-          ]
-        },
+        "specifyHeaders": "json",
+        "headersJson": "={\n  \"Authorization\": \"Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD\",\n  \"Content-Type\": \"application/json\"\n}",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Query Site Won Details\"].json[\"customer_mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"cta_url\",\n    \"header\": {\n      \"type\": \"text\",\n      \"text\": \"Site Converted\"\n    },\n    \"body\": {\n      \"text\": \"Dear {{$node[\"Postgres - Query Site Won Details\"].json[\"customer_name\"]}},\n\nCongratulations! Site at {{$node[\"Postgres - Query Site Won Details\"].json[\"address_line1\"]}}{{$node[\"Postgres - Query Site Won Details\"].json[\"address_line2\"] ? \", \" + $node[\"Postgres - Query Site Won Details\"].json[\"address_line2\"] : \"\"}}, {{$node[\"Postgres - Query Site Won Details\"].json[\"town\"]}}, {{$node[\"Postgres - Query Site Won Details\"].json[\"state\"]}} - {{$node[\"Postgres - Query Site Won Details\"].json[\"pincode\"]}} has been converted. To view latest estimate click link below.\n\nThank you,\nBerger Paints\"\n    },\n    \"action\": {\n      \"name\": \"cta_url\",\n      \"parameters\": {\n        \"display_text\": \"View Estimate\",\n        \"url\": \"https://lms-berger-ui.vercel.app/UI/view-estimate.html?userid={{$node[\"Postgres - Query Site Won Details\"].json[\"customer_id\"]}}&lead_id={{$node[\"Postgres - Query Site Won Details\"].json[\"lead_id\"]}}\"\n      }\n    }\n  }\n}"
@@ -1345,14 +1291,8 @@
         "method": "POST",
         "url": "https://graph.facebook.com/v19.0/1034929049696068/messages",
         "sendHeaders": true,
-        "headersTemplates": {
-          "entries": [
-            {
-              "name": "Authorization",
-              "value": "Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD"
-            }
-          ]
-        },
+        "specifyHeaders": "json",
+        "headersJson": "={\n  \"Authorization\": \"Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD\",\n  \"Content-Type\": \"application/json\"\n}",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Query Site Lost Details\"].json[\"painter_mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"cta_url\",\n    \"header\": {\n      \"type\": \"text\",\n      \"text\": \"Site Lost\"\n    },\n    \"body\": {\n      \"text\": \"Dear {{$node[\"Postgres - Query Site Lost Details\"].json[\"painter_name\"]}},\\n\\nSite at {{$node[\"Postgres - Query Site Lost Details\"].json[\"address_line1\"]}}{{$node[\"Postgres - Query Site Lost Details\"].json[\"address_line2\"] ? \", \" + $node[\"Postgres - Query Site Lost Details\"].json[\"address_line2\"] : \"\"}}, {{$node[\"Postgres - Query Site Lost Details\"].json[\"town\"]}}, {{$node[\"Postgres - Query Site Lost Details\"].json[\"state\"]}} - {{$node[\"Postgres - Query Site Lost Details\"].json[\"pincode\"]}} has been marked as lost.\\nLoss reason: {{$node[\"Postgres - Query Site Lost Details\"].json[\"loss_reason\"] || 'Not Specified'}}\\n\\nThank you,\\nBerger Paints\"\n    },\n    \"action\": {\n      \"name\": \"cta_url\",\n      \"parameters\": {\n        \"display_text\": \"Track Pipeline\",\n        \"url\": \"https://lms-berger-ui.vercel.app/UI/open-leads-by-user-type.html?id={{$node[\"Postgres - Query Site Lost Details\"].json[\"painter_id\"]}}\"\n      }\n    }\n  }\n}"
@@ -1370,14 +1310,8 @@
         "method": "POST",
         "url": "https://graph.facebook.com/v19.0/1034929049696068/messages",
         "sendHeaders": true,
-        "headersTemplates": {
-          "entries": [
-            {
-              "name": "Authorization",
-              "value": "Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD"
-            }
-          ]
-        },
+        "specifyHeaders": "json",
+        "headersJson": "={\n  \"Authorization\": \"Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD\",\n  \"Content-Type\": \"application/json\"\n}",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Query Site Lost Details\"].json[\"retailer_mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"cta_url\",\n    \"header\": {\n      \"type\": \"text\",\n      \"text\": \"Site Lost\"\n    },\n    \"body\": {\n      \"text\": \"Dear {{$node[\"Postgres - Query Site Lost Details\"].json[\"retailer_name\"]}},\\n\\nSite at {{$node[\"Postgres - Query Site Lost Details\"].json[\"address_line1\"]}}{{$node[\"Postgres - Query Site Lost Details\"].json[\"address_line2\"] ? \", \" + $node[\"Postgres - Query Site Lost Details\"].json[\"address_line2\"] : \"\"}}, {{$node[\"Postgres - Query Site Lost Details\"].json[\"town\"]}}, {{$node[\"Postgres - Query Site Lost Details\"].json[\"state\"]}} - {{$node[\"Postgres - Query Site Lost Details\"].json[\"pincode\"]}} has been marked as lost.\\nLoss reason: {{$node[\"Postgres - Query Site Lost Details\"].json[\"loss_reason\"] || 'Not Specified'}}\\n\\nThank you,\\nBerger Paints\"\n    },\n    \"action\": {\n      \"name\": \"cta_url\",\n      \"parameters\": {\n        \"display_text\": \"Track Pipeline\",\n        \"url\": \"https://lms-berger-ui.vercel.app/UI/open-leads-by-user-type.html?id={{$node[\"Postgres - Query Site Lost Details\"].json[\"retailer_id\"]}}\"\n      }\n    }\n  }\n}"
@@ -1395,14 +1329,8 @@
         "method": "POST",
         "url": "https://graph.facebook.com/v19.0/1034929049696068/messages",
         "sendHeaders": true,
-        "headersTemplates": {
-          "entries": [
-            {
-              "name": "Authorization",
-              "value": "Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD"
-            }
-          ]
-        },
+        "specifyHeaders": "json",
+        "headersJson": "={\n  \"Authorization\": \"Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD\",\n  \"Content-Type\": \"application/json\"\n}",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Query Site Lost Details\"].json[\"customer_mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"cta_url\",\n    \"header\": {\n      \"type\": \"text\",\n      \"text\": \"Site Lost\"\n    },\n    \"body\": {\n      \"text\": \"Dear {{$node[\"Postgres - Query Site Lost Details\"].json[\"customer_name\"]}},\\n\\nSite at {{$node[\"Postgres - Query Site Lost Details\"].json[\"address_line1\"]}}{{$node[\"Postgres - Query Site Lost Details\"].json[\"address_line2\"] ? \", \" + $node[\"Postgres - Query Site Lost Details\"].json[\"address_line2\"] : \"\"}}, {{$node[\"Postgres - Query Site Lost Details\"].json[\"town\"]}}, {{$node[\"Postgres - Query Site Lost Details\"].json[\"state\"]}} - {{$node[\"Postgres - Query Site Lost Details\"].json[\"pincode\"]}} has been marked as lost.\\nLoss reason: {{$node[\"Postgres - Query Site Lost Details\"].json[\"loss_reason\"] || 'Not Specified'}}\\n\\nThank you,\\nBerger Paints\"\n    },\n    \"action\": {\n      \"name\": \"cta_url\",\n      \"parameters\": {\n        \"display_text\": \"Track Pipeline\",\n        \"url\": \"https://lms-berger-ui.vercel.app/UI/open-leads-by-user-type.html?id={{$node[\"Postgres - Query Site Lost Details\"].json[\"customer_id\"]}}\"\n      }\n    }\n  }\n}"
