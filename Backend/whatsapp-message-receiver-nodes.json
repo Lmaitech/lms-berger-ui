@@ -33,6 +33,208 @@
     {
       "parameters": {
         "dataType": "string",
+        "value1": "={{$node[\"WhatsApp Trigger\"].json.message.type}}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "button"
+            }
+          ]
+        },
+        "fallbackOutput": 1
+      },
+      "name": "Switch - Message Type Router",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        540,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{$node[\"WhatsApp Trigger\"].json.message.button.payload}}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "customer_track_enquiry"
+            },
+            {
+              "value2": "retailer_open_leads",
+              "output": 1
+            },
+            {
+              "value2": "retailer_capture_lead",
+              "output": 2
+            },
+            {
+              "value2": "painter_open_leads",
+              "output": 3
+            },
+            {
+              "value2": "painter_calendar",
+              "output": 4
+            }
+          ]
+        }
+      },
+      "name": "Switch - Button Payload Router",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        760,
+        150
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v19.0/1034929049696068/messages",
+        "sendHeaders": true,
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Look Up User\"].json[\"mobile\"]}}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": \"Here is your tracking link:\\nhttps://lms-berger-ui.vercel.app/open-leads-by-user-type.html?id={{$node[\"Postgres - Look Up User\"].json[\"id\"]}}\"\n  }\n}",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        }
+      },
+      "name": "HTTP Request - Customer Link Responder",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1000,
+        20
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v19.0/1034929049696068/messages",
+        "sendHeaders": true,
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Look Up User\"].json[\"mobile\"]}}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": \"Here is your open leads dashboard link:\\nhttps://lms-berger-ui.vercel.app/open-leads-by-user-type.html?id={{$node[\"Postgres - Look Up User\"].json[\"id\"]}}\"\n  }\n}",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        }
+      },
+      "name": "HTTP Request - Retailer Open Leads Responder",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1000,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v19.0/1034929049696068/messages",
+        "sendHeaders": true,
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Look Up User\"].json[\"mobile\"]}}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": \"Here is your lead registration form link:\\nhttps://lms-berger-ui.vercel.app/lead-capture-form.html\"\n  }\n}",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        }
+      },
+      "name": "HTTP Request - Retailer Capture Link Responder",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1000,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v19.0/1034929049696068/messages",
+        "sendHeaders": true,
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Look Up User\"].json[\"mobile\"]}}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": \"Here is your open leads dashboard link:\\nhttps://lms-berger-ui.vercel.app/open-leads-by-user-type.html?id={{$node[\"Postgres - Look Up User\"].json[\"id\"]}}\"\n  }\n}",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        }
+      },
+      "name": "HTTP Request - Painter Open Leads Responder",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1000,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v19.0/1034929049696068/messages",
+        "sendHeaders": true,
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Look Up User\"].json[\"mobile\"]}}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": \"Here is your calendar link:\\nhttps://lms-berger-ui.vercel.app/painter-calendar.html?painter_id={{$node[\"Postgres - Look Up User\"].json[\"id\"]}}\"\n  }\n}",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        }
+      },
+      "name": "HTTP Request - Painter Calendar Link Responder",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1000,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "dataType": "string",
         "value1": "={{$json[\"user_type\"]}}",
         "rules": {
           "rules": [
@@ -63,8 +265,8 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 1,
       "position": [
-        540,
-        300
+        760,
+        600
       ]
     },
     {
@@ -74,7 +276,7 @@
         "sendHeaders": true,
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$json[\"mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"cta_url\",\n    \"header\": {\n      \"type\": \"text\",\n      \"text\": \"Welcome to Berger LMS\"\n    },\n    \"body\": {\n      \"text\": \"Welcome to Berger LMS, {{$json[\"name\"]}}!\\nTo view and track the status of your painting enquiry/lead, please click the button below.\\n\\nThank you,\\nBerger Paints\"\n    },\n    \"action\": {\n      \"name\": \"cta_url\",\n      \"parameters\": {\n        \"display_text\": \"Track Enquiry\",\n        \"url\": \"https://lms-berger-ui.vercel.app/open-leads-by-user-type.html?id={{$json[\"id\"]}}\"\n      }\n    }\n  }\n}",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$json[\"mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"button\",\n    \"header\": {\n      \"type\": \"text\",\n      \"text\": \"Welcome to Berger LMS\"\n    },\n    \"body\": {\n      \"text\": \"Welcome to Berger LMS, {{$json[\"name\"]}}!\\nTo view and track the status of your painting enquiry/lead, please click the button below.\"\n    },\n    \"action\": {\n      \"buttons\": [\n        {\n          \"type\": \"reply\",\n          \"reply\": {\n            \"id\": \"customer_track_enquiry\",\n            \"title\": \"Track Enquiry\"\n          }\n        }\n      ]\n    }\n  }\n}",
         "headerParameters": {
           "parameters": [
             {
@@ -88,70 +290,12 @@
           ]
         }
       },
-      "name": "HTTP Request - Customer Welcome",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.1,
-      "position": [
-        780,
-        100
-      ]
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "https://graph.facebook.com/v19.0/1034929049696068/messages",
-        "sendHeaders": true,
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$json[\"mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"cta_url\",\n    \"header\": {\n      \"type\": \"text\",\n      \"text\": \"Welcome to Berger LMS\"\n    },\n    \"body\": {\n      \"text\": \"Welcome to Berger LMS, {{$json[\"name\"]}} (Retailer)!\\nClick the button below to view and manage all your active and open lead client sites.\"\n    },\n    \"action\": {\n      \"name\": \"cta_url\",\n      \"parameters\": {\n        \"display_text\": \"View Open Leads\",\n        \"url\": \"https://lms-berger-ui.vercel.app/open-leads-by-user-type.html?id={{$json[\"id\"]}}\"\n      }\n    }\n  }\n}",
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Authorization",
-              "value": "Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD"
-            },
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            }
-          ]
-        }
-      },
-      "name": "HTTP Request - Retailer Welcome",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.1,
-      "position": [
-        780,
-        220
-      ]
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "https://graph.facebook.com/v19.0/1034929049696068/messages",
-        "sendHeaders": true,
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Look Up User\"].json[\"mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"cta_url\",\n    \"header\": {\n      \"type\": \"text\",\n      \"text\": \"Enter New Lead\"\n    },\n    \"body\": {\n      \"text\": \"To register a new customer painting consultation in the system, click the button below.\"\n    },\n    \"action\": {\n      \"name\": \"cta_url\",\n      \"parameters\": {\n        \"display_text\": \"Enter Lead\",\n        \"url\": \"https://lms-berger-ui.vercel.app/lead-capture-form.html\"\n      }\n    }\n  }\n}",
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Authorization",
-              "value": "Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD"
-            },
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            }
-          ]
-        }
-      },
-      "name": "HTTP Request - Retailer Capture Link",
+      "name": "HTTP Request - Customer Menu",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
       "position": [
         1000,
-        220
+        550
       ]
     },
     {
@@ -161,7 +305,7 @@
         "sendHeaders": true,
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$json[\"mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"cta_url\",\n    \"header\": {\n      \"type\": \"text\",\n      \"text\": \"Welcome to Berger LMS\"\n    },\n    \"body\": {\n      \"text\": \"Welcome to Berger LMS, {{$json[\"name\"]}} (Painter)!\\nClick the button below to view and track all your active painting site visits.\"\n    },\n    \"action\": {\n      \"name\": \"cta_url\",\n      \"parameters\": {\n        \"display_text\": \"Open Leads\",\n        \"url\": \"https://lms-berger-ui.vercel.app/open-leads-by-user-type.html?id={{$json[\"id\"]}}\"\n      }\n    }\n  }\n}",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$json[\"mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"button\",\n    \"header\": {\n      \"type\": \"text\",\n      \"text\": \"Welcome to Berger LMS\"\n    },\n    \"body\": {\n      \"text\": \"Welcome to Berger LMS, {{$json[\"name\"]}} (Retailer)!\\nManage your active pipeline or capture new customer leads using the options below:\"\n    },\n    \"action\": {\n      \"buttons\": [\n        {\n          \"type\": \"reply\",\n          \"reply\": {\n            \"id\": \"retailer_open_leads\",\n            \"title\": \"View Open Leads\"\n          }\n        },\n        {\n          \"type\": \"reply\",\n          \"reply\": {\n            \"id\": \"retailer_capture_lead\",\n            \"title\": \"Enter New Lead\"\n          }\n        }\n      ]\n    }\n  }\n}",
         "headerParameters": {
           "parameters": [
             {
@@ -175,41 +319,41 @@
           ]
         }
       },
-      "name": "HTTP Request - Painter Welcome",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.1,
-      "position": [
-        780,
-        340
-      ]
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "https://graph.facebook.com/v19.0/1034929049696068/messages",
-        "sendHeaders": true,
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Look Up User\"].json[\"mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"cta_url\",\n    \"header\": {\n      \"type\": \"text\",\n      \"text\": \"Your Schedule Calendar\"\n    },\n    \"body\": {\n      \"text\": \"To view your consultation schedule, calendar entries, and check-in details, click the button below.\"\n    },\n    \"action\": {\n      \"name\": \"cta_url\",\n      \"parameters\": {\n        \"display_text\": \"View Calendar\",\n        \"url\": \"https://lms-berger-ui.vercel.app/painter-calendar.html?painter_id={{$node[\"Postgres - Look Up User\"].json[\"id\"]}}\"\n      }\n    }\n  }\n}",
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Authorization",
-              "value": "Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD"
-            },
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            }
-          ]
-        }
-      },
-      "name": "HTTP Request - Painter Calendar Link",
+      "name": "HTTP Request - Retailer Menu",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
       "position": [
         1000,
-        340
+        660
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v19.0/1034929049696068/messages",
+        "sendHeaders": true,
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$json[\"mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"button\",\n    \"header\": {\n      \"type\": \"text\",\n      \"text\": \"Welcome to Berger LMS\"\n    },\n    \"body\": {\n      \"text\": \"Welcome to Berger LMS, {{$json[\"name\"]}} (Painter)!\\nAccess your active painting assignments or view your schedule calendar using the options below:\"\n    },\n    \"action\": {\n      \"buttons\": [\n        {\n          \"type\": \"reply\",\n          \"reply\": {\n            \"id\": \"painter_open_leads\",\n            \"title\": \"Open Leads\"\n          }\n        },\n        {\n          \"type\": \"reply\",\n          \"reply\": {\n            \"id\": \"painter_calendar\",\n            \"title\": \"View Calendar\"\n          }\n        }\n      ]\n    }\n  }\n}",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        }
+      },
+      "name": "HTTP Request - Painter Menu",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1000,
+        780
       ]
     },
     {
@@ -221,8 +365,8 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 1,
       "position": [
-        780,
-        480
+        1000,
+        900
       ],
       "credentials": {
         "postgresDb": {
@@ -256,8 +400,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
       "position": [
-        1000,
-        480
+        1220,
+        900
       ]
     },
     {
@@ -285,8 +429,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
       "position": [
-        1220,
-        480
+        1440,
+        900
       ]
     },
     {
@@ -314,13 +458,13 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
       "position": [
-        780,
-        640
+        1000,
+        1020
       ]
     },
     {
       "parameters": {
-        "content": "### WhatsApp Message Receiver & AI Agent Router\n\n**Functions & Features:**\n- **WhatsApp Trigger**: Listens for incoming WhatsApp messages.\n- **Lookup & Switch**: Matches user's mobile against database and routes them by role.\n- **Sequential Buttons**: Sends welcome and tools as separate CTA URL buttons for Retailer and Painter roles.\n- **DSE/DSO AI Agent**: Secure aggregated query and OpenAI mini inference pipeline.",
+        "content": "### WhatsApp Message Receiver & AI Agent Router\n\n**Functions & Features:**\n- **WhatsApp Trigger**: Listens for incoming WhatsApp messages.\n- **Message Type Switch**: Detects text messages versus button click replies.\n- **Quick-Reply Buttons**: Delivers an interactive multiple choice button menu to users.\n- **Link Responders**: Instantly returns the specific Vercel URL payload upon click.\n- **DSE/DSO AI Agent**: Secure aggregated query and OpenAI mini inference pipeline.",
         "height": 220,
         "width": 340
       },
@@ -349,7 +493,64 @@
       "main": [
         [
           {
+            "node": "Switch - Message Type Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch - Message Type Router": {
+      "main": [
+        [
+          {
+            "node": "Switch - Button Payload Router",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
             "node": "Switch - User Type Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch - Button Payload Router": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Customer Link Responder",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request - Retailer Open Leads Responder",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request - Retailer Capture Link Responder",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request - Painter Open Leads Responder",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request - Painter Calendar Link Responder",
             "type": "main",
             "index": 0
           }
@@ -360,21 +561,21 @@
       "main": [
         [
           {
-            "node": "HTTP Request - Customer Welcome",
+            "node": "HTTP Request - Customer Menu",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "HTTP Request - Retailer Welcome",
+            "node": "HTTP Request - Retailer Menu",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "HTTP Request - Painter Welcome",
+            "node": "HTTP Request - Painter Menu",
             "type": "main",
             "index": 0
           }
@@ -396,28 +597,6 @@
         [
           {
             "node": "HTTP Request - Non Registered User",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "HTTP Request - Retailer Welcome": {
-      "main": [
-        [
-          {
-            "node": "HTTP Request - Retailer Capture Link",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "HTTP Request - Painter Welcome": {
-      "main": [
-        [
-          {
-            "node": "HTTP Request - Painter Calendar Link",
             "type": "main",
             "index": 0
           }
