@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Berger LMS - Painter Visit Calendar</title>
+  <!-- Modern Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root {
+      --primary-purple: #3A0066;
+      --secondary-purple: #1A0033;
+      --berger-yellow: #FFCC00;
+      --dark-bg: #0A0214;
+      --card-bg: rgba(25, 10, 45, 0.7);
+      --card-border: rgba(255, 204, 0, 0.2);
+      --glass-glow: rgba(147, 51, 234, 0.25);
+      --text-main: #F3E8FF;
+      --text-muted: #C084FC;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background-color: var(--dark-bg);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(58, 0, 102, 0.4) 0%, transparent 50%),
+        radial-gradient(circle at 90% 80%, rgba(255, 204, 0, 0.15) 0%, transparent 50%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1.5rem 1rem;
+    }
+
+    /* Page container */
+    .calendar-container {
+      width: 100%;
+      max-width: 500px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* Header component */
+    .header-card {
+      background: linear-gradient(135deg, var(--primary-purple), var(--secondary-purple));
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 1.5rem;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px var(--glass-glow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255, 204, 0, 0.05) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .logo-img {
+      height: 50px;
+      margin-bottom: 0.75rem;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
+    }
+
+    .header-card h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #FFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .header-card h1 span {
+      color: var(--berger-yellow);
+    }
+
+    .header-card p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    /* Quick Stats Panel */
+    .stats-panel {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 1rem;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--card-border);
+    }
+
+    .stat-card .num {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--berger-yellow);
+      margin-bottom: 0.2rem;
+    }
+
+    .stat-card .label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* Tab Layout switcher */
+    .tab-switcher {
+      background: rgba(25, 10, 45, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 0.35rem;
+      border-radius: 12px;
+      display: flex;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.8);
+    }
+
+    .tab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 0.75rem 1rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, var(--berger-yellow), #E0B300);
+      color: var(--secondary-purple);
+      box-shadow: 0 4px 12px rgba(255, 204, 0, 0.3);
+    }
+
+    /* Scrollable Schedule View */
+    .schedule-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      min-height: 250px;
+    }
+
+    /* Individual site cards */
+    .site-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 18px;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+      position: relative;
+      transition: all 0.3s ease;
+      animation: fadeInUp 0.4s ease forwards;
+    }
+
+    .site-card:hover {
+      border-color: rgba(255, 204, 0, 0.4);
+      transform: translateY(-2px) scale(1.01);
+      box-shadow: 0 10px 30px rgba(147, 51, 234, 0.15);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .date-badge {
+      background: rgba(192, 132, 252, 0.15);
+      border: 1px solid rgba(192, 132, 252, 0.3);
+      padding: 0.35rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .time-badge {
+      background: rgba(255, 204, 0, 0.15);
+      border: 1px solid rgba(255, 204, 0, 0.3);
+      padding: 0.35rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--berger-yellow);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .client-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .client-name {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #FFF;
+    }
+
+    .client-address {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      line-height: 1.4;
+    }
+
+    .client-actions {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 0.25rem;
+    }
+
+    .action-btn {
+      flex: 1;
+      padding: 0.7rem 1rem;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-main);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--berger-yellow), #E0B300);
+      border: none;
+      color: var(--secondary-purple);
+      box-shadow: 0 4px 12px rgba(255, 204, 0, 0.25);
+    }
+
+    .btn-primary:hover {
+      transform: scale(1.02);
+      box-shadow: 0 6px 15px rgba(255, 204, 0, 0.35);
+    }
+
+    /* Back control */
+    .back-btn-container {
+      margin-top: 0.5rem;
+      text-align: center;
+    }
+
+    .back-dashboard-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--berger-yellow);
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      background: rgba(255, 204, 0, 0.05);
+      border: 1px solid rgba(255, 204, 0, 0.1);
+    }
+
+    .back-dashboard-btn:hover {
+      background: rgba(255, 204, 0, 0.15);
+      transform: translateX(-2px);
+    }
+
+    /* Loading overlay */
+    .loader-overlay {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+      min-height: 250px;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(255, 204, 0, 0.1);
+      border-top-color: var(--berger-yellow);
+      border-radius: 50%;
+      animation: spin 1s infinite linear;
+    }
+
+    /* Empty state */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      text-align: center;
+      min-height: 250px;
+      color: var(--text-muted);
+    }
+
+    .empty-state i {
+      font-size: 3rem;
+      color: rgba(255, 204, 0, 0.3);
+      margin-bottom: 0.5rem;
+    }
+
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="calendar-container">
+    <!-- Header -->
+    <div class="header-card">
+      <img src="assets/berger_logo.png" alt="Berger Logo" class="logo-img" onerror="this.src='https://raw.githubusercontent.com/Lmaitech/whatsapp-assets/main/LeadRegistered.jpg'; this.style.borderRadius='10px';">
+      <h1>Consultation <span>Calendar</span></h1>
+      <p id="painter-name-subtitle">LMS Portal Scheduler</p>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="stats-panel">
+      <div class="stat-card">
+        <div class="num" id="stat-scheduled">0</div>
+        <div class="label">Scheduled Visits</div>
+      </div>
+      <div class="stat-card">
+        <div class="num" id="stat-completed">0</div>
+        <div class="label">Completed Visits</div>
+      </div>
+    </div>
+
+    <!-- Tab switcher -->
+    <div class="tab-switcher">
+      <button class="tab-btn active" id="tab-scheduled-btn" onclick="switchTab('scheduled')">
+        <i class="fa-solid fa-calendar-day"></i> Scheduled
+      </button>
+      <button class="tab-btn" id="tab-completed-btn" onclick="switchTab('completed')">
+        <i class="fa-solid fa-circle-check"></i> Completed
+      </button>
+    </div>
+
+    <!-- Main Dynamic List -->
+    <div class="schedule-list" id="schedule-list">
+      <div class="loader-overlay">
+        <div class="spinner"></div>
+        <p>Retrieving your schedule...</p>
+      </div>
+    </div>
+
+    <!-- Return Link -->
+    <div class="back-btn-container">
+      <a href="#" class="back-dashboard-btn" id="back-dashboard-link">
+        <i class="fa-solid fa-arrow-left-long"></i> Back to Dashboard
+      </a>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script>
+    // Get painter ID from URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const painterId = urlParams.get('painter_id');
+
+    let allVisits = [];
+    let currentTab = 'scheduled';
+
+    // Route return link back to active dashboard
+    const backLink = document.getElementById('back-dashboard-link');
+    if (painterId) {
+      backLink.href = `open-leads-by-user-type.html?id=${painterId}`;
+    } else {
+      backLink.href = `open-leads-by-user-type.html`;
+    }
+
+    // Initialize and fetch data
+    async function loadCalendar() {
+      if (!painterId) {
+        document.getElementById('schedule-list').innerHTML = `
+          <div class="empty-state">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <h3>Missing Painter ID</h3>
+            <p>Please log in or click the link sent to your mobile phone number.</p>
+          </div>
+        `;
+        return;
+      }
+
+      try {
+        const response = await fetch(`${CONFIG.N8N_WEBHOOK_URL}painter-visits?painter_id=${painterId}`);
+        if (!response.ok) {
+          throw new Error('Failed to query schedule');
+        }
+
+        allVisits = await response.json();
+        
+        // Ensure it is parsed as an array
+        if (!Array.isArray(allVisits)) {
+          allVisits = [];
+        }
+
+        renderCalendar();
+      } catch (err) {
+        console.error(err);
+        document.getElementById('schedule-list').innerHTML = `
+          <div class="empty-state">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <h3>Could Not Load Schedule</h3>
+            <p>Please verify your internet connection and try again.</p>
+          </div>
+        `;
+      }
+    }
+
+    // Split and render list
+    function renderCalendar() {
+      // Filter schedules
+      // Scheduled: current_status in ('ASSIGNED', 'ACCEPTED', 'FOLLOWUP') and visit_count = 0
+      // Completed: current_status in ('VISITED', 'WON', 'LOST') or visit_count > 0
+      const scheduledList = allVisits.filter(v => 
+        ['ASSIGNED', 'ACCEPTED', 'FOLLOWUP'].includes(v.current_status) && parseInt(v.visit_count || 0) === 0
+      );
+      const completedList = allVisits.filter(v => 
+        ['VISITED', 'WON', 'LOST'].includes(v.current_status) || parseInt(v.visit_count || 0) > 0
+      );
+
+      // Update statistical numbers
+      document.getElementById('stat-scheduled').innerText = scheduledList.length;
+      document.getElementById('stat-completed').innerText = completedList.length;
+
+      const activeList = currentTab === 'scheduled' ? scheduledList : completedList;
+      const listContainer = document.getElementById('schedule-list');
+
+      if (activeList.length === 0) {
+        listContainer.innerHTML = `
+          <div class="empty-state">
+            <i class="fa-regular fa-calendar-xmark"></i>
+            <h3>No visits found</h3>
+            <p>You have no ${currentTab} consults in your directory.</p>
+          </div>
+        `;
+        return;
+      }
+
+      listContainer.innerHTML = activeList.map(visit => {
+        // Date options
+        const visitDateStr = visit.visit_date ? new Date(visit.visit_date).toLocaleDateString('en-US', {
+          weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'
+        }) : 'No Date Set';
+
+        // Check if visit is scheduled or done
+        const isCompleted = currentTab === 'completed';
+
+        return `
+          <div class="site-card">
+            <div class="card-top">
+              <span class="date-badge"><i class="fa-regular fa-calendar"></i> ${visitDateStr}</span>
+              <span class="time-badge"><i class="fa-regular fa-clock"></i> ${visit.formatted_visit_time || 'TBD'}</span>
+            </div>
+            <div class="client-info">
+              <div class="client-name">${visit.site_owner_name}</div>
+              <div class="client-address">
+                <i class="fa-solid fa-location-dot"></i>
+                <span>${visit.address_line1}, ${visit.town}</span>
+              </div>
+            </div>
+            <div class="client-actions">
+              <a href="tel:${visit.site_owner_mobile}" class="action-btn btn-secondary">
+                <i class="fa-solid fa-phone"></i> Call
+              </a>
+              ${!isCompleted ? `
+                <a href="open-leads-by-user-type.html?id=${painterId}" class="action-btn btn-primary">
+                  <i class="fa-solid fa-circle-check"></i> Check-in
+                </a>
+              ` : `
+                <div class="action-btn btn-secondary" style="border: 1px solid rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.05); color: #10B981; cursor: default;">
+                  <i class="fa-solid fa-circle-check"></i> Visited
+                </div>
+              `}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Toggle tabs
+    function switchTab(tab) {
+      currentTab = tab;
+      
+      document.getElementById('tab-scheduled-btn').classList.toggle('active', tab === 'scheduled');
+      document.getElementById('tab-completed-btn').classList.toggle('active', tab === 'completed');
+
+      renderCalendar();
+    }
+
+    // Load data
+    loadCalendar();
+  </script>
+</body>
+</html>

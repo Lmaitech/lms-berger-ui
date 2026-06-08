@@ -1,0 +1,130 @@
+{
+  "name": "LMS - Daily Site Visit Reminders",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 * * *"
+            }
+          ]
+        }
+      },
+      "name": "Schedule Trigger - 8AM Daily",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        100,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT l.lead_id, l.site_owner_name, l.site_owner_mobile, l.address_line1, l.town, TO_CHAR(l.visit_time, 'HH12:MI AM') as formatted_visit_time, l.carpet_area, l.budget_range, p.id as painter_id, p.name as painter_name, p.mobile as painter_mobile FROM leads l JOIN users p ON l.current_painter_id = p.id WHERE l.visit_date = CURRENT_DATE AND l.current_status IN ('ACCEPTED', 'ASSIGNED', 'VISITED', 'FOLLOWUP');"
+      },
+      "name": "Postgres - Query Today Visits",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        320,
+        300
+      ],
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v19.0/1034929049696068/messages",
+        "sendHeaders": true,
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$json[\"painter_mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"cta_url\",\n    \"header\": {\n      \"type\": \"text\",\n      \"text\": \"Today's Site Visit Scheduled\"\n    },\n    \"body\": {\n      \"text\": \"Hello {{$json[\"painter_name\"]}},\\nYou have a site visit scheduled for today:\\n\\nCustomer: {{$json[\"site_owner_name\"]}}\\nTime: {{$json[\"formatted_visit_time\"]}}\\nLocation: {{$json[\"address_line1\"]}}, {{$json[\"town\"]}}\\nCarpet Area: {{$json[\"carpet_area\"]}} sq ft\\nBudget: {{$json[\"budget_range\"]}}\\n\\nCheck your complete schedule and open leads calendar via the link below.\"\n    },\n    \"action\": {\n      \"name\": \"cta_url\",\n      \"parameters\": {\n        \"display_text\": \"View Calendar\",\n        \"url\": \"https://lms-berger-ui.vercel.app/painter-calendar.html?painter_id={{$json[\"painter_id\"]}}\"\n      }\n    }\n  }\n}",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        }
+      },
+      "name": "HTTP Request - Send Painter Today Visit Reminder",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        540,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v19.0/1034929049696068/messages",
+        "sendHeaders": true,
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$json[\"site_owner_mobile\"]}}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": \"Dear {{$json[\"site_owner_name\"]}},\\nThis is a friendly reminder that your painting site consultation visit is scheduled for today at {{$json[\"formatted_visit_time\"]}}.\\n\\nYour Assigned Painter:\\nName: {{$json[\"painter_name\"]}}\\nMobile: {{$json[\"painter_mobile\"]}}\\n\\nThank you for choosing Berger Paints!\"\n  }\n}",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        }
+      },
+      "name": "HTTP Request - Send Customer Today Visit Reminder",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        540,
+        400
+      ]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger - 8AM Daily": {
+      "main": [
+        [
+          {
+            "node": "Postgres - Query Today Visits",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres - Query Today Visits": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Send Painter Today Visit Reminder",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request - Send Customer Today Visit Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
