@@ -14,7 +14,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "=SELECT id, user_type, name, mobile FROM users WHERE mobile = '{{$json.from}}' OR mobile LIKE '%' || RIGHT('{{$json.from}}', 10) LIMIT 1;"
+        "query": "=SELECT id, user_type, name, mobile FROM users WHERE mobile = '{{$json.messages[0].from}}' OR mobile LIKE '%' || RIGHT('{{$json.messages[0].from}}', 10) LIMIT 1;"
       },
       "name": "Postgres - Look Up User",
       "type": "n8n-nodes-base.postgres",
@@ -33,7 +33,7 @@
     {
       "parameters": {
         "dataType": "string",
-        "value1": "={{$node[\"WhatsApp Trigger\"].json.message.type}}",
+        "value1": "={{$node[\"WhatsApp Trigger\"].json.messages[0].type}}",
         "rules": {
           "rules": [
             {
@@ -54,7 +54,7 @@
     {
       "parameters": {
         "dataType": "string",
-        "value1": "={{$node[\"WhatsApp Trigger\"].json.message.interactive.list_reply.id}}",
+        "value1": "={{$node[\"WhatsApp Trigger\"].json.messages[0].interactive.list_reply.id}}",
         "rules": {
           "rules": [
             {
@@ -349,7 +349,7 @@
         "sendHeaders": true,
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\"model\": \"gpt-4o-mini\", \"messages\": [{\"role\": \"system\", \"content\": \"You are the Berger Paints AI Agent assistant for DSEs (District Sales Executives) and DSOs (District Sales Officers). The following is the real-time database view representing all leads, retailers, and painters that report to you or are within your scope. You have access to NO other data.\\n\\n[SCOPED DATA]:\\n{{JSON.stringify($json.scoped_data)}}\\n\\nAnswer the user's question accurately, concisely, and professionally using only this data. Do not hallucinate or refer to external entities outside this scoped data. If they ask for something you do not have, politely state you do not have access to that information.\"}, {\"role\": \"user\", \"content\": \"{{$node[\"WhatsApp Trigger\"].json[\"message\"][\"text\"][\"body\"]}}\"}]}",
+        "jsonBody": "={\"model\": \"gpt-4o-mini\", \"messages\": [{\"role\": \"system\", \"content\": \"You are the Berger Paints AI Agent assistant for DSEs (District Sales Executives) and DSOs (District Sales Officers). The following is the real-time database view representing all leads, retailers, and painters that report to you or are within your scope. You have access to NO other data.\\n\\n[SCOPED DATA]:\\n{{JSON.stringify($json.scoped_data)}}\\n\\nAnswer the user's question accurately, concisely, and professionally using only this data. Do not hallucinate or refer to external entities outside this scoped data. If they ask for something you do not have, politely state you do not have access to that information.\"}, {\"role\": \"user\", \"content\": \"{{$node[\"WhatsApp Trigger\"].json[\"messages\"][0][\"text\"][\"body\"]}}\"}]}",
         "headerParameters": {
           "parameters": [
             {
@@ -407,7 +407,7 @@
         "sendHeaders": true,
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"WhatsApp Trigger\"].json[\"from\"]}}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": \"Welcome to Berger Paints Lead Management System!\\nYour number is not registered in our database. Please contact Berger support or your Retailer for access.\\n\\nThank you!\"\n    }\n}",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"WhatsApp Trigger\"].json[\"messages\"][0][\"from\"]}}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": \"Welcome to Berger Paints Lead Management System!\\nYour number is not registered in our database. Please contact Berger support or your Retailer for access.\\n\\nThank you!\"\n    }\n}",
         "headerParameters": {
           "parameters": [
             {
@@ -431,7 +431,7 @@
     },
     {
       "parameters": {
-        "content": "### WhatsApp Message Receiver & AI Agent Router\n\n**Functions & Features:**\n- **WhatsApp Trigger**: Native n8n WhatsApp messages trigger.\n- **Inbound Type Router**: Differentiates between text messages and interactive list choices.\n- **List Reply Router**: Intercepts Retailer/Painter list option clicks and returns CTA URL buttons.\n- **User Type Router**: For text messages, delivers list choice menus to Retailers/Painters, URL buttons to Customers, and executes DSE/DSO AI Agent logic.",
+        "content": "### WhatsApp Message Receiver & AI Agent Router\n\n**Functions & Features:**\n- **WhatsApp Trigger**: Native n8n WhatsApp messages trigger node.\n- **Inbound Type Router**: Differentiates between text messages and interactive list choices.\n- **List Reply Router**: Intercepts Retailer/Painter list option clicks and returns CTA URL buttons.\n- **User Type Router**: For text messages, delivers list choice menus to Retailers/Painters, URL buttons to Customers, and executes DSE/DSO AI Agent logic.",
         "height": 220,
         "width": 340
       },
