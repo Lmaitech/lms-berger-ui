@@ -1,0 +1,9 @@
+# Ignore n8n backend configurations and workflows (contain credentials)
+/Backend/
+
+# Ignore local Supabase schema migrations (contain local secrets/queries)
+/supabase_migrations/
+
+# Ignore local operating system files
+.DS_Store
+Thumbs.db
