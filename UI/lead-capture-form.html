@@ -724,7 +724,7 @@
                 // Fetch request to n8n get-retailer profile webhook
                 // Appends 'profile' on top of the base URL
                 const baseUrl = CONFIG.N8N_WEBHOOK_URL.endsWith('/') ? CONFIG.N8N_WEBHOOK_URL : CONFIG.N8N_WEBHOOK_URL + '/';
-                const response = await fetch(`${baseUrl}profile?retailer_id=${id}`);
+                const response = await fetch(`${baseUrl}profile?retailer_id=${id}`, { headers: { "Authorization": "Bearer " + CONFIG.API_TOKEN } });
 
                 if (response.ok) {
                     const data = await response.json();

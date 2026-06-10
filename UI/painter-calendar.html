@@ -452,7 +452,7 @@
       }
 
       try {
-        const response = await fetch(`${CONFIG.N8N_WEBHOOK_URL}painter-visits?painter_id=${painterId}`);
+        const response = await fetch(`${CONFIG.N8N_WEBHOOK_URL}painter-visits?painter_id=${painterId}`, { headers: { "Authorization": "Bearer " + CONFIG.API_TOKEN } });
         if (!response.ok) {
           throw new Error('Failed to query schedule');
         }

@@ -444,7 +444,8 @@
                 const response = await fetch(`${baseUrl}schedule-followup`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + CONFIG.API_TOKEN
                     },
                     body: JSON.stringify({
                         lead_id: leadId,

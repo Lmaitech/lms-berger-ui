@@ -967,7 +967,7 @@
         async function loadSummaryDashboard() {
             try {
                 const baseUrl = CONFIG.N8N_WEBHOOK_URL.endsWith('/') ? CONFIG.N8N_WEBHOOK_URL : CONFIG.N8N_WEBHOOK_URL + '/';
-                const response = await fetch(`${baseUrl}dashboard-summary?user_id=${currentUser.id}&user_type=${currentUser.user_type}`);
+                const response = await fetch(`${baseUrl}dashboard-summary?user_id=${currentUser.id}&user_type=${currentUser.user_type}`, { headers: { "Authorization": "Bearer " + CONFIG.API_TOKEN } });
                 
                 if (response.ok) {
                     const data = await response.json();
@@ -999,7 +999,7 @@
                 document.getElementById('chartsContainer').style.display = 'none';
 
                 const baseUrl = CONFIG.N8N_WEBHOOK_URL.endsWith('/') ? CONFIG.N8N_WEBHOOK_URL : CONFIG.N8N_WEBHOOK_URL + '/';
-                const response = await fetch(`${baseUrl}dashboard-drilldown?parent_type=${parentType}&parent_id=${parentId}`);
+                const response = await fetch(`${baseUrl}dashboard-drilldown?parent_type=${parentType}&parent_id=${parentId}`, { headers: { "Authorization": "Bearer " + CONFIG.API_TOKEN } });
                 if (response.ok) {
                     currentDataList = await response.json();
                     applyFilters();

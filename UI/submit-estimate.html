@@ -720,7 +720,7 @@
         window.addEventListener('load', async () => {
             try {
                 const baseUrl = CONFIG.N8N_WEBHOOK_URL.endsWith('/') ? CONFIG.N8N_WEBHOOK_URL : CONFIG.N8N_WEBHOOK_URL + '/';
-                const response = await fetch(`${baseUrl}products`);
+                const response = await fetch(`${baseUrl}products`, { headers: { "Authorization": "Bearer " + CONFIG.API_TOKEN } });
                 if (response.ok) {
                     productsCatalog = await response.json();
                     // Add first row by default
@@ -971,7 +971,7 @@
             
             try {
                 const baseUrl = CONFIG.N8N_WEBHOOK_URL.endsWith('/') ? CONFIG.N8N_WEBHOOK_URL : CONFIG.N8N_WEBHOOK_URL + '/';
-                const response = await fetch(`${baseUrl}previous-estimates?lead_id=${leadId}`);
+                const response = await fetch(`${baseUrl}previous-estimates?lead_id=${leadId}`, { headers: { "Authorization": "Bearer " + CONFIG.API_TOKEN } });
                 if (response.ok) {
                     let data = await response.json();
                     // Filter empty objects returned due to n8n alwaysOutputData
