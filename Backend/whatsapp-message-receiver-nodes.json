@@ -13,6 +13,25 @@
     },
     {
       "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{!!$json.messages}}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "name": "IF - Is Message Event",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        280,
+        300
+      ]
+    },
+    {
+      "parameters": {
         "operation": "executeQuery",
         "query": "=SELECT id, user_type, name, mobile FROM users WHERE mobile = '{{$json.messages[0].from}}' OR mobile LIKE '%' || RIGHT('{{$json.messages[0].from}}', 10) LIMIT 1;"
       },
@@ -20,7 +39,7 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 1,
       "position": [
-        320,
+        460,
         300
       ],
       "credentials": {
@@ -47,7 +66,7 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 1,
       "position": [
-        540,
+        660,
         300
       ]
     },
@@ -79,7 +98,7 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 1,
       "position": [
-        760,
+        860,
         150
       ]
     },
@@ -90,7 +109,7 @@
         "sendHeaders": true,
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Look Up User\"].json[\"mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"cta_url\",\n    \"header\": {\n      \"type\": \"text\",\n      \"text\": \"Enter New Lead\"\n    },\n    \"body\": {\n      \"text\": \"To register a new customer painting consultation in the system, click the button below.\"\n    },\n    \"action\": {\n      \"name\": \"cta_url\",\n      \"parameters\": {\n        \"display_text\": \"Enter Lead\",\n        \"url\": \"https://lms-berger-ui.vercel.app/lead-capture-form.html?id={{$node[\"Postgres - Look Up User\"].json[\"id\"]}}\"\n      }\n    }\n  }\n}",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Look Up User\"].json[\"mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"cta_url\",\n    \"header\": {\n      \"type\": \"image\",\n      \"image\": {\n        \"link\": \"https://raw.githubusercontent.com/Lmaitech/whatsapp-assets/main/RetailerCaptureLead.png\"\n      }\n    },\n    \"body\": {\n      \"text\": \"To register a new customer painting consultation in the system, click the button below.\"\n    },\n    \"action\": {\n      \"name\": \"cta_url\",\n      \"parameters\": {\n        \"display_text\": \"Enter Lead\",\n        \"url\": \"https://lms-berger-ui.vercel.app/lead-capture-form.html?id={{$node[\"Postgres - Look Up User\"].json[\"id\"]}}\"\n      }\n    }\n  }\n}",
         "headerParameters": {
           "parameters": [
             {
@@ -108,7 +127,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
       "position": [
-        1000,
+        1100,
         20
       ]
     },
@@ -119,7 +138,7 @@
         "sendHeaders": true,
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Look Up User\"].json[\"mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"cta_url\",\n    \"header\": {\n      \"type\": \"text\",\n      \"text\": \"Check Lead Status\"\n    },\n    \"body\": {\n      \"text\": \"To view and track the status of your logged sites and opportunities, click the button below.\"\n    },\n    \"action\": {\n      \"name\": \"cta_url\",\n      \"parameters\": {\n        \"display_text\": \"Open Leads\",\n        \"url\": \"https://lms-berger-ui.vercel.app/open-leads-by-user-type.html?id={{$node[\"Postgres - Look Up User\"].json[\"id\"]}}\"\n      }\n    }\n  }\n}",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Look Up User\"].json[\"mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"cta_url\",\n    \"header\": {\n      \"type\": \"image\",\n      \"image\": {\n        \"link\": \"https://raw.githubusercontent.com/Lmaitech/whatsapp-assets/main/TrackOpenLeads.png\"\n      }\n    },\n    \"body\": {\n      \"text\": \"To view and track the status of your logged sites and opportunities, click the button below.\"\n    },\n    \"action\": {\n      \"name\": \"cta_url\",\n      \"parameters\": {\n        \"display_text\": \"Open Leads\",\n        \"url\": \"https://lms-berger-ui.vercel.app/open-leads-by-user-type.html?id={{$node[\"Postgres - Look Up User\"].json[\"id\"]}}\"\n      }\n    }\n  }\n}",
         "headerParameters": {
           "parameters": [
             {
@@ -137,7 +156,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
       "position": [
-        1000,
+        1100,
         120
       ]
     },
@@ -148,7 +167,7 @@
         "sendHeaders": true,
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Look Up User\"].json[\"mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"cta_url\",\n    \"header\": {\n      \"type\": \"text\",\n      \"text\": \"Select Lead\"\n    },\n    \"body\": {\n      \"text\": \"To check active site visit requirements, review lead scopes, and check-in, click the button below.\"\n    },\n    \"action\": {\n      \"name\": \"cta_url\",\n      \"parameters\": {\n        \"display_text\": \"Open Leads\",\n        \"url\": \"https://lms-berger-ui.vercel.app/open-leads-by-user-type.html?id={{$node[\"Postgres - Look Up User\"].json[\"id\"]}}\"\n      }\n    }\n  }\n}",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Look Up User\"].json[\"mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"cta_url\",\n    \"header\": {\n      \"type\": \"image\",\n      \"image\": {\n        \"link\": \"https://raw.githubusercontent.com/Lmaitech/whatsapp-assets/main/PainterStartSite.png\"\n      }\n    },\n    \"body\": {\n      \"text\": \"To check active site visit requirements, review lead scopes, and check-in, click the button below.\"\n    },\n    \"action\": {\n      \"name\": \"cta_url\",\n      \"parameters\": {\n        \"display_text\": \"Open Leads\",\n        \"url\": \"https://lms-berger-ui.vercel.app/open-leads-by-user-type.html?id={{$node[\"Postgres - Look Up User\"].json[\"id\"]}}\"\n      }\n    }\n  }\n}",
         "headerParameters": {
           "parameters": [
             {
@@ -166,7 +185,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
       "position": [
-        1000,
+        1100,
         220
       ]
     },
@@ -177,7 +196,7 @@
         "sendHeaders": true,
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Look Up User\"].json[\"mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"cta_url\",\n    \"header\": {\n      \"type\": \"text\",\n      \"text\": \"Schedule Calendar\"\n    },\n    \"body\": {\n      \"text\": \"To view your consultation schedule calendar and check visit lists, click the button below.\"\n    },\n    \"action\": {\n      \"name\": \"cta_url\",\n      \"parameters\": {\n        \"display_text\": \"View Calendar\",\n        \"url\": \"https://lms-berger-ui.vercel.app/painter-calendar.html?painter_id={{$node[\"Postgres - Look Up User\"].json[\"id\"]}}\"\n      }\n    }\n  }\n}",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Look Up User\"].json[\"mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"cta_url\",\n    \"header\": {\n      \"type\": \"image\",\n      \"image\": {\n        \"link\": \"https://raw.githubusercontent.com/Lmaitech/whatsapp-assets/main/PainterCalendar.png\"\n      }\n    },\n    \"body\": {\n      \"text\": \"To view your consultation schedule calendar and check visit lists, click the button below.\"\n    },\n    \"action\": {\n      \"name\": \"cta_url\",\n      \"parameters\": {\n        \"display_text\": \"View Calendar\",\n        \"url\": \"https://lms-berger-ui.vercel.app/painter-calendar.html?painter_id={{$node[\"Postgres - Look Up User\"].json[\"id\"]}}\"\n      }\n    }\n  }\n}",
         "headerParameters": {
           "parameters": [
             {
@@ -195,7 +214,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
       "position": [
-        1000,
+        1100,
         320
       ]
     },
@@ -232,7 +251,7 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 1,
       "position": [
-        760,
+        860,
         600
       ]
     },
@@ -243,7 +262,7 @@
         "sendHeaders": true,
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$json[\"mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"cta_url\",\n    \"header\": {\n      \"type\": \"text\",\n      \"text\": \"Welcome to Berger LMS\"\n    },\n    \"body\": {\n      \"text\": \"Welcome to Berger LMS, {{$json[\"name\"]}}!\\nTo track and check the status of your painting enquiry/lead, please click the button below.\"\n    },\n    \"action\": {\n      \"name\": \"cta_url\",\n      \"parameters\": {\n        \"display_text\": \"Check Status\",\n        \"url\": \"https://lms-berger-ui.vercel.app/open-leads-by-user-type.html?id={{$json[\"id\"]}}\"\n      }\n    }\n  }\n}",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$json[\"mobile\"]}}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"cta_url\",\n    \"header\": {\n      \"type\": \"image\",\n      \"image\": {\n        \"link\": \"https://raw.githubusercontent.com/Lmaitech/whatsapp-assets/main/TrackOpenLeads.png\"\n      }\n    },\n    \"body\": {\n      \"text\": \"Welcome to Berger LMS, {{$json[\"name\"]}}!\\nTo track and check the status of your painting enquiry/lead, please click the button below.\"\n    },\n    \"action\": {\n      \"name\": \"cta_url\",\n      \"parameters\": {\n        \"display_text\": \"Check Status\",\n        \"url\": \"https://lms-berger-ui.vercel.app/open-leads-by-user-type.html?id={{$json[\"id\"]}}\"\n      }\n    }\n  }\n}",
         "headerParameters": {
           "parameters": [
             {
@@ -261,8 +280,37 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
       "position": [
-        1000,
+        1100,
         500
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v19.0/1034929049696068/messages",
+        "sendHeaders": true,
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$json[\"mobile\"]}}\",\n  \"type\": \"image\",\n  \"image\": {\n    \"link\": \"https://raw.githubusercontent.com/Lmaitech/whatsapp-assets/main/WelcomeToLMS.png\"\n  }\n}",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        }
+      },
+      "name": "HTTP Request - Send Retailer Welcome Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1100,
+        600
       ]
     },
     {
@@ -290,8 +338,37 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
       "position": [
-        1000,
+        1300,
         600
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v19.0/1034929049696068/messages",
+        "sendHeaders": true,
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$json[\"mobile\"]}}\",\n  \"type\": \"image\",\n  \"image\": {\n    \"link\": \"https://raw.githubusercontent.com/Lmaitech/whatsapp-assets/main/WelcomeToLMS.png\"\n  }\n}",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer EAASEggbZCr1gBRrTZAYDBOMtnce5GcG4LHae2xtoMDLwjuYwfBW5qPcYK0tHAU2w1UEhZCCsODKjUkuzpXdQvIHTYK2F93AyPk3X28udnsXCQnluG2RfNigTSybC2ORdsEnrQZCJ9QfZBCc3er4SZBYMDQWeMdHdAoDxchFDLAB5x301kq6QK0u5sFDEjRsPtQXAZDZD"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        }
+      },
+      "name": "HTTP Request - Send Painter Welcome Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1100,
+        700
       ]
     },
     {
@@ -319,7 +396,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
       "position": [
-        1000,
+        1300,
         700
       ]
     },
@@ -332,7 +409,7 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 1,
       "position": [
-        1000,
+        1100,
         820
       ],
       "credentials": {
@@ -367,7 +444,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
       "position": [
-        1220,
+        1320,
         820
       ]
     },
@@ -396,7 +473,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
       "position": [
-        1440,
+        1540,
         820
       ]
     },
@@ -425,13 +502,13 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
       "position": [
-        1000,
+        1100,
         940
       ]
     },
     {
       "parameters": {
-        "content": "### WhatsApp Message Receiver & AI Agent Router\n\n**Functions & Features:**\n- **WhatsApp Trigger**: Native n8n WhatsApp messages trigger node.\n- **Inbound Type Router**: Differentiates between text messages and interactive list choices.\n- **List Reply Router**: Intercepts Retailer/Painter list option clicks and returns CTA URL buttons.\n- **User Type Router**: For text messages, delivers list choice menus to Retailers/Painters, URL buttons to Customers, and executes DSE/DSO AI Agent logic.",
+        "content": "### WhatsApp Message Receiver & AI Agent Router\n\n**Functions & Features:**\n- **WhatsApp Trigger**: Native n8n WhatsApp messages trigger node.\n- **IF - Message Filter**: Ignores Meta status notifications silently to keep logs clean.\n- **Inbound Type Router**: Differentiates between text messages and interactive list choices.\n- **List Reply Router**: Intercepts Retailer/Painter list option clicks and returns CTA URL buttons with high-quality headers.\n- **User Type Router**: Sends image welcomed lists to Retailers/Painters, URL buttons to Customers, and executes DSE/DSO AI Agent logic.",
         "height": 220,
         "width": 340
       },
@@ -446,6 +523,17 @@
   ],
   "connections": {
     "WhatsApp Trigger": {
+      "main": [
+        [
+          {
+            "node": "IF - Is Message Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Is Message Event": {
       "main": [
         [
           {
@@ -528,14 +616,14 @@
         ],
         [
           {
-            "node": "HTTP Request - Retailer List Menu",
+            "node": "HTTP Request - Send Retailer Welcome Image",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "HTTP Request - Painter List Menu",
+            "node": "HTTP Request - Send Painter Welcome Image",
             "type": "main",
             "index": 0
           }
@@ -557,6 +645,28 @@
         [
           {
             "node": "HTTP Request - Non Registered User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Send Retailer Welcome Image": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Retailer List Menu",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Send Painter Welcome Image": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Painter List Menu",
             "type": "main",
             "index": 0
           }
