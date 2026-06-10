@@ -56,7 +56,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "=UPDATE lead_assignment_history SET response_status = 'EXPIRED', response_at = NOW() WHERE assignment_id = '{{$json.assignment_id}}' RETURNING assignment_id;"
+        "query": "=UPDATE lead_assignment_history SET response_status = 'EXPIRED', response_at = NOW() WHERE assignment_id = '{{$json.assignment_id}}';\n\nUPDATE leads SET current_status = 'CREATED', current_painter_id = NULL, updated_at = NOW() WHERE lead_id = '{{$json.lead_id}}';\n\nINSERT INTO lead_status_history (lead_id, old_status, new_status, remarks) VALUES ('{{$json.lead_id}}', 'ASSIGNED', 'CREATED', 'Assignment timed out (6h threshold exceeded)');"
       },
       "name": "Postgres - Mark Assignment Expired",
       "type": "n8n-nodes-base.postgres",
