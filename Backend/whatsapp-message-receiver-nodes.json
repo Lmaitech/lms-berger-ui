@@ -402,148 +402,13 @@
     },
     {
       "parameters": {
-        "method": "POST",
-        "url": "https://api.openai.com/v1/chat/completions",
-        "sendHeaders": true,
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ { \"model\": \"gpt-4o-mini\", \"messages\": [ { \"role\": \"system\", \"content\": \"You are an AI router for a Lead Management System database. Analyze the user's question and determine if it requires querying a database tool. The user is a DSE/DSO with ID: '\" + $node[\"Postgres - Look Up User\"].json[\"id\"] + \"'.\\n\\nThe available tools are:\\n1. 'query_lead_details': For questions about lead status, site owner details, client contact info, assigned painter/retailer, or site address. Can accept optional filters like 'lead_id' (UUID), 'current_status' (string), or 'town' (string).\\n2. 'query_site_visits': For questions about painter check-in history, visit count, visit logs, or coordinates. Requires 'lead_id' (UUID).\\n3. 'query_estimates': For questions about estimates, pricing, items list, material/labor breakdown. Requires 'lead_id' (UUID).\\n4. 'none': For general questions or chit-chat that don't need database information.\\n\\nRespond ONLY with a valid JSON object matching this schema:\\n{\\n  \\\"tool\\\": \\\"query_lead_details\\\" | \\\"query_site_visits\\\" | \\\"query_estimates\\\" | \\\"none\\\",\\n  \\\"filters\\\": {\\n    \\\"lead_id\\\": \\\"UUID or null\\\",\\n    \\\"current_status\\\": \\\"STATUS or null\\\",\\n    \\\"town\\\": \\\"TOWN or null\\\"\\n  }\\n}\\nDo not include markdown code block formatting or any extra text.\" }, { \"role\": \"user\", \"content\": $node[\"WhatsApp Trigger\"].json.messages[0].text.body } ] } }}",
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Authorization",
-              "value": "Bearer your-openai-api-key-here"
-            },
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            }
-          ]
-        }
+        "jsCode": "const userId = $('Postgres - Look Up User').first().json.id;\nconst userName = $('Postgres - Look Up User').first().json.name;\nconst userMobile = $('Postgres - Look Up User').first().json.mobile;\nconst userRole = $('Postgres - Look Up User').first().json.user_type;\nconst userQuery = $('WhatsApp Trigger').first().json.messages[0].text.body;\n\nconst SUPABASE_URL = \"https://osszfmwnxnfngtgfmugv.supabase.co\";\nconst SUPABASE_ANON_KEY = \"your-supabase-anon-key-here\";\nconst OPENAI_API_KEY = \"your-openai-api-key-here\";\n\n// 1. Fetch memory history from Supabase\nconst histResponse = await fetch(`${SUPABASE_URL}/rest/v1/chat_history?user_id=eq.${userId}&order=created_at.asc&limit=10`, {\n  headers: {\n    'apikey': SUPABASE_ANON_KEY,\n    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`\n  }\n});\nconst history = histResponse.ok ? await histResponse.json() : [];\n\n// 2. Build messages array\nconst messages = [\n  {\n    role: 'system',\n    content: `You are the Berger Paints AI Agent assistant for DSEs (District Sales Executives) and DSOs (District Sales Officers). The current user is:\\n- Name: ${userName}\\n- User ID: ${userId}\\n- Mobile: ${userMobile}\\n- Role: ${userRole}\\n\\nUse your tools to query info to answer the user's questions. Always search for leads, sites, check-in history, or estimates matching their queries. Refer to specific lead IDs when executing detail or log searches. Do not hallucinate data.`\n  }\n];\n\nhistory.forEach(h => {\n  messages.push({ role: h.role, content: h.content });\n});\nmessages.push({ role: 'user', content: userQuery });\n\n// 3. Define Tools\nconst tools = [\n  {\n    type: 'function',\n    function: {\n      name: 'query_lead_details',\n      description: 'Query detailed info about leads (including customer name, mobile, address, town, status, budget, assigned painter, assigned retailer). Option filters: lead_id, current_status, town.',\n      parameters: {\n        type: 'object',\n        properties: {\n          lead_id: { type: 'string' },\n          current_status: { type: 'string' },\n          town: { type: 'string' }\n        }\n      }\n    }\n  },\n  {\n    type: 'function',\n    function: {\n      name: 'query_site_visits',\n      description: 'Query visit check-in logs and remarks for a lead. Requires lead_id.',\n      parameters: {\n        type: 'object',\n        properties: {\n          lead_id: { type: 'string' }\n        },\n        required: ['lead_id']\n      }\n    }\n  },\n  {\n    type: 'function',\n    function: {\n      name: 'query_estimates',\n      description: 'Query version numbers and breakdowns of estimates for a lead. Requires lead_id.',\n      parameters: {\n        type: 'object',\n        properties: {\n          lead_id: { type: 'string' }\n        },\n        required: ['lead_id']\n      }\n    }\n  }\n];\n\n// 4. Request completion to OpenAI\nlet response = await fetch('https://api.openai.com/v1/chat/completions', {\n  method: 'POST',\n  headers: {\n    'Content-Type': 'application/json',\n    'Authorization': `Bearer ${OPENAI_API_KEY}`\n  },\n  body: JSON.stringify({ model: 'gpt-4o-mini', messages, tools })\n});\nlet data = await response.json();\nlet choice = data.choices[0].message;\n\n// 5. Run tool call loop if OpenAI requests tool execution\nif (choice.tool_calls && choice.tool_calls.length > 0) {\n  messages.push(choice);\n  \n  const toolPromises = choice.tool_calls.map(async (toolCall) => {\n    const args = JSON.parse(toolCall.function.arguments);\n    let queryUrl = '';\n    if (toolCall.function.name === 'query_lead_details') {\n      queryUrl = `${SUPABASE_URL}/rest/v1/lead_detail_drilldown_view?or=(dse_id.eq.${userId},dso_id.eq.${userId})`;\n      if (args.lead_id) queryUrl += `&lead_id=eq.${args.lead_id}`;\n      if (args.current_status) queryUrl += `&current_status=eq.${args.current_status}`;\n      if (args.town) queryUrl += `&town=ilike.*${args.town}*`;\n    } else if (toolCall.function.name === 'query_site_visits') {\n      queryUrl = `${SUPABASE_URL}/rest/v1/site_visits?lead_id=eq.${args.lead_id}`;\n    } else if (toolCall.function.name === 'query_estimates') {\n      queryUrl = `${SUPABASE_URL}/rest/v1/estimate_details_view?lead_id=eq.${args.lead_id}`;\n    }\n    \n    const toolRes = await fetch(queryUrl, {\n      headers: {\n        'apikey': SUPABASE_ANON_KEY,\n        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`\n      }\n    });\n    const toolData = toolRes.ok ? await toolRes.json() : { error: 'Failed to fetch database records' };\n    return {\n      role: 'tool',\n      tool_call_id: toolCall.id,\n      name: toolCall.function.name,\n      content: JSON.stringify(toolData)\n    };\n  });\n  \n  const toolOutputs = await Promise.all(toolPromises);\n  toolOutputs.forEach(out => messages.push(out));\n  \n  // Query OpenAI again with the tool output content\n  response = await fetch('https://api.openai.com/v1/chat/completions', {\n    method: 'POST',\n    headers: {\n      'Content-Type': 'application/json',\n      'Authorization': `Bearer ${OPENAI_API_KEY}`\n    },\n    body: JSON.stringify({ model: 'gpt-4o-mini', messages })\n  });\n  data = await response.json();\n  choice = data.choices[0].message;\n}\n\nconst finalAnswer = choice.content || 'I encountered an error retrieving that database record.';\n\n// 6. Save chat history to Supabase\nawait fetch(`${SUPABASE_URL}/rest/v1/chat_history`, {\n  method: 'POST',\n  headers: {\n    'Content-Type': 'application/json',\n    'apikey': SUPABASE_ANON_KEY,\n    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`\n  },\n  body: JSON.stringify([\n    { user_id: userId, role: 'user', content: userQuery },\n    { user_id: userId, role: 'assistant', content: finalAnswer }\n  ])\n});\n\nreturn [{ json: { output: finalAnswer } }];"
       },
-      "name": "HTTP Request - OpenAI Router",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.1,
-      "position": [
-        1100,
-        820
-      ]
-    },
-    {
-      "parameters": {
-        "dataType": "string",
-        "value1": "={{JSON.parse($node[\"HTTP Request - OpenAI Router\"].json[\"choices\"][0][\"message\"][\"content\"]).tool}}",
-        "rules": {
-          "rules": [
-            {
-              "value2": "query_lead_details"
-            },
-            {
-              "value2": "query_site_visits",
-              "output": 1
-            },
-            {
-              "value2": "query_estimates",
-              "output": 2
-            },
-            {
-              "value2": "none",
-              "output": 3
-            }
-          ]
-        }
-      },
-      "name": "Switch - Tool Selection",
-      "type": "n8n-nodes-base.switch",
+      "name": "JS - OpenAI Agent Loop",
+      "type": "n8n-nodes-base.code",
       "typeVersion": 1,
       "position": [
-        1300,
-        820
-      ]
-    },
-    {
-      "parameters": {
-        "operation": "executeQuery",
-        "query": "=SELECT lead_id, site_owner_name, site_owner_mobile, address_line1, address_line2, town, state, pincode, current_status, painter_name, retailer_name, latest_estimate_total FROM lead_detail_drilldown_view WHERE (dse_id = '{{$node[\"Postgres - Look Up User\"].json[\"id\"]}}' OR dso_id = '{{$node[\"Postgres - Look Up User\"].json[\"id\"]}}') AND ('{{JSON.parse($node[\"HTTP Request - OpenAI Router\"].json[\"choices\"][0][\"message\"][\"content\"]).filters.lead_id}}' IS NULL OR '{{JSON.parse($node[\"HTTP Request - OpenAI Router\"].json[\"choices\"][0][\"message\"][\"content\"]).filters.lead_id}}' = '' OR lead_id = '{{JSON.parse($node[\"HTTP Request - OpenAI Router\"].json[\"choices\"][0][\"message\"][\"content\"]).filters.lead_id}}'::uuid) AND ('{{JSON.parse($node[\"HTTP Request - OpenAI Router\"].json[\"choices\"][0][\"message\"][\"content\"]).filters.current_status}}' IS NULL OR '{{JSON.parse($node[\"HTTP Request - OpenAI Router\"].json[\"choices\"][0][\"message\"][\"content\"]).filters.current_status}}' = '' OR current_status = '{{JSON.parse($node[\"HTTP Request - OpenAI Router\"].json[\"choices\"][0][\"message\"][\"content\"]).filters.current_status}}') AND ('{{JSON.parse($node[\"HTTP Request - OpenAI Router\"].json[\"choices\"][0][\"message\"][\"content\"]).filters.town}}' IS NULL OR '{{JSON.parse($node[\"HTTP Request - OpenAI Router\"].json[\"choices\"][0][\"message\"][\"content\"]).filters.town}}' = '' OR LOWER(town) = LOWER('{{JSON.parse($node[\"HTTP Request - OpenAI Router\"].json[\"choices\"][0][\"message\"][\"content\"]).filters.town}}'));"
-      },
-      "name": "Postgres - Tool Query Lead Details",
-      "type": "n8n-nodes-base.postgres",
-      "typeVersion": 1,
-      "position": [
-        1520,
-        700
-      ],
-      "credentials": {
-        "postgresDb": {
-          "id": "postgres-cred-id",
-          "name": "Supabase Postgres Connection"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "operation": "executeQuery",
-        "query": "=SELECT v.visit_id, v.visit_number, v.visit_time, v.remarks, l.site_owner_name FROM site_visits v JOIN leads l ON v.lead_id = l.lead_id WHERE v.lead_id = '{{JSON.parse($node[\"HTTP Request - OpenAI Router\"].json[\"choices\"][0][\"message\"][\"content\"]).filters.lead_id}}'::uuid AND (l.retailer_id IN (SELECT retailer_id FROM dse_retailer_mapping WHERE dse_id = '{{$node[\"Postgres - Look Up User\"].json[\"id\"]}}') OR l.current_painter_id = '{{$node[\"Postgres - Look Up User\"].json[\"id\"]}}');"
-      },
-      "name": "Postgres - Tool Query Site Visits",
-      "type": "n8n-nodes-base.postgres",
-      "typeVersion": 1,
-      "position": [
-        1520,
-        820
-      ],
-      "credentials": {
-        "postgresDb": {
-          "id": "postgres-cred-id",
-          "name": "Supabase Postgres Connection"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "operation": "executeQuery",
-        "query": "=SELECT estimate_id, estimate_version, product_name, quantity, rate, line_total, material_total, labour_cost, grand_total FROM estimate_details_view WHERE lead_id = '{{JSON.parse($node[\"HTTP Request - OpenAI Router\"].json[\"choices\"][0][\"message\"][\"content\"]).filters.lead_id}}'::uuid;"
-      },
-      "name": "Postgres - Tool Query Estimates",
-      "type": "n8n-nodes-base.postgres",
-      "typeVersion": 1,
-      "position": [
-        1520,
-        940
-      ],
-      "credentials": {
-        "postgresDb": {
-          "id": "postgres-cred-id",
-          "name": "Supabase Postgres Connection"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "https://api.openai.com/v1/chat/completions",
-        "sendHeaders": true,
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ { \"model\": \"gpt-4o-mini\", \"messages\": [ { \"role\": \"system\", \"content\": \"You are the Berger Paints AI Agent assistant for DSEs (District Sales Executives) and DSOs (District Sales Officers). Answer the user's question accurately, concisely, and professionally using the retrieved database context (if any).\\n\\n[DATABASE CONTEXT]:\\n\" + JSON.stringify($json) + \"\\n\\nOriginal user request: \" + $node[\"WhatsApp Trigger\"].json.messages[0].text.body }, { \"role\": \"user\", \"content\": $node[\"WhatsApp Trigger\"].json.messages[0].text.body } ] } }}",
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Authorization",
-              "value": "Bearer your-openai-api-key-here"
-            },
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            }
-          ]
-        }
-      },
-      "name": "HTTP Request - OpenAI Answerer",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.1,
-      "position": [
-        1760,
+        1200,
         820
       ]
     },
@@ -554,7 +419,7 @@
         "sendHeaders": true,
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Look Up User\"].json[\"mobile\"]}}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": \"{{$json[\"choices\"][0][\"message\"][\"content\"].replace(/\\\"/g, '\\\\\\\"').replace(/\\n/g, '\\\\n')}}\"\n  }\n}",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Look Up User\"].json[\"mobile\"]}}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": \"{{$json[\"output\"].replace(/\\\"/g, '\\\\\\\"').replace(/\\n/g, '\\\\n')}}\"\n  }\n}",
         "headerParameters": {
           "parameters": [
             {
@@ -729,14 +594,14 @@
         ],
         [
           {
-            "node": "HTTP Request - OpenAI Router",
+            "node": "JS - OpenAI Agent Loop",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "HTTP Request - OpenAI Router",
+            "node": "JS - OpenAI Agent Loop",
             "type": "main",
             "index": 0
           }
@@ -772,83 +637,7 @@
         ]
       ]
     },
-    "HTTP Request - OpenAI Router": {
-      "main": [
-        [
-          {
-            "node": "Switch - Tool Selection",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Switch - Tool Selection": {
-      "main": [
-        [
-          {
-            "node": "Postgres - Tool Query Lead Details",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Postgres - Tool Query Site Visits",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Postgres - Tool Query Estimates",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "HTTP Request - OpenAI Answerer",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Postgres - Tool Query Lead Details": {
-      "main": [
-        [
-          {
-            "node": "HTTP Request - OpenAI Answerer",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Postgres - Tool Query Site Visits": {
-      "main": [
-        [
-          {
-            "node": "HTTP Request - OpenAI Answerer",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Postgres - Tool Query Estimates": {
-      "main": [
-        [
-          {
-            "node": "HTTP Request - OpenAI Answerer",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "HTTP Request - OpenAI Answerer": {
+    "JS - OpenAI Agent Loop": {
       "main": [
         [
           {
