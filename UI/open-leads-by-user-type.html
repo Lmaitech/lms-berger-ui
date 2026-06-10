@@ -703,7 +703,7 @@
         async function fetchOpenLeads() {
             try {
                 const baseUrl = CONFIG.N8N_WEBHOOK_URL.endsWith('/') ? CONFIG.N8N_WEBHOOK_URL : CONFIG.N8N_WEBHOOK_URL + '/';
-                const response = await fetch(`${baseUrl}user-open-leads?userid=${userId}`, { headers: { "Authorization": "Bearer " + CONFIG.API_TOKEN } });
+                const response = await fetch(`${baseUrl}user-open-leads?userid=${userId}`);
 
                 if (response.ok) {
                     let data = await response.json();
@@ -881,7 +881,7 @@
 
             try {
                 const baseUrl = CONFIG.N8N_WEBHOOK_URL.endsWith('/') ? CONFIG.N8N_WEBHOOK_URL : CONFIG.N8N_WEBHOOK_URL + '/';
-                const response = await fetch(`${baseUrl}lead-history?lead_id=${leadId}`, { headers: { "Authorization": "Bearer " + CONFIG.API_TOKEN } });
+                const response = await fetch(`${baseUrl}lead-history?lead_id=${leadId}`);
 
                 if (response.ok) {
                     const historyDataRaw = await response.json();
@@ -1139,8 +1139,7 @@
                         const response = await fetch(`${baseUrl}start-visit`, {
                             method: 'POST',
                             headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': 'Bearer ' + CONFIG.API_TOKEN
+                                'Content-Type': 'application/json'
                             },
                             body: JSON.stringify({
                                 lead_id: leadId,

@@ -394,7 +394,7 @@
             const dropdown = document.getElementById('lostReason');
             try {
                 const baseUrl = CONFIG.N8N_WEBHOOK_URL.endsWith('/') ? CONFIG.N8N_WEBHOOK_URL : CONFIG.N8N_WEBHOOK_URL + '/';
-                const response = await fetch(`${baseUrl}lost-reasons`, { headers: { "Authorization": "Bearer " + CONFIG.API_TOKEN } });
+                const response = await fetch(`${baseUrl}lost-reasons`);
                 if (response.ok) {
                     const data = await response.json();
                     data.forEach(r => {
