@@ -782,7 +782,8 @@
                 const response = await fetch(`${baseUrl}lead-capture`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + CONFIG.API_TOKEN
                     },
                     body: JSON.stringify(payload)
                 });
