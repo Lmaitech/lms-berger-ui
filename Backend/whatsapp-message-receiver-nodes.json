@@ -402,12 +402,59 @@
     },
     {
       "parameters": {
-        "options": {
-          "systemMessage": "=You are the Berger Paints AI Agent assistant for DSEs (District Sales Executives) and DSOs (District Sales Officers).\nThe current user you are assisting is:\n- Name: {{$node[\"Postgres - Look Up User\"].json[\"name\"]}}\n- User ID: {{$node[\"Postgres - Look Up User\"].json[\"id\"]}}\n- Mobile: {{$node[\"Postgres - Look Up User\"].json[\"mobile\"]}}\n- Role: {{$node[\"Postgres - Look Up User\"].json[\"user_type\"]}}\n\nUse your tools to query information to answer the user's questions. Always search for leads, sites, check-in history, or estimates matching their queries. Refer to specific lead IDs when executing detail or log searches. Do not hallucinate data."
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "sendHeaders": true,
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"model\": \"gpt-4o-mini\", \"messages\": [ { \"role\": \"system\", \"content\": \"You are an AI router for a Lead Management System database. Analyze the user's question and determine if it requires querying a database tool. The user is a DSE/DSO with ID: '\" + $node[\"Postgres - Look Up User\"].json[\"id\"] + \"'.\\n\\nThe available tools are:\\n1. 'query_lead_details': For questions about lead status, site owner details, client contact info, assigned painter/retailer, or site address. Can accept optional filters like 'lead_id' (UUID), 'current_status' (string), or 'town' (string).\\n2. 'query_site_visits': For questions about painter check-in history, visit count, visit logs, or coordinates. Requires 'lead_id' (UUID).\\n3. 'query_estimates': For questions about estimates, pricing, items list, material/labor breakdown. Requires 'lead_id' (UUID).\\n4. 'none': For general questions or chit-chat that don't need database information.\\n\\nRespond ONLY with a valid JSON object matching this schema:\\n{\\n  \\\"tool\\\": \\\"query_lead_details\\\" | \\\"query_site_visits\\\" | \\\"query_estimates\\\" | \\\"none\\\",\\n  \\\"filters\\\": {\\n    \\\"lead_id\\\": \\\"UUID or null\\\",\\n    \\\"current_status\\\": \\\"STATUS or null\\\",\\n    \\\"town\\\": \\\"TOWN or null\\\"\\n  }\\n}\\nDo not include markdown code block formatting or any extra text.\" }, { \"role\": \"user\", \"content\": $node[\"WhatsApp Trigger\"].json.messages[0].text.body } ] } }}",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer your-openai-api-key-here"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
         }
       },
-      "name": "AI Agent",
-      "type": "n8n-nodes-base.advancedAiAgent",
+      "name": "HTTP Request - OpenAI Router",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1100,
+        820
+      ]
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{JSON.parse($node[\"HTTP Request - OpenAI Router\"].json[\"choices\"][0][\"message\"][\"content\"]).tool}}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "query_lead_details"
+            },
+            {
+              "value2": "query_site_visits",
+              "output": 1
+            },
+            {
+              "value2": "query_estimates",
+              "output": 2
+            },
+            {
+              "value2": "none",
+              "output": 3
+            }
+          ]
+        }
+      },
+      "name": "Switch - Tool Selection",
+      "type": "n8n-nodes-base.switch",
       "typeVersion": 1,
       "position": [
         1300,
@@ -416,115 +463,88 @@
     },
     {
       "parameters": {
-        "model": "gpt-4o-mini",
-        "options": {}
+        "operation": "executeQuery",
+        "query": "=SELECT lead_id, site_owner_name, site_owner_mobile, address_line1, address_line2, town, state, pincode, current_status, painter_name, retailer_name, latest_estimate_total FROM lead_detail_drilldown_view WHERE (dse_id = '{{$node[\"Postgres - Look Up User\"].json[\"id\"]}}' OR dso_id = '{{$node[\"Postgres - Look Up User\"].json[\"id\"]}}') AND ('{{JSON.parse($node[\"HTTP Request - OpenAI Router\"].json[\"choices\"][0][\"message\"][\"content\"]).filters.lead_id}}' IS NULL OR '{{JSON.parse($node[\"HTTP Request - OpenAI Router\"].json[\"choices\"][0][\"message\"][\"content\"]).filters.lead_id}}' = '' OR lead_id = '{{JSON.parse($node[\"HTTP Request - OpenAI Router\"].json[\"choices\"][0][\"message\"][\"content\"]).filters.lead_id}}'::uuid) AND ('{{JSON.parse($node[\"HTTP Request - OpenAI Router\"].json[\"choices\"][0][\"message\"][\"content\"]).filters.current_status}}' IS NULL OR '{{JSON.parse($node[\"HTTP Request - OpenAI Router\"].json[\"choices\"][0][\"message\"][\"content\"]).filters.current_status}}' = '' OR current_status = '{{JSON.parse($node[\"HTTP Request - OpenAI Router\"].json[\"choices\"][0][\"message\"][\"content\"]).filters.current_status}}') AND ('{{JSON.parse($node[\"HTTP Request - OpenAI Router\"].json[\"choices\"][0][\"message\"][\"content\"]).filters.town}}' IS NULL OR '{{JSON.parse($node[\"HTTP Request - OpenAI Router\"].json[\"choices\"][0][\"message\"][\"content\"]).filters.town}}' = '' OR LOWER(town) = LOWER('{{JSON.parse($node[\"HTTP Request - OpenAI Router\"].json[\"choices\"][0][\"message\"][\"content\"]).filters.town}}'));"
       },
-      "name": "OpenAI Chat Model",
-      "type": "n8n-nodes-base.lmChatOpenAi",
+      "name": "Postgres - Tool Query Lead Details",
+      "type": "n8n-nodes-base.postgres",
       "typeVersion": 1,
       "position": [
-        1200,
-        960
+        1520,
+        700
       ],
       "credentials": {
-        "openAiApi": {
-          "id": "openai-cred-id",
-          "name": "OpenAI API Connection"
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
         }
       }
     },
     {
-      "parameters": {},
-      "name": "Simple Memory",
-      "type": "n8n-nodes-base.memorySimple",
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=SELECT v.visit_id, v.visit_number, v.visit_time, v.remarks, l.site_owner_name FROM site_visits v JOIN leads l ON v.lead_id = l.lead_id WHERE v.lead_id = '{{JSON.parse($node[\"HTTP Request - OpenAI Router\"].json[\"choices\"][0][\"message\"][\"content\"]).filters.lead_id}}'::uuid AND (l.retailer_id IN (SELECT retailer_id FROM dse_retailer_mapping WHERE dse_id = '{{$node[\"Postgres - Look Up User\"].json[\"id\"]}}') OR l.current_painter_id = '{{$node[\"Postgres - Look Up User\"].json[\"id\"]}}');"
+      },
+      "name": "Postgres - Tool Query Site Visits",
+      "type": "n8n-nodes-base.postgres",
       "typeVersion": 1,
       "position": [
-        1300,
-        960
-      ]
+        1520,
+        820
+      ],
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
     },
     {
       "parameters": {
-        "name": "query_lead_details",
-        "description": "Query detailed info about leads (including customer name, mobile, full address lines, town, status, budget, assigned painter, assigned retailer). You can pass optional query parameters to filter results (e.g. 'lead_id=eq.UUID' to fetch a specific site's full address/details, or 'current_status=eq.STATUS' to filter). All queries are automatically scoped to your reporting boundary.",
-        "url": "=https://osszfmwnxnfngtgfmugv.supabase.co/rest/v1/lead_detail_drilldown_view?or=(dse_id.eq.{{$node[\"Postgres - Look Up User\"].json[\"id\"]}},dso_id.eq.{{$node[\"Postgres - Look Up User\"].json[\"id\"]}})",
+        "operation": "executeQuery",
+        "query": "=SELECT estimate_id, estimate_version, product_name, quantity, rate, line_total, material_total, labour_cost, grand_total FROM estimate_details_view WHERE lead_id = '{{JSON.parse($node[\"HTTP Request - OpenAI Router\"].json[\"choices\"][0][\"message\"][\"content\"]).filters.lead_id}}'::uuid;"
+      },
+      "name": "Postgres - Tool Query Estimates",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        1520,
+        940
+      ],
+      "credentials": {
+        "postgresDb": {
+          "id": "postgres-cred-id",
+          "name": "Supabase Postgres Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
         "sendHeaders": true,
-        "specifyHeaders": "keypair",
-        "headers": {
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"model\": \"gpt-4o-mini\", \"messages\": [ { \"role\": \"system\", \"content\": \"You are the Berger Paints AI Agent assistant for DSEs (District Sales Executives) and DSOs (District Sales Officers). Answer the user's question accurately, concisely, and professionally using the retrieved database context (if any).\\n\\n[DATABASE CONTEXT]:\\n\" + JSON.stringify($json) + \"\\n\\nOriginal user request: \" + $node[\"WhatsApp Trigger\"].json.messages[0].text.body }, { \"role\": \"user\", \"content\": $node[\"WhatsApp Trigger\"].json.messages[0].text.body } ] } }}",
+        "headerParameters": {
           "parameters": [
             {
-              "name": "apikey",
-              "value": "your-supabase-anon-key-here"
+              "name": "Authorization",
+              "value": "Bearer your-openai-api-key-here"
             },
             {
-              "name": "Authorization",
-              "value": "Bearer your-supabase-anon-key-here"
+              "name": "Content-Type",
+              "value": "application/json"
             }
           ]
         }
       },
-      "name": "Tool - Query Lead Details",
-      "type": "n8n-nodes-base.toolHttpRequest",
-      "typeVersion": 1,
+      "name": "HTTP Request - OpenAI Answerer",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
       "position": [
-        1400,
-        960
-      ]
-    },
-    {
-      "parameters": {
-        "name": "query_site_visits",
-        "description": "Query check-in logs and visit logs for a specific site. You MUST pass query parameter 'lead_id=eq.UUID' to view coordinates, check-in timestamps, and remarks left by painters.",
-        "url": "https://osszfmwnxnfngtgfmugv.supabase.co/rest/v1/site_visits",
-        "sendHeaders": true,
-        "specifyHeaders": "keypair",
-        "headers": {
-          "parameters": [
-            {
-              "name": "apikey",
-              "value": "your-supabase-anon-key-here"
-            },
-            {
-              "name": "Authorization",
-              "value": "Bearer your-supabase-anon-key-here"
-            }
-          ]
-        }
-      },
-      "name": "Tool - Query Site Visits",
-      "type": "n8n-nodes-base.toolHttpRequest",
-      "typeVersion": 1,
-      "position": [
-        1500,
-        960
-      ]
-    },
-    {
-      "parameters": {
-        "name": "query_estimates",
-        "description": "Query breakdown items, materials, labour costs, and version numbers of estimates. You MUST pass query parameter 'lead_id=eq.UUID' to get estimate details.",
-        "url": "https://osszfmwnxnfngtgfmugv.supabase.co/rest/v1/estimate_details_view",
-        "sendHeaders": true,
-        "specifyHeaders": "keypair",
-        "headers": {
-          "parameters": [
-            {
-              "name": "apikey",
-              "value": "your-supabase-anon-key-here"
-            },
-            {
-              "name": "Authorization",
-              "value": "Bearer your-supabase-anon-key-here"
-            }
-          ]
-        }
-      },
-      "name": "Tool - Query Estimates",
-      "type": "n8n-nodes-base.toolHttpRequest",
-      "typeVersion": 1,
-      "position": [
-        1600,
-        960
+        1760,
+        820
       ]
     },
     {
@@ -534,7 +554,7 @@
         "sendHeaders": true,
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Look Up User\"].json[\"mobile\"]}}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": \"{{$json[\"output\"].replace(/\\\"/g, '\\\\\\\"').replace(/\\n/g, '\\\\n')}}\"\n  }\n}",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{$node[\"Postgres - Look Up User\"].json[\"mobile\"]}}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": \"{{$json[\"choices\"][0][\"message\"][\"content\"].replace(/\\\"/g, '\\\\\\\"').replace(/\\n/g, '\\\\n')}}\"\n  }\n}",
         "headerParameters": {
           "parameters": [
             {
@@ -709,14 +729,14 @@
         ],
         [
           {
-            "node": "AI Agent",
+            "node": "HTTP Request - OpenAI Router",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "AI Agent",
+            "node": "HTTP Request - OpenAI Router",
             "type": "main",
             "index": 0
           }
@@ -752,67 +772,88 @@
         ]
       ]
     },
-    "AI Agent": {
+    "HTTP Request - OpenAI Router": {
       "main": [
         [
           {
-            "node": "HTTP Request - Send Agent WhatsApp",
+            "node": "Switch - Tool Selection",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "OpenAI Chat Model": {
-      "ai_languageModel": [
+    "Switch - Tool Selection": {
+      "main": [
         [
           {
-            "node": "AI Agent",
-            "type": "ai_languageModel",
+            "node": "Postgres - Tool Query Lead Details",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Postgres - Tool Query Site Visits",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Postgres - Tool Query Estimates",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request - OpenAI Answerer",
+            "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Simple Memory": {
-      "ai_memory": [
+    "Postgres - Tool Query Lead Details": {
+      "main": [
         [
           {
-            "node": "AI Agent",
-            "type": "ai_memory",
+            "node": "HTTP Request - OpenAI Answerer",
+            "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Tool - Query Lead Details": {
-      "ai_tool": [
+    "Postgres - Tool Query Site Visits": {
+      "main": [
         [
           {
-            "node": "AI Agent",
-            "type": "ai_tool",
+            "node": "HTTP Request - OpenAI Answerer",
+            "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Tool - Query Site Visits": {
-      "ai_tool": [
+    "Postgres - Tool Query Estimates": {
+      "main": [
         [
           {
-            "node": "AI Agent",
-            "type": "ai_tool",
+            "node": "HTTP Request - OpenAI Answerer",
+            "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Tool - Query Estimates": {
-      "ai_tool": [
+    "HTTP Request - OpenAI Answerer": {
+      "main": [
         [
           {
-            "node": "AI Agent",
-            "type": "ai_tool",
+            "node": "HTTP Request - Send Agent WhatsApp",
+            "type": "main",
             "index": 0
           }
         ]
