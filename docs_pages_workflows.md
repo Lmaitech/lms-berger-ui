@@ -363,6 +363,38 @@ The data is persisted across three Supabase tables:
   - Validates `userid` and `leadid` formats using PostgreSQL regex constraints inside standard Postgres nodes.
   - Interrogates `lead_detail_drilldown_view` to verify user hierarchy access. Returns complete product registry on success, otherwise routes to a `403` response node.
 
+---
+
+## 7. WhatsApp Incoming Message Receiver & Dynamic JS Agent Loop
+
+### A. Webhook Receiver & Router Workflow
+* **File Path:** [whatsapp-message-receiver-nodes.json](file:///Users/kaustavroychoudhury/Desktop/LMS%20Berger/Backend/whatsapp-message-receiver-nodes.json)
+* **Description:** An incoming message parser and router that intercepts WhatsApp messages, filters status callbacks, formats recipient numbers, and executes either role-based lists or an OpenAI-backed query agent.
+* **Key Features:**
+  - **Status Message Filtering**: Uses an `IF - Is Message Event` routing node immediately after the trigger to ignore `sent` or `delivered` delivery status receipts, preventing log noise.
+  - **91 Country Code Prefixing**: Automatically prefixes the sender's 10-digit mobile number from the database with the `91` country code prefix required by Meta APIs.
+  - **JS OpenAI Agent Loop**: Deploys a JavaScript Code node (`JS - OpenAI Agent Loop`) interfacing with OpenAI tool completions:
+    - Queries the `chat_history` table in Supabase to assemble conversation context memory.
+    - Specifies function calling schemas for `query_lead_details`, `query_site_visits`, and `query_estimates`.
+    - Automatically loops over parallel `tool_calls` using `Promise.all` fetches to query active views and tables.
+    - Saves the conversation history back to the `chat_history` table and returns the final response string.
+
+---
+
+## 8. Potential Code & Logic Issues Detected
+
+During this documentation process, the following critical logical gaps and potential errors were identified:
+
+> [!WARNING]
+> **Timeout Reassignment State Inconsistency**
+> In the assignment timeout monitor workflow (`painter-assignment-timeout-nodes.json`), when a pending assignment expires:
+> 1. It updates the assignment history status to `'EXPIRED'`.
+> 2. It dispatches a request to `/assign-painter` to trigger a new assignment search.
+>
+> However, unlike the Reject flow, the Timeout checker does **not** update the target row in the `leads` table to clear the old `current_painter_id` and reset `current_status` back to `'CREATED'` *before* firing the reassignment request.
+> If the re-assignment webhook fails to find any new painter (returns 404), the lead is left in `ASSIGNED` status and still points to the expired `current_painter_id` instead of reverting to `CREATED` (unassigned).
+
+
 
 
 

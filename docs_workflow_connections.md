@@ -347,6 +347,141 @@ sequenceDiagram
     deactivate HW
 ```
 
+---
+
+## 12. Estimate Details & PDF Generation Sequence
+
+```mermaid
+sequenceDiagram
+    participant UI as Estimate Viewer UI (view-estimate.html)
+    participant HW as HTTP Webhook (latest-estimate)
+    participant DB as Database (estimate_details_view)
+    participant PDF as html2pdf.js engine
+
+    UI->>HW: 1. GET /latest-estimate (lead_id, user_id)
+    activate HW
+    HW->>DB: 2. SELECT matching estimate records
+    DB-->>HW: Returns items array
+    HW-->>UI: 3. Respond with estimate details JSON
+    deactivate HW
+    UI->>UI: Render products catalog details & aggregates
+
+    opt Click Download PDF
+        UI->>UI: Trigger Download PDF Listener
+        Note over UI, PDF: Exclude buttons with data-html2canvas-ignore
+        UI->>PDF: Pass .app-container element
+        PDF->>PDF: Capture DOM and compile to PDF
+        PDF-->>UI: Trigger browser download (.pdf file)
+    end
+```
+
+---
+
+## 13. WhatsApp Parallel Tool Agent Loop & Memory Sequence
+
+```mermaid
+sequenceDiagram
+    participant WT as WhatsApp Trigger
+    participant LU as Look Up User Node
+    participant AL as JS Agent Loop Node (Code Node)
+    participant DB as Supabase REST API
+    participant OA as OpenAI gpt-4o-mini
+    participant WA as Send Agent WhatsApp Node
+
+    WT->>LU: 1. Message Trigger received ("HI" or text query)
+    LU->>AL: 2. Pass sender name, ID, and message body
+    activate AL
+
+    AL->>DB: 3. Fetch past 10 messages (chat_history table)
+    DB-->>AL: Returns history array
+    AL->>OA: 4. POST completion (messages + tools schema)
+    activate OA
+    
+    alt OpenAI Requests Database Query Tool Execution
+        OA-->>AL: 5. Returns array of tool_calls (query_lead_details, query_site_visits, query_estimates)
+        deactivate OA
+        
+        Note over AL, DB: Parallel fetch execution
+        AL->>DB: 6. Resolve all tool queries via Promise.all
+        DB-->>AL: Returns database tables/views results
+        
+        AL->>OA: 7. POST completion with tool query response arrays
+        activate OA
+        OA-->>AL: 8. Returns final text answer response
+        deactivate OA
+    else No Tools Required / Direct Response
+        activate OA
+        OA-->>AL: 5b. Returns direct completion text
+        deactivate OA
+    end
+
+    AL->>DB: 9. POST save messages (user query + final assistant answer) to chat_history
+    AL->>WA: 10. Pass final text string output
+    deactivate AL
+    WA->>WT: 11. Dispatches message payload back to user via WhatsApp
+```
+
+---
+
+## 14. Painter Consultation Calendar Load Flow
+
+```mermaid
+sequenceDiagram
+    participant UI as Calendar Page (painter-calendar.html)
+    participant HW as HTTP Webhook (painter-visits)
+    participant DB as Postgres Database (Supabase)
+
+    UI->>HW: 1. GET /painter-visits?painter_id=painter_id
+    activate HW
+    HW->>DB: 2. SELECT leads and count(site_visits)
+    DB-->>HW: Returns list of assigned sites & visit counts
+    HW-->>UI: 3. Respond with JSON array
+    deactivate HW
+    UI->>UI: Filter and render Scheduled vs Completed tabs
+```
+
+---
+
+## 15. Painter Assignment Timeout Reassignment Sequence
+
+```mermaid
+sequenceDiagram
+    participant CT as Cron Trigger (Every 2h)
+    participant DB as Postgres Database (Supabase)
+    participant AM as Auto-Assignment Webhook (assign-painter)
+
+    CT->>DB: 1. Query PENDING assignments > 6 hours old
+    DB-->>CT: Returns matching assignment_id & lead_id list
+    loop For each expired assignment
+        CT->>DB: 2. UPDATE lead_assignment_history to EXPIRED
+        CT->>AM: 3. POST assign-painter (lead_id, retailer_id)
+        activate AM
+        Note over AM: Search & match next candidate
+        AM-->>CT: Returns new assignment status
+        deactivate AM
+    end
+```
+
+---
+
+## 16. Daily Site Visit Reminders Notification Sequence
+
+```mermaid
+sequenceDiagram
+    participant CT as Cron Trigger (Daily 8AM)
+    participant DB as Postgres Database (Supabase)
+    participant WA as Meta WhatsApp API
+
+    CT->>DB: 1. Query today's consults (leads + painter users)
+    DB-->>CT: Returns scheduled visits list with contact details
+    loop For each scheduled visit
+        CT->>WA: 2. Send interactive cta_url calendar link to Painter
+        CT->>WA: 3. Send text reminder containing painter details to Customer
+    end
+```
+
+
+
 
 
 

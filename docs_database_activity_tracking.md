@@ -295,6 +295,58 @@ This document acts as a registry to track which user activities, front-end actio
   - **`lead_detail_drilldown_view`**: Checks that the requested `userid` matches one of the assigned roles (`dso_id`, `dse_id`, `retailer_id`, `painter_id`) associated with the `leadid` row.
   - **`products`**: If authorized, retrieves the list of active products including `product_id`, `sku_code`, `product_name`, `category`, `unit`, `description`, `specifications`, `segment`, and `tags`.
 
+---
+
+## 15. Activity: Fetch Estimate Viewer Details
+* **Trigger Component:** `UI/view-estimate.html` (onload event)
+* **Backend Endpoint:** GET `/latest-estimate?lead_id=...&user_id=...`
+* **Database Action:** Read (SELECT)
+* **Tables/Views Affected:**
+  - **`estimate_details_view`**: Returns the list of product items, quantities, rates, and line totals for the matching estimate ID.
+
+---
+
+## 16. Activity: Read/Write Chat History Conversation Context
+* **Trigger Component:** WhatsApp Message Agent Query loop (`Backend/whatsapp-message-receiver-nodes.json`)
+* **Backend Endpoint:** Orchestration inside the JS Agent Loop Code Node
+* **Database Action:** Read & Write (SELECT / INSERT)
+* **Tables Affected:**
+  - **`chat_history`**: 
+    - **Read**: Selects the last 10 messages ordered by `created_at` where `user_id` matches the sender's UUID.
+    - **Write**: Inserts the new user query message and the final assistant response message at the end of the loop.
+
+---
+
+## 17. Activity: Load Painter Consultation Calendar
+* **Trigger Component:** `UI/painter-calendar.html` (onload event)
+* **Backend Endpoint:** GET `/painter-visits?painter_id=...`
+* **Database Action:** Read (SELECT)
+* **Tables/Views Affected:**
+  - **`leads`**: Selects all leads assigned to `current_painter_id`.
+  - **`site_visits`**: Run counts of visit events per lead.
+
+---
+
+## 18. Activity: Painter Assignment Timeout Check
+* **Trigger Component:** Background Cron service (`Backend/painter-assignment-timeout-nodes.json`)
+* **Backend Endpoint:** Automated scheduled query runs every 2 hours
+* **Database Action:** Read & Write (SELECT / UPDATE)
+* **Tables Affected:**
+  - **`lead_assignment_history`**: Reads pending records older than 6 hours and updates `response_status` to `'EXPIRED'`.
+  - **`leads`**: Joins to check active status.
+
+---
+
+## 19. Activity: Daily Site Visit Reminders Cron Execution
+* **Trigger Component:** Background Cron service (`Backend/daily-visit-reminders.json`)
+* **Backend Endpoint:** Automated scheduled query runs daily at 8:00 AM
+* **Database Action:** Read (SELECT)
+* **Tables/Views Affected:**
+  - **`leads`**: Reads visits scheduled for the current date.
+  - **`users`**: Joins on `current_painter_id` to get contact details for notifications.
+
+
+
 
 
 
