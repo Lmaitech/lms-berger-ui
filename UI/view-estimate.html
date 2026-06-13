@@ -278,17 +278,14 @@
         </header>
 
         <div class="content" id="mainContent">
-            <div id="pdfTemplate" style="position: fixed; top: 0; left: 0; width: 794px; height: 0; overflow: hidden; z-index: -9999;">
-                <div class="pdf-container" id="pdfContent" style="width: 794px; background: #ffffff; position: absolute; left: 0; top: 0;">
+            <div id="pdfTemplate" style="position: absolute; left: -9999px; top: 0; width: 794px;">
+                <div class="pdf-container" id="pdfContent" style="width: 794px; background: #ffffff;">
                     <style>
                         .pdf-container {
                             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
                             color: #1a202c;
                             width: 794px;
                             background: #ffffff;
-                            position: absolute;
-                            left: 0;
-                            top: 0;
                         }
                     .pdf-header {
                         background-color: #0b2d6a; /* Berger navy blue */
@@ -664,6 +661,14 @@
 
         // Download PDF functionality
         document.getElementById('btnDownloadPdf').addEventListener('click', () => {
+            const pdfTemplate = document.getElementById('pdfTemplate');
+            
+            // Temporarily move to top-left viewport but keep hidden behind main UI layers
+            pdfTemplate.style.position = 'fixed';
+            pdfTemplate.style.left = '0';
+            pdfTemplate.style.top = '0';
+            pdfTemplate.style.zIndex = '-9999';
+
             const element = document.getElementById('pdfContent');
             const options = {
                 margin: 0,
@@ -673,7 +678,13 @@
                 jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
             };
             
-            html2pdf().set(options).from(element).save();
+            html2pdf().set(options).from(element).save().then(() => {
+                // Restore offscreen layout
+                pdfTemplate.style.position = 'absolute';
+                pdfTemplate.style.left = '-9999px';
+                pdfTemplate.style.top = '0';
+                pdfTemplate.style.zIndex = '';
+            });
         });
     </script>
 </body>
