@@ -278,8 +278,8 @@
         </header>
 
         <div class="content" id="mainContent">
-            <!-- Hidden PDF Template rendered off-screen to allow layout calculation -->
-            <div id="pdfTemplate" style="position: absolute; left: -9999px; top: 0; width: 800px;">
+            <!-- Hidden PDF Template rendered off-screen with height:0 to maintain correct coordinates for html2canvas -->
+            <div id="pdfTemplate" style="position: fixed; top: 0; left: 0; width: 794px; height: 0; overflow: hidden; z-index: -9999;">
                 <style>
                     .pdf-container {
                         font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -667,7 +667,7 @@
                 margin: 0,
                 filename: `Berger_Paints_Estimate_${leadId || 'Details'}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true, windowWidth: 800 },
+                html2canvas: { scale: 2, useCORS: true, windowWidth: 794 },
                 jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
             };
             
