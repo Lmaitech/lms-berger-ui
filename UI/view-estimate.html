@@ -278,15 +278,18 @@
         </header>
 
         <div class="content" id="mainContent">
-            <!-- Hidden PDF Template rendered off-screen with height:0 to maintain correct coordinates for html2canvas -->
             <div id="pdfTemplate" style="position: fixed; top: 0; left: 0; width: 794px; height: 0; overflow: hidden; z-index: -9999;">
-                <style>
-                    .pdf-container {
-                        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-                        color: #1a202c;
-                        width: 100%;
-                        background: #ffffff;
-                    }
+                <div class="pdf-container" id="pdfContent" style="width: 794px; background: #ffffff; position: absolute; left: 0; top: 0;">
+                    <style>
+                        .pdf-container {
+                            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+                            color: #1a202c;
+                            width: 794px;
+                            background: #ffffff;
+                            position: absolute;
+                            left: 0;
+                            top: 0;
+                        }
                     .pdf-header {
                         background-color: #0b2d6a; /* Berger navy blue */
                         color: #ffffff;
@@ -382,7 +385,6 @@
                         font-size: 14px;
                     }
                 </style>
-                <div class="pdf-container" id="pdfContent">
                     <div class="pdf-header">
                         <div class="pdf-header-left">
                             <h1>Estimate</h1>
