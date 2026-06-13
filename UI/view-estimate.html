@@ -278,8 +278,8 @@
         </header>
 
         <div class="content" id="mainContent">
-            <!-- Hidden PDF Template -->
-            <div id="pdfTemplate" style="display: none;">
+            <!-- Hidden PDF Template rendered off-screen to allow layout calculation -->
+            <div id="pdfTemplate" style="position: absolute; left: -9999px; top: 0; width: 800px;">
                 <style>
                     .pdf-container {
                         font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -662,9 +662,6 @@
 
         // Download PDF functionality
         document.getElementById('btnDownloadPdf').addEventListener('click', () => {
-            const pdfTemplate = document.getElementById('pdfTemplate');
-            pdfTemplate.style.display = 'block';
-            
             const element = document.getElementById('pdfContent');
             const options = {
                 margin: 0,
@@ -674,9 +671,7 @@
                 jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
             };
             
-            html2pdf().set(options).from(element).save().then(() => {
-                pdfTemplate.style.display = 'none';
-            });
+            html2pdf().set(options).from(element).save();
         });
     </script>
 </body>
