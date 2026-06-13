@@ -972,7 +972,7 @@
                     cleanStatusHistory.forEach(item => {
                         const formattedTime = new Date(item.changed_at).toLocaleString('en-IN', istOptions) + " (IST)";
 
-                        if (item.isReassignmentGroup) {
+                        if (item.isReassignmentGroup && role === 'RETAILER') {
                             let attemptsDetailHTML = "";
                             declineAttempts.forEach((attempt, index) => {
                                 const rejectedTime = new Date(attempt.response_at || attempt.assigned_at).toLocaleString('en-IN', istOptions);

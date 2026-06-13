@@ -333,6 +333,10 @@
                     <span class="summary-val" id="summaryName">-</span>
                 </div>
                 <div class="summary-row">
+                    <span class="summary-label">Client Mobile</span>
+                    <span class="summary-val" id="summaryMobile">-</span>
+                </div>
+                <div class="summary-row">
                     <span class="summary-label">Address</span>
                     <span class="summary-val" id="summaryAddress">-</span>
                 </div>
@@ -380,6 +384,7 @@
 
         // Populate summary
         document.getElementById('summaryName').textContent = ownerName || '-';
+        document.getElementById('summaryMobile').textContent = ownerMobile || '-';
         document.getElementById('summaryAddress').textContent = address || '-';
         document.getElementById('summaryVisitNumber').textContent = `${visitNumber} Visits`;
 

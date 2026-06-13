@@ -271,12 +271,21 @@
                 </div>
 
                 <!-- Tool 5 -->
-                <div class="tool-card" style="grid-column: span 2;" onclick="goToKnowledgeBase()">
+                <div class="tool-card" onclick="goToKnowledgeBase()">
                     <div class="tool-icon" style="color: var(--purple-main); background: rgba(74, 21, 75, 0.08);">
                         <svg viewBox="0 0 24 24"><path d="M12 11.55C9.64 9.35 6.48 8 3 8v11c3.48 0 6.64 1.35 9 3.55 2.36-2.2 5.52-3.55 9-3.55V8c-3.48 0-6.64 1.35-9 3.55zM12 2c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3z"/></svg>
                     </div>
                     <div class="tool-name">Knowledge Bank</div>
                     <div class="tool-desc">Access paint catalog, application guides, and product catalog training</div>
+                </div>
+
+                <!-- Tool 6 -->
+                <div class="tool-card" onclick="openBergerApp()">
+                    <div class="tool-icon" style="color: #00838f; background: rgba(0, 131, 143, 0.1);">
+                        <svg viewBox="0 0 24 24"><path d="M17 1H7c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2zm0 18H7V5h10v14zM8 6h8v2H8z"/></svg>
+                    </div>
+                    <div class="tool-name">My Colour App</div>
+                    <div class="tool-desc">Launch or download the Berger My Colour visualizer app</div>
                 </div>
             </div>
 
@@ -345,6 +354,20 @@
 
         function goToKnowledgeBase() {
             window.location.href = `berger-paints-product-knowledgebase.html?userid=${painterId}&leadid=${leadId}`;
+        }
+
+        function openBergerApp() {
+            const appScheme = "bergerpaints://"; 
+            const playStoreUrl = "https://play.google.com/store/apps/details?id=com.berger.mycolour";
+            
+            const start = Date.now();
+            window.location.href = appScheme;
+            
+            setTimeout(() => {
+                if (Date.now() - start < 1500) {
+                    window.location.href = playStoreUrl;
+                }
+            }, 1000);
         }
     </script>
 </body>

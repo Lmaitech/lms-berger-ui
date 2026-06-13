@@ -278,6 +278,176 @@
         </header>
 
         <div class="content" id="mainContent">
+            <!-- Hidden PDF Template -->
+            <div id="pdfTemplate" style="display: none;">
+                <style>
+                    .pdf-container {
+                        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+                        color: #1a202c;
+                        width: 100%;
+                        background: #ffffff;
+                    }
+                    .pdf-header {
+                        background-color: #0b2d6a; /* Berger navy blue */
+                        color: #ffffff;
+                        padding: 35px;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: flex-start;
+                    }
+                    .pdf-header-left h1 {
+                        margin: 0 0 20px 0;
+                        font-size: 38px;
+                        font-weight: 700;
+                        letter-spacing: 1px;
+                    }
+                    .pdf-logo {
+                        background: #ffffff;
+                        padding: 10px 15px;
+                        display: inline-block;
+                    }
+                    .pdf-header-right {
+                        text-align: right;
+                        font-size: 13px;
+                        line-height: 1.6;
+                    }
+                    .pdf-info-section {
+                        display: flex;
+                        justify-content: space-between;
+                        padding: 35px;
+                        border-bottom: 2px solid #0b2d6a;
+                    }
+                    .pdf-info-block h3 {
+                        font-size: 12px;
+                        font-weight: 800;
+                        text-transform: uppercase;
+                        color: #0b2d6a;
+                        margin: 0 0 10px 0;
+                    }
+                    .pdf-info-table {
+                        font-size: 12px;
+                    }
+                    .pdf-info-table td {
+                        padding: 3px 12px 3px 0;
+                    }
+                    .pdf-table {
+                        width: calc(100% - 70px);
+                        border-collapse: collapse;
+                        margin: 25px 35px;
+                    }
+                    .pdf-table th {
+                        text-transform: uppercase;
+                        font-size: 11px;
+                        color: #0b2d6a;
+                        border-bottom: 2px solid #0b2d6a;
+                        padding: 12px 8px;
+                        text-align: left;
+                    }
+                    .pdf-table td {
+                        font-size: 12px;
+                        padding: 12px 8px;
+                        border-bottom: 1px solid #e2e8f0;
+                    }
+                    .pdf-footer {
+                        display: flex;
+                        justify-content: space-between;
+                        padding: 35px;
+                    }
+                    .pdf-terms {
+                        width: 50%;
+                        font-size: 11px;
+                        line-height: 1.5;
+                        color: #4a5568;
+                    }
+                    .pdf-terms h3 {
+                        font-size: 12px;
+                        color: #0b2d6a;
+                        text-transform: uppercase;
+                        margin: 0 0 8px 0;
+                        font-weight: 800;
+                    }
+                    .pdf-summary-table {
+                        width: 40%;
+                        font-size: 13px;
+                        border-collapse: collapse;
+                    }
+                    .pdf-summary-table td {
+                        padding: 6px 10px;
+                    }
+                    .pdf-summary-table tr.pdf-total td {
+                        font-weight: 800;
+                        border-top: 2px solid #0b2d6a;
+                        padding-top: 12px;
+                        margin-top: 12px;
+                        font-size: 14px;
+                    }
+                </style>
+                <div class="pdf-container" id="pdfContent">
+                    <div class="pdf-header">
+                        <div class="pdf-header-left">
+                            <h1>Estimate</h1>
+                            <div class="pdf-logo">
+                                <img src="assets/berger_logo.png" style="height: 45px;" alt="Logo" onerror="this.style.display='none'">
+                                <span style="color: #0b2d6a; font-weight: 800; font-size: 16px; margin-left: 8px; vertical-align: super;">Berger Paints</span>
+                            </div>
+                        </div>
+                        <div class="pdf-header-right">
+                            <div style="font-weight: 700; font-size: 16px; margin-bottom: 5px;">Berger Paints India Ltd.</div>
+                            <div>129, Park Street</div>
+                            <div>Kolkata, West Bengal 700017</div>
+                            <div>1800-103-6030</div>
+                            <div>consumerfeedback@bergerindia.com</div>
+                            <div>www.bergerpaints.com</div>
+                        </div>
+                    </div>
+                    <div class="pdf-info-section">
+                        <div class="pdf-info-block">
+                            <h3>ESTIMATE DETAILS:</h3>
+                            <table class="pdf-info-table">
+                                <tr><td style="font-weight: 700; color: #0b2d6a;">Estimate #</td><td id="pdfEstVersion">0000</td></tr>
+                                <tr><td style="font-weight: 700; color: #0b2d6a;">Estimate Date</td><td id="pdfEstDate">MM/DD/YYYY</td></tr>
+                            </table>
+                        </div>
+                        <div class="pdf-info-block" style="text-align: right;">
+                            <h3>PREPARED FOR:</h3>
+                            <div id="pdfCustName" style="font-weight: 800; font-size: 14px; margin-bottom: 5px; color: #0b2d6a;">CUSTOMER NAME</div>
+                            <div id="pdfCustAddress" style="font-size: 12px; color: #4a5568;">Street Address Line 01<br>Street Address Line 02</div>
+                        </div>
+                    </div>
+                    
+                    <table class="pdf-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 20%">ITEM/SERVICE</th>
+                                <th style="width: 40%">DESCRIPTION</th>
+                                <th style="width: 15%; text-align: center;">QTY/HRS</th>
+                                <th style="width: 15%; text-align: right;">RATE</th>
+                                <th style="width: 10%; text-align: right;">AMOUNT</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pdfTableBody">
+                            <!-- dynamic -->
+                        </tbody>
+                    </table>
+
+                    <div class="pdf-footer">
+                        <div class="pdf-terms">
+                            <h3>TERMS</h3>
+                            <p style="margin-bottom: 20px;">Estimate valid for 15 days. Subject to change based on final site conditions.</p>
+                            <h3>CONDITIONS/INSTRUCTIONS</h3>
+                            <p>Surface preparation and minor crack filling included. Deep masonry cracks or dampness treatments will be charged extra. Final billing based on actual volume consumed or measured area.</p>
+                        </div>
+                        <table class="pdf-summary-table">
+                            <tr><td style="font-weight: 700; color: #4a5568;">Material Total</td><td style="text-align: right;" id="pdfCostMaterial">₹0.00</td></tr>
+                            <tr><td style="font-weight: 700; color: #4a5568;">Labour & Manpower</td><td style="text-align: right;" id="pdfCostLabour">₹0.00</td></tr>
+                            <tr><td style="font-weight: 700; color: #4a5568;">Discount Applied</td><td style="text-align: right;" id="pdfCostDiscount">₹0.00</td></tr>
+                            <tr class="pdf-total"><td style="color: #0b2d6a;">TOTAL</td><td style="text-align: right; color: #0b2d6a;" id="pdfCostGrand">₹0.00</td></tr>
+                        </table>
+                    </div>
+                    <div style="background: #0b2d6a; height: 16px; width: 100%; margin-top: 40px;"></div>
+                </div>
+            </div>
+
             <!-- Loading Overlay -->
             <div class="overlay" id="loadingOverlay">
                 <div class="spinner"></div>
@@ -455,6 +625,35 @@
                 `;
                 itemsList.appendChild(itemCard);
             });
+            
+            // Populate PDF Template
+            document.getElementById('pdfEstVersion').textContent = `EST-${(leadId || '0000').substring(0,6).toUpperCase()}-V${firstRow.estimate_version}`;
+            document.getElementById('pdfEstDate').textContent = firstRow.formatted_submitted_at;
+            document.getElementById('pdfCustName').textContent = firstRow.site_owner_name;
+            document.getElementById('pdfCustAddress').innerHTML = `${firstRow.address_line1}${firstRow.address_line2 ? '<br>' + firstRow.address_line2 : ''}<br>${firstRow.town}, ${firstRow.state} - ${firstRow.pincode}`;
+            
+            document.getElementById('pdfCostMaterial').textContent = `₹${parseFloat(firstRow.material_total).toLocaleString('en-IN')}`;
+            document.getElementById('pdfCostLabour').textContent = `₹${parseFloat(firstRow.labour_cost).toLocaleString('en-IN')}`;
+            document.getElementById('pdfCostDiscount').textContent = `₹${parseFloat(firstRow.discount).toLocaleString('en-IN')}`;
+            document.getElementById('pdfCostGrand').textContent = `₹${parseFloat(firstRow.grand_total).toLocaleString('en-IN')}`;
+            
+            const pdfTableBody = document.getElementById('pdfTableBody');
+            pdfTableBody.innerHTML = '';
+            rows.forEach(item => {
+                const isVolume = firstRow.estimate_type === 'VOLUME';
+                const qtyStr = isVolume ? `${parseFloat(item.quantity)} ${item.unit}` : '-';
+                const rateStr = isVolume ? `₹${parseFloat(item.rate)}/${item.unit}` : `₹${parseFloat(item.rate)}`;
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-weight: 700; color: #0b2d6a;">${item.category || 'Painting'}</td>
+                    <td>${item.product_name}</td>
+                    <td style="text-align: center; color: #4a5568;">${qtyStr}</td>
+                    <td style="text-align: right; color: #4a5568;">${rateStr}</td>
+                    <td style="text-align: right; font-weight: 600;">₹${parseFloat(item.line_total).toLocaleString('en-IN')}</td>
+                `;
+                pdfTableBody.appendChild(tr);
+            });
 
             // Transition visibility
             loadingOverlay.style.display = 'none';
@@ -463,15 +662,21 @@
 
         // Download PDF functionality
         document.getElementById('btnDownloadPdf').addEventListener('click', () => {
-            const element = document.querySelector('.app-container');
+            const pdfTemplate = document.getElementById('pdfTemplate');
+            pdfTemplate.style.display = 'block';
+            
+            const element = document.getElementById('pdfContent');
             const options = {
-                margin: [10, 10, 10, 10],
+                margin: 0,
                 filename: `Berger_Paints_Estimate_${leadId || 'Details'}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                html2canvas: { scale: 2, useCORS: true, windowWidth: 800 },
+                jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
             };
-            html2pdf().set(options).from(element).save();
+            
+            html2pdf().set(options).from(element).save().then(() => {
+                pdfTemplate.style.display = 'none';
+            });
         });
     </script>
 </body>
