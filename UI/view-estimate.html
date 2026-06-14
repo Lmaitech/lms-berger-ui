@@ -420,13 +420,90 @@
             // Render Metadata
             document.getElementById('estVersion').textContent = `v${firstRow.estimate_version}`;
             document.getElementById('estMode').textContent = firstRow.estimate_mode === 'SUPPLY_APPLY' ? 'Supply & Apply' : 'Supply Only';
-            document.getElementById('estDate').textContent = firstRow.formatted_submitted_at;
+            
+            if (firstRow.submitted_at) {
+                const dateObj = new Date(firstRow.submitted_at);
+                const dd = String(dateObj.getDate()).padStart(2, '0');
+                const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+                const yyyy = dateObj.getFullYear();
+                document.getElementById('estDate').textContent = `${dd}:${mm}:${yyyy}`;
+            } else {
+                document.getElementById('estDate').textContent = '-';
+            }
 
-            // Render Cost aggregation
-            document.getElementById('costMaterial').textContent = `₹${parseFloat(firstRow.material_total).toLocaleString('en-IN')}`;
-            document.getElementById('costLabour').textContent = `₹${parseFloat(firstRow.labour_cost).toLocaleString('en-IN')}`;
-            document.getElementById('costDiscount').textContent = `₹${parseFloat(firstRow.discount).toLocaleString('en-IN')}`;
-            document.getElementById('costGrand').textContent = `₹${parseFloat(firstRow.grand_total).toLocaleString('en-IN')}`;
+            const isVolume = firstRow.estimate_type === 'VOLUME';
+            const isSupplyApply = firstRow.estimate_mode === 'SUPPLY_APPLY';
+            const costSummaryDiv = document.querySelector('.cost-summary');
+
+            if (isVolume) {
+                const volumeSums = {};
+                rows.forEach(item => {
+                    let unit = item.unit || 'L';
+                    const upperUnit = unit.toUpperCase().trim();
+                    if (['L', 'LTR', 'LITRE', 'LITRES', 'LTRS'].includes(upperUnit)) {
+                        unit = 'L';
+                    } else if (['KG', 'KGS', 'KILOGRAM', 'KILOGRAMS'].includes(upperUnit)) {
+                        unit = 'Kg';
+                    }
+                    volumeSums[unit] = (volumeSums[unit] || 0) + (parseFloat(item.quantity) || 0);
+                });
+
+                const volParts = [];
+                Object.keys(volumeSums).forEach(u => {
+                    if (volumeSums[u] > 0) {
+                        volParts.push(`${volumeSums[u].toFixed(2)} ${u}`);
+                    }
+                });
+                const materialDisplay = volParts.length > 0 ? volParts.join(' + ') : '0.00 L/Kg';
+
+                let grandDisplay = '';
+                if (isSupplyApply) {
+                    grandDisplay = `Rs ${parseFloat(firstRow.labour_cost).toFixed(2)} (Manpower) + ${materialDisplay}`;
+                } else {
+                    grandDisplay = materialDisplay;
+                }
+
+                costSummaryDiv.innerHTML = `
+                    <div class="cost-row">
+                        <span>Material Total</span>
+                        <span>${materialDisplay}</span>
+                    </div>
+                    ${isSupplyApply ? `
+                    <div class="cost-row">
+                        <span>Labour & Manpower</span>
+                        <span>₹${parseFloat(firstRow.labour_cost).toLocaleString('en-IN')}</span>
+                    </div>` : ''}
+                    <div class="cost-row grand-total">
+                        <span>Grand Total</span>
+                        <span>${grandDisplay}</span>
+                    </div>
+                `;
+            } else {
+                const materialVal = parseFloat(firstRow.material_total) || 0;
+                const labourVal = parseFloat(firstRow.labour_cost) || 0;
+                const subtotal = materialVal + labourVal;
+                const gstVal = subtotal * 0.18;
+                const grandTotal = subtotal + gstVal;
+
+                costSummaryDiv.innerHTML = `
+                    <div class="cost-row">
+                        <span>Material Total</span>
+                        <span>₹${materialVal.toLocaleString('en-IN')}</span>
+                    </div>
+                    <div class="cost-row">
+                        <span>Labour & Manpower</span>
+                        <span>₹${labourVal.toLocaleString('en-IN')}</span>
+                    </div>
+                    <div class="cost-row">
+                        <span>GST (18%)</span>
+                        <span>₹${gstVal.toLocaleString('en-IN')}</span>
+                    </div>
+                    <div class="cost-row grand-total">
+                        <span>Grand Total</span>
+                        <span>₹${grandTotal.toLocaleString('en-IN')}</span>
+                    </div>
+                `;
+            }
 
             // Render Items List
             const itemsList = document.getElementById('itemsList');
@@ -435,18 +512,33 @@
                 const itemCard = document.createElement('div');
                 itemCard.className = 'item-card';
 
-                // Setup metric display based on type (Volume in L/Kg or Value)
-                const isVolume = firstRow.estimate_type === 'VOLUME';
-                const metaString = isVolume 
-                    ? `Qty: ${parseFloat(item.quantity)} ${item.unit} | Rate: ₹${parseFloat(item.rate)}/${item.unit}` 
-                    : `Estimated Value | Unit Rate: ₹${parseFloat(item.rate)}`;
+                let unit = item.unit || 'L';
+                const upperUnit = unit.toUpperCase().trim();
+                if (['L', 'LTR', 'LITRE', 'LITRES', 'LTRS'].includes(upperUnit)) {
+                    unit = 'L';
+                } else if (['KG', 'KGS', 'KILOGRAM', 'KILOGRAMS'].includes(upperUnit)) {
+                    unit = 'Kg';
+                }
+
+                let metaString = '';
+                if (firstRow.estimate_mode === 'SUPPLY') {
+                    metaString = `Qty: ${parseFloat(item.quantity)} ${unit}`;
+                } else {
+                    metaString = isVolume 
+                        ? `Qty: ${parseFloat(item.quantity)} ${unit} | Rate: ₹${parseFloat(item.rate)}/${unit}` 
+                        : `Estimated Value | Unit Rate: ₹${parseFloat(item.rate)}`;
+                }
+
+                const totalDisplay = isVolume
+                    ? `${parseFloat(item.quantity)} ${unit}`
+                    : `₹${parseFloat(item.line_total).toLocaleString('en-IN')}`;
 
                 itemCard.innerHTML = `
                     <div class="item-details">
                         <div class="item-name">${item.product_name}</div>
                         <div class="item-meta">${metaString}</div>
                     </div>
-                    <div class="item-total">₹${parseFloat(item.line_total).toLocaleString('en-IN')}</div>
+                    <div class="item-total">${totalDisplay}</div>
                 `;
                 itemsList.appendChild(itemCard);
             });
