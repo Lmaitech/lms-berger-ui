@@ -80,6 +80,13 @@ This document describes the front-end pages and back-end integration workflows i
   - Provides a stylized single-select dropdown of reasons (e.g. Price Too High, Chosen Another Brand).
   - Submit action records the site as Lost and returns the user to the landing dashboard pipeline.
 
+### H. Project Tools Landing Page
+* **File Path:** [project-tools.html](file:///Users/kaustavroychoudhury/Desktop/LMS%20Berger/UI/project-tools.html)
+* **Description:** A mobile-first routing menu for active site visits.
+* **Key Features:**
+  - Provides navigation links to standard operations (Site Won, Site Lost, Submit Estimate, Schedule Follow-up).
+  - Features smart device detection to redirect users accurately to the Apple App Store or Google Play Store when launching the Berger My Colour App.
+
 ---
 
 ## 2. Configuration Settings
@@ -365,19 +372,21 @@ The data is persisted across three Supabase tables:
 
 ---
 
-## 7. WhatsApp Incoming Message Receiver & Dynamic JS Agent Loop
+## 7. WhatsApp Incoming Message Receiver & Dual-Agent Architecture
 
 ### A. Webhook Receiver & Router Workflow
 * **File Path:** [whatsapp-message-receiver-nodes.json](file:///Users/kaustavroychoudhury/Desktop/LMS%20Berger/Backend/whatsapp-message-receiver-nodes.json)
-* **Description:** An incoming message parser and router that intercepts WhatsApp messages, filters status callbacks, formats recipient numbers, and executes either role-based lists or an OpenAI-backed query agent.
+* **Description:** An incoming message parser and router that intercepts WhatsApp messages, filters status callbacks, formats recipient numbers, and executes either role-based lists or an advanced dual-agent architecture for DSEs/DSOs.
 * **Key Features:**
   - **Status Message Filtering**: Uses an `IF - Is Message Event` routing node immediately after the trigger to ignore `sent` or `delivered` delivery status receipts, preventing log noise.
   - **91 Country Code Prefixing**: Automatically prefixes the sender's 10-digit mobile number from the database with the `91` country code prefix required by Meta APIs.
-  - **JS OpenAI Agent Loop**: Deploys a JavaScript Code node (`JS - OpenAI Agent Loop`) interfacing with OpenAI tool completions:
-    - Queries the `chat_history` table in Supabase to assemble conversation context memory.
-    - Specifies function calling schemas for `query_lead_details`, `query_site_visits`, and `query_estimates`.
-    - Automatically loops over parallel `tool_calls` using `Promise.all` fetches to query active views and tables.
-    - Saves the conversation history back to the `chat_history` table and returns the final response string.
+  - **Dual-Agent Database Architecture**: Replaced the single loop agent with a powerful dual-agent pipeline:
+    - **Postgres - Get Chat History**: Queries the `chat_history` table directly in n8n.
+    - **Agent 1 (Planner)**: Analyzes the user's intent alongside a massive system prompt containing the full database schema, dynamic constraints, and `enum_list.md`. It outputs exact Postgres SQL queries to run or executes a smart fallback query (e.g. mapping DSE to Retailers) if no explicit query is needed (general chit-chat). It stringifies the chat history directly into the system prompt to avoid OpenAI 400 `AxiosError`s.
+    - **Parallel SQL Execution**: Uses a switch node to execute the dynamic SQL queries across multiple Postgres nodes in parallel.
+    - **Agent 2 (Responder)**: Receives the raw JSON data results from the database, combined with the conversational history string, to craft a coherent, highly-accurate final response to the user.
+    - Both agents output `tokenUsage` metrics and their exact `inputPrompt` payloads for tracking and debugging.
+  - **Chat History Logging**: Concludes the pipeline with a `Postgres - Save Chat History` node that securely interpolates the user's query and the AI's output back into the Supabase memory.
 
 ---
 
