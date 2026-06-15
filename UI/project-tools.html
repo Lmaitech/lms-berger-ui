@@ -357,17 +357,20 @@
         }
 
         function openBergerApp() {
-            const appScheme = "bergerpaints://"; 
-            const playStoreUrl = "https://play.google.com/store/apps/details?id=com.berger.mycolour";
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
             
-            const start = Date.now();
-            window.location.href = appScheme;
-            
-            setTimeout(() => {
-                if (Date.now() - start < 1500) {
-                    window.location.href = playStoreUrl;
-                }
-            }, 1000);
+            // 1. iOS / Mac OS Detection
+            if (/iPad|iPhone|iPod|Macintosh|Mac OS X/.test(userAgent) && !window.MSStream) {
+                window.location.href = "https://apps.apple.com/in/app/berger-my-colour/id6448659259";
+            } 
+            // 2. Android Detection
+            else if (/android/i.test(userAgent)) {
+                window.location.href = "https://play.google.com/store/apps/details?id=com.bergervis&pcampaignid=web_share";
+            } 
+            // 3. Fallback (Windows/Linux/Other)
+            else {
+                window.location.href = "https://play.google.com/store/apps/details?id=com.bergervis&pcampaignid=web_share";
+            }
         }
     </script>
 </body>
